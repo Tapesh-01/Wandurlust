@@ -52,6 +52,12 @@
         <div class="invalid-feedback">Location should be valid</div>
       </div>
 
+      <div class="mb-3">
+        <label for="maxGuests" class="form-label">Max Guests Allowed</label>
+        <input name="listing[maxGuests]" value="<%= listing.maxGuests || 10 %>" type="number" class="form-control" min="1" required />
+        <div class="form-text text-muted">How many guests can stay at your property?</div>
+      </div>
+
       <button class="btn btn-dark edit-btn mt-3">Edit</button>
     </form>
   </div>

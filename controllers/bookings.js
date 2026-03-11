@@ -24,6 +24,13 @@ module.exports.createBooking = async (req, res) => {
 
     const { checkIn, checkOut, guests } = req.body.booking;
 
+    // Validate guest count against listing's maxGuests
+    const maxGuests = listing.maxGuests || 10;
+    if (parseInt(guests) > maxGuests) {
+        req.flash("error", `This property allows a maximum of ${maxGuests} guests.`);
+        return res.redirect(`/listings/${id}/book`);
+    }
+
     // Calculate number of nights
     const checkInDate = new Date(checkIn);
     const checkOutDate = new Date(checkOut);

@@ -52,8 +52,9 @@
                         <div class="mb-3">
                             <label for="guests" class="form-label">Number of Guests</label>
                             <input type="number" class="form-control" id="guests" name="booking[guests]" min="1"
-                                value="1" required>
-                            <div class="invalid-feedback">Please enter number of guests (minimum 1)</div>
+                                max="<%= listing.maxGuests || 10 %>" value="1" required>
+                            <div class="form-text text-muted">Max <strong><%= listing.maxGuests || 10 %></strong> guests allowed for this property</div>
+                            <div class="invalid-feedback">Please enter number of guests (min 1, max <%= listing.maxGuests || 10 %>)</div>
                         </div>
 
                         <!-- Total Price Display -->
