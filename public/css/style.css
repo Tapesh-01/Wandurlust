@@ -1,0 +1,453 @@
+body {
+    font-family: "Plus Jakarta Sans", sans-serif !important;
+    font-optical-sizing: auto;
+    font-weight: weight;
+    font-style: normal;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    flex: 1;
+}
+
+.navbar {
+    height: 5rem;
+    background-color: white;
+}
+
+.fa-compass {
+    color: #fe424d;
+    font-size: 2rem;
+}
+
+.nav-link {
+    color: #222222 !important;
+}
+
+/* footer */
+
+footer {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+}
+
+.f-info-links a {
+    text-decoration: none;
+    color: #222222;
+}
+
+.f-info-links a:hover {
+    text-decoration: underline;
+}
+
+.f-info-links,
+.f-info-socials,
+.f-info-brand {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.f-info-socials i {
+    font-size: 1.2rem;
+    margin-right: 1rem;
+}
+
+.f-info {
+    text-align: center;
+    height: 8rem;
+    width: 100%;
+    background-color: #ebebeb;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: space-evenly;
+}
+
+/* cards */
+.card {
+    border: none !important;
+    margin-bottom: 2rem;
+}
+
+.card-listing {
+    border: none !important;
+    margin-bottom: 2rem;
+}
+
+.card-img-top {
+    border-radius: 1rem !important;
+    width: 100%;
+    object-fit: cover !important;
+}
+
+.card-body {
+    padding: 0 !important;
+}
+
+.card-text p {
+    font-weight: 400;
+}
+
+.listing-link {
+    text-decoration: none;
+}
+
+/* card effect */
+.card-img-overlay {
+    opacity: 0;
+}
+
+.card-img-overlay:hover {
+    opacity: 0.2;
+    background-color: white;
+}
+
+/* New Page */
+
+.add-btn {
+    background-color: #fe424d !important;
+    border: none !important;
+}
+
+/* Edit page */
+.edit-btn {
+    background-color: #fe424d !important;
+    border: none !important;
+}
+
+/* Show-Page */
+
+.show-img {
+    height: 30vh;
+}
+
+.btns {
+    display: flex;
+}
+
+.show-card {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* map */
+
+#map {
+    height: 400px;
+    width: 100%;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.map-section {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.map-section h3 {
+    margin-bottom: 1rem;
+    color: #222222;
+    font-weight: 600;
+}
+
+/* Fullscreen button styling */
+.leaflet-control-fullscreen a {
+    background-color: white;
+    color: #222222;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.leaflet-control-fullscreen a:hover {
+    background-color: #fe424d;
+    color: white;
+}
+
+.fullscreen-icon {
+    display: inline-block;
+}
+
+/* Layer control styling */
+.leaflet-control-layers {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.leaflet-control-layers-toggle {
+    background-color: white;
+    border-radius: 8px;
+}
+
+.leaflet-control-layers-expanded {
+    padding: 10px;
+    background-color: white;
+    border-radius: 8px;
+}
+
+.leaflet-control-layers label {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.leaflet-control-layers label:hover {
+    color: #fe424d;
+    font-weight: 500;
+}
+
+/* Geocoding search control styling */
+.leaflet-control-geocoder {
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    background: white;
+}
+
+.leaflet-control-geocoder-form {
+    background: white;
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.leaflet-control-geocoder-form input {
+    border-radius: 6px;
+    border: 2px solid #ddd;
+    padding: 10px 14px;
+    font-size: 15px;
+    width: 280px;
+    transition: all 0.3s ease;
+}
+
+.leaflet-control-geocoder-form input:focus {
+    outline: none;
+    border-color: #fe424d;
+    box-shadow: 0 0 0 3px rgba(254, 66, 77, 0.15);
+}
+
+.leaflet-control-geocoder-form button {
+    background-color: #fe424d;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.leaflet-control-geocoder-form button:hover {
+    background-color: #e63946;
+}
+
+.leaflet-control-geocoder-alternatives {
+    border-radius: 6px;
+    max-height: 250px;
+    overflow-y: auto;
+    margin-top: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.leaflet-control-geocoder-alternatives a {
+    padding: 10px 14px;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+}
+
+.leaflet-control-geocoder-alternatives a:hover {
+    background-color: #ffe5e7;
+    color: #fe424d;
+}
+
+.leaflet-control-geocoder-alternatives a:last-child {
+    border-bottom: none;
+}
+
+/* Expanded search box styling */
+.leaflet-control-geocoder-expanded {
+    width: auto !important;
+}
+
+
+/* search bar */
+.search-container {
+    width: 100%;
+    padding: 2rem 0 1rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.search-form {
+    width: 100%;
+    max-width: 800px;
+}
+
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border: 2px solid #dddddd;
+    border-radius: 2rem;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.search-wrapper:focus-within {
+    border-color: #fe424d;
+    box-shadow: 0 4px 12px rgba(254, 66, 77, 0.2);
+}
+
+.search-icon {
+    color: #717171;
+    font-size: 1.2rem;
+    margin-right: 0.8rem;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    padding: 0.5rem;
+    color: #222222;
+}
+
+.search-input::placeholder {
+    color: #717171;
+}
+
+.search-btn {
+    background-color: #fe424d;
+    color: white;
+    border: none;
+    border-radius: 1.5rem;
+    padding: 0.6rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.search-btn:hover {
+    background-color: #e03d47;
+    transform: scale(1.05);
+}
+
+.search-btn i {
+    font-size: 0.9rem;
+}
+
+.clear-search-btn {
+    background-color: #f7f7f7;
+    color: #222222;
+    border: none;
+    border-radius: 1.5rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: 0.5rem;
+}
+
+.clear-search-btn:hover {
+    background-color: #ebebeb;
+    color: #222222;
+}
+
+.clear-search-btn i {
+    font-size: 0.9rem;
+}
+
+/* Responsive search bar */
+@media (max-width: 768px) {
+    .search-wrapper {
+        flex-wrap: wrap;
+        padding: 0.8rem;
+    }
+
+    .search-input {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .search-btn,
+    .clear-search-btn {
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Booking Styles */
+
+.reserve-btn {
+    background-color: #fe424d !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.reserve-btn:hover {
+    background-color: #e03d47 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(254, 66, 77, 0.3);
+}
+
+.booking-form-card {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 1rem;
+}
+
+.booking-form-card .card-body {
+    padding: 2rem;
+}
+
+.total-price-display {
+    background-color: #f0f9ff;
+    border-color: #3b82f6;
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.booking-card {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+}
+
+.booking-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.booking-card .card-img-top {
+    border-radius: 1rem 1rem 0 0;
+}
+
+.booking-details {
+    font-size: 0.95rem;
+}
+
+.booking-details i {
+    color: #fe424d;
+    width: 20px;
+}

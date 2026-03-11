@@ -1,0 +1,149 @@
+<% layout("/layouts/boilerplate") %>
+
+    <div class="row mt-4">
+        <div class="col-8 offset-2">
+            <h3 class="mb-4">Reserve <%= listing.title %>
+            </h3>
+
+            <!-- Listing Summary Card -->
+            <div class="card mb-4">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="<%= listing.image.url %>" class="img-fluid rounded-start" alt="<%= listing.title %>"
+                            style="height: 200px; object-fit: cover; width: 100%;">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <%= listing.title %>
+                            </h5>
+                            <p class="card-text">
+                                <%= listing.location %>, <%= listing.country %>
+                            </p>
+                            <p class="card-text"><strong>&#8377;<%= listing.price.toLocaleString("en-IN") %></strong>
+                                per night</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Form -->
+            <div class="card booking-form-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Booking Details</h5>
+
+                    <form action="/listings/<%= listing._id %>/book" method="POST" novalidate class="needs-validation">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="checkIn" class="form-label">Check-in Date</label>
+                                <input type="date" class="form-control" id="checkIn" name="booking[checkIn]" required
+                                    min="<%= new Date().toISOString().split('T')[0] %>">
+                                <div class="invalid-feedback">Please select a check-in date</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="checkOut" class="form-label">Check-out Date</label>
+                                <input type="date" class="form-control" id="checkOut" name="booking[checkOut]" required
+                                    min="<%= new Date(Date.now() + 86400000).toISOString().split('T')[0] %>">
+                                <div class="invalid-feedback">Please select a check-out date</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="guests" class="form-label">Number of Guests</label>
+                            <input type="number" class="form-control" id="guests" name="booking[guests]" min="1"
+                                value="1" required>
+                            <div class="invalid-feedback">Please enter number of guests (minimum 1)</div>
+                        </div>
+
+                        <!-- Total Price Display -->
+                        <div class="alert alert-info total-price-display" role="alert" style="display: none;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>Total Price:</strong>
+                                    <div class="text-muted small" id="priceBreakdown"></div>
+                                </div>
+                                <div class="h4 mb-0" id="totalPrice">&#8377;0</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn reserve-btn">Confirm Booking</button>
+                            <a href="/listings/<%= listing._id %>" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const pricePerNight = <%= listing.price %>;
+        const checkInInput = document.getElementById('checkIn');
+        const checkOutInput = document.getElementById('checkOut');
+        const guestsInput = document.getElementById('guests');
+        const totalPriceDisplay = document.querySelector('.total-price-display');
+        const totalPriceElement = document.getElementById('totalPrice');
+        const priceBreakdownElement = document.getElementById('priceBreakdown');
+
+        function calculateTotal() {
+            const checkIn = new Date(checkInInput.value);
+            const checkOut = new Date(checkOutInput.value);
+
+            if (checkInInput.value && checkOutInput.value && checkOut > checkIn) {
+                const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+                const total = pricePerNight * nights;
+
+                totalPriceElement.textContent = '₹' + total.toLocaleString('en-IN');
+                priceBreakdownElement.textContent = `₹${pricePerNight.toLocaleString('en-IN')} × ${nights} night${nights > 1 ? 's' : ''}`;
+                totalPriceDisplay.style.display = 'block';
+            } else {
+                totalPriceDisplay.style.display = 'none';
+            }
+        }
+
+        // Update minimum checkout date when checkin changes
+        checkInInput.addEventListener('change', function () {
+            const checkInDate = new Date(this.value);
+            const minCheckOut = new Date(checkInDate);
+            minCheckOut.setDate(minCheckOut.getDate() + 1);
+            checkOutInput.min = minCheckOut.toISOString().split('T')[0];
+
+            // Reset checkout if it's before the new minimum
+            if (checkOutInput.value && new Date(checkOutInput.value) <= checkInDate) {
+                checkOutInput.value = '';
+            }
+
+            calculateTotal();
+        });
+
+        checkOutInput.addEventListener('change', calculateTotal);
+        guestsInput.addEventListener('input', calculateTotal);
+
+        // Form validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    const checkIn = new Date(checkInInput.value);
+                    const checkOut = new Date(checkOutInput.value);
+
+                    if (checkOut <= checkIn) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        checkOutInput.setCustomValidity('Check-out must be after check-in');
+                    } else {
+                        checkOutInput.setCustomValidity('');
+                    }
+
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>

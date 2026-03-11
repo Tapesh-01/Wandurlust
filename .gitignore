@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Practice/tutorial code
+classroom/
+
+# Environment variables (SENSITIVE - never push this!)
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+
+# Build output
+dist/
+build/
