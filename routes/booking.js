@@ -32,4 +32,11 @@ router.delete(
     wrapAsync(bookingController.cancelBooking)
 );
 
+// Host dashboard - show bookings on my listings
+router.get(
+    "/host/bookings",
+    isLoggedIn,
+    wrapAsync(bookingController.getHostBookings)
+);
+
 module.exports = router;

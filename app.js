@@ -14,6 +14,7 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
+const Listing = require("./models/listing.js");
 
 // -------------------- SESSION OPTIONS --------------------
 const sessionOptions = {
@@ -52,10 +53,19 @@ passport.deserializeUser(User.deserializeUser());
 
 
 // Make flash messages available in all templates
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
   res.locals.currUser = req.user;
+  res.locals.currUserIsHost = false;
+  try {
+    if (req.user) {
+      const count = await Listing.countDocuments({ owner: req.user._id });
+      res.locals.currUserIsHost = count > 0;
+    }
+  } catch (e) {
+    res.locals.currUserIsHost = false;
+  }
   next();
 });
 

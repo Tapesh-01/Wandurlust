@@ -1,0 +1,91 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="row mt-4">
+    <div class="col-10 offset-1">
+        <h3 class="mb-1"><i class="fa-solid fa-house-chimney"></i> Host Dashboard</h3>
+        <p class="text-muted mb-4">Bookings received on your listings</p>
+
+        <% if (listings.length === 0) { %>
+            <div class="text-center py-5">
+                <i class="fa-solid fa-house-circle-xmark" style="font-size: 4rem; color: #ccc;"></i>
+                <h4 class="mt-3 text-muted">You have no listings yet</h4>
+                <p class="text-muted">Create a listing to start hosting!</p>
+                <a href="/listings/new" class="btn reserve-btn mt-3">Add Listing</a>
+            </div>
+
+        <% } else if (bookings.length === 0) { %>
+            <div class="text-center py-5">
+                <i class="fa-regular fa-calendar-xmark" style="font-size: 4rem; color: #ccc;"></i>
+                <h4 class="mt-3 text-muted">No bookings yet on your listings</h4>
+                <p class="text-muted">When someone books your listing, it will appear here.</p>
+            </div>
+
+        <% } else { %>
+            <!-- Summary Cards -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card text-center p-3 border-0 shadow-sm">
+                        <h2 class="text-danger mb-0"><%= bookings.length %></h2>
+                        <p class="text-muted mb-0">Total Bookings</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center p-3 border-0 shadow-sm">
+                        <h2 class="text-success mb-0">
+                            ₹<%= bookings.reduce((sum, b) => sum + b.totalPrice, 0).toLocaleString('en-IN') %>
+                        </h2>
+                        <p class="text-muted mb-0">Total Earnings</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center p-3 border-0 shadow-sm">
+                        <h2 class="text-primary mb-0"><%= listings.length %></h2>
+                        <p class="text-muted mb-0">Your Listings</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bookings Table -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Listing</th>
+                                    <th>Guest</th>
+                                    <th>Check-in</th>
+                                    <th>Check-out</th>
+                                    <th>Guests</th>
+                                    <th>Total</th>
+                                    <th>Booked On</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for (let booking of bookings) { %>
+                                    <tr>
+                                        <td>
+                                            <a href="/listings/<%= booking.listing._id %>" class="text-decoration-none text-dark fw-semibold">
+                                                <img src="<%= booking.listing.image.url %>" alt="" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;" class="me-2">
+                                                <%= booking.listing.title %>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <i class="fa-solid fa-user text-muted me-1"></i>
+                                            <%= booking.user ? booking.user.username : "Unknown" %>
+                                        </td>
+                                        <td><%= new Date(booking.checkIn).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
+                                        <td><%= new Date(booking.checkOut).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
+                                        <td><%= booking.guests %></td>
+                                        <td class="text-success fw-bold">₹<%= booking.totalPrice.toLocaleString('en-IN') %></td>
+                                        <td class="text-muted small"><%= new Date(booking.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>

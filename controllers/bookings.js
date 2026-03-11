@@ -60,3 +60,17 @@ module.exports.cancelBooking = async (req, res) => {
     req.flash("success", "Booking cancelled successfully!");
     res.redirect("/bookings");
 };
+
+module.exports.getHostBookings = async (req, res) => {
+    // Find all listings owned by this user
+    const listings = await Listing.find({ owner: req.user._id });
+    const listingIds = listings.map(l => l._id);
+
+    // Find all bookings for those listings, populate guest & listing info
+    const bookings = await Booking.find({ listing: { $in: listingIds } })
+        .populate("listing")
+        .populate("user", "username email")
+        .sort({ createdAt: -1 });
+
+    res.render("bookings/host.ejs", { bookings, listings });
+};
