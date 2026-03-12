@@ -60,8 +60,18 @@ app.use(async (req, res, next) => {
   res.locals.currUserIsHost = false;
   try {
     if (req.user) {
-      const count = await Listing.countDocuments({ owner: req.user._id });
-      res.locals.currUserIsHost = count > 0;
+      const listings = await Listing.find({ owner: req.user._id });
+      res.locals.currUserIsHost = listings.length > 0;
+      
+      if (res.locals.currUserIsHost) {
+        const listingIds = listings.map(l => l._id);
+        const Booking = require('./models/booking.js'); // Require here to avoid circular dependency issues at top level
+        const newBookingsCount = await Booking.countDocuments({ 
+            listing: { $in: listingIds },
+            isNewBooking: true
+        });
+        res.locals.globalNewBookingsCount = newBookingsCount;
+      }
     }
   } catch (e) {
     res.locals.currUserIsHost = false;

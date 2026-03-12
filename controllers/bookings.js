@@ -31,9 +31,28 @@ module.exports.createBooking = async (req, res) => {
         return res.redirect(`/listings/${id}/book`);
     }
 
-    // Calculate number of nights
     const checkInDate = new Date(checkIn);
     const checkOutDate = new Date(checkOut);
+
+    // Check for date conflicts (overlapping bookings)
+    const existingBookings = await Booking.find({
+        listing: id,
+        $or: [
+            // Case 1: New check-in is during an existing booking
+            { checkIn: { $lte: checkInDate }, checkOut: { $gt: checkInDate } },
+            // Case 2: New check-out is during an existing booking
+            { checkIn: { $lt: checkOutDate }, checkOut: { $gte: checkOutDate } },
+            // Case 3: New booking completely envelops an existing booking
+            { checkIn: { $gte: checkInDate }, checkOut: { $lte: checkOutDate } }
+        ]
+    });
+
+    if (existingBookings.length > 0) {
+        req.flash("error", "Sorry, these dates are already booked! Please select different dates.");
+        return res.redirect(`/listings/${id}/book`);
+    }
+
+    // Calculate number of nights
     const nights = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
 
     // Calculate total price
@@ -79,5 +98,14 @@ module.exports.getHostBookings = async (req, res) => {
         .populate("user", "username email")
         .sort({ createdAt: -1 });
 
-    res.render("bookings/host.ejs", { bookings, listings });
+    // Count new bookings to send to the view
+    const newBookingsCount = bookings.filter(b => b.isNewBooking).length;
+
+    res.render("bookings/host.ejs", { bookings, listings, newBookingsCount });
+
+    // Mark all new bookings for this host as seen AFTER rendering
+    if (newBookingsCount > 0) {
+        const newBookingIds = bookings.filter(b => b.isNewBooking).map(b => b._id);
+        await Booking.updateMany({ _id: { $in: newBookingIds } }, { isNewBooking: false });
+    }
 };

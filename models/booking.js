@@ -29,6 +29,10 @@ const bookingSchema = new Schema({
         type: Number,
         required: true
     },
+    isNewBooking: {
+        type: Boolean,
+        default: true
+    },
     createdAt: {
         type: Date,
         default: Date.now

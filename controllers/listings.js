@@ -1,23 +1,27 @@
 const Listing = require("../models/listing");
 
 module.exports.index = async (req, res) => {
-  const { search } = req.query;
-  let allListings;
-
+  const { search, maxPrice } = req.query;
+  
+  let query = {};
+  
+  // 1. Build Text Search Condition
   if (search) {
-    // Search in title, location, and country fields (case-insensitive)
-    allListings = await Listing.find({
-      $or: [
-        { title: { $regex: search, $options: 'i' } },
-        { location: { $regex: search, $options: 'i' } },
-        { country: { $regex: search, $options: 'i' } }
-      ]
-    });
-  } else {
-    allListings = await Listing.find({});
+    query.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { location: { $regex: search, $options: 'i' } },
+      { country: { $regex: search, $options: 'i' } }
+    ];
   }
 
-  res.render("listings/index.ejs", { allListings, search });
+  // 2. Build Max Price Condition
+  if (maxPrice && !isNaN(maxPrice)) {
+    query.price = { $lte: parseInt(maxPrice) };
+  }
+
+  const allListings = await Listing.find(query);
+
+  res.render("listings/index.ejs", { allListings, search, maxPrice });
 };
 
 module.exports.renderNewForm = (req, res) => {

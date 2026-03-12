@@ -58,6 +58,7 @@
                                     <th>Check-out</th>
                                     <th>Guests</th>
                                     <th>Total</th>
+                                    <th>Status</th>
                                     <th>Booked On</th>
                                 </tr>
                             </thead>
@@ -78,6 +79,13 @@
                                         <td><%= new Date(booking.checkOut).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
                                         <td><%= booking.guests %></td>
                                         <td class="text-success fw-bold">₹<%= booking.totalPrice.toLocaleString('en-IN') %></td>
+                                        <td>
+                                            <% if (booking.isNewBooking) { %>
+                                                <span class="badge bg-danger rounded-pill">New!</span>
+                                            <% } else { %>
+                                                <span class="badge bg-secondary rounded-pill">Viewed</span>
+                                            <% } %>
+                                        </td>
                                         <td class="text-muted small"><%= new Date(booking.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
                                     </tr>
                                 <% } %>

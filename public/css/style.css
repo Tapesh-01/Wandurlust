@@ -319,6 +319,16 @@ footer {
     color: #222222;
 }
 
+/* Remove up/down spinners from number inputs */
+.search-input[type="number"]::-webkit-outer-spin-button,
+.search-input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.search-input[type="number"] {
+    -moz-appearance: textfield;
+}
+
 .search-input::placeholder {
     color: #717171;
 }

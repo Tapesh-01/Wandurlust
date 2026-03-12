@@ -41,8 +41,8 @@ module.exports.logout = (req, res, next) => {
         if (err) {
             return next(err);
         }
-        
         req.flash("success", "you are logged out!"); // Set a success flash message
         res.redirect("/listings"); // Redirect the user to the homepage or listings page
     });
 };
+
