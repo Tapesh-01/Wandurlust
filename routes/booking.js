@@ -18,6 +18,13 @@ router.post(
     wrapAsync(bookingController.createBooking)
 );
 
+// Simulate payment success/failure
+router.post(
+    "/bookings/simulate-payment",
+    isLoggedIn,
+    wrapAsync(bookingController.simulatePayment)
+);
+
 // Show all bookings for the logged-in user
 router.get(
     "/bookings",

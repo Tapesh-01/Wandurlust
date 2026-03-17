@@ -60,6 +60,7 @@
                                     <th>Total</th>
                                     <th>Status</th>
                                     <th>Booked On</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -87,6 +88,14 @@
                                             <% } %>
                                         </td>
                                         <td class="text-muted small"><%= new Date(booking.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
+                                        <td>
+                                            <form method="POST" action="/bookings/<%= booking._id %>?_method=DELETE">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                    onclick="return confirm('Are you sure you want to cancel this guest\'s booking?')">
+                                                    Cancel
+                                                </button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 <% } %>
                             </tbody>

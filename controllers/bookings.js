@@ -58,17 +58,43 @@ module.exports.createBooking = async (req, res) => {
     // Calculate total price
     const totalPrice = listing.price * nights;
 
+    // Create the Booking as "Pending" Payment
     const newBooking = new Booking({
         listing: id,
         user: req.user._id,
         checkIn: checkInDate,
         checkOut: checkOutDate,
         guests: guests,
-        totalPrice: totalPrice
+        totalPrice: totalPrice,
+        paymentStatus: "pending"
     });
 
     await newBooking.save();
-    req.flash("success", "Booking created successfully!");
+    
+    // Redirect to our PREIMUM simulated checkout page
+    res.render("bookings/payment.ejs", { 
+        booking: newBooking, 
+        amount: totalPrice,
+        listingTitle: listing.title
+    });
+};
+
+module.exports.simulatePayment = async (req, res) => {
+    const { booking_id, status } = req.body;
+
+    // Logic to simulate backend delay for "REAL" feel
+    if (status === "success") {
+        await Booking.findByIdAndUpdate(booking_id, {
+            paymentStatus: "paid"
+        });
+        req.flash("success", "Payment successful! Your booking is confirmed.");
+    } else {
+        await Booking.findByIdAndUpdate(booking_id, {
+            paymentStatus: "failed"
+        });
+        req.flash("error", "Payment failed. Please try booking again.");
+    }
+    
     res.redirect("/bookings");
 };
 

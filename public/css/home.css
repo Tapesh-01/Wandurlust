@@ -20,13 +20,20 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-image: url('/images/hero-image.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    overflow: hidden; /* Added to contain video */
     color: white;
     text-align: center;
+}
+
+#hero-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100vh; /* Swapped for rotation */
+    height: 100vw; /* Swapped for rotation */
+    object-fit: cover;
+    z-index: 0;
+    transform: translate(-50%, -50%) rotate(-90deg);
 }
 
 /* Enhanced gradient overlay for better text readability */
