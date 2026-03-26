@@ -10,46 +10,85 @@
       </div>
 
       <div class="navbar-nav mx-auto">
-        <form method="GET" action="/listings" class="d-flex search-form" role="search">
-          <div class="search-wrapper d-flex align-items-center">
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            
-            <input type="text" name="search" class="search-input" placeholder="Search destinations..."
-              value="<%= typeof search !== 'undefined' ? search : '' %>" />
-              
-            <div class="vr mx-2 bg-secondary opacity-25" style="width: 2px; height: 30px;"></div>
-            
-            <input type="number" name="maxPrice" class="search-input border-0 bg-transparent px-2 text-center" placeholder="Max Price (₹)"
-              value="<%= typeof maxPrice !== 'undefined' ? maxPrice : '' %>" min="1" style="width: 140px;" />
-              
-            <button type="submit" class="search-btn ms-1">
-              Search
-            </button>
-          </div>
+        <form method="GET" action="/listings" class="d-flex" role="search">
+          <input class="form-control me-2 search-input rounded-pill shadow-sm" type="search" name="search" placeholder="Search destinations..."
+              value="<%= typeof search !== 'undefined' ? search : '' %>" style="width: 250px;" />
+          <button type="submit" class="btn btn-danger rounded-pill px-4 shadow-sm">
+            <i class="fa-solid fa-magnifying-glass me-2"></i>Search
+          </button>
         </form>
       </div>
 
-      <div class="navbar-nav ms-auto">
-        <a class="nav-link" href="/listings/new">Add Listing</a>
-        <% if(currUser) {%>
-          <a class="nav-link" href="/bookings"><i class="fa-solid fa-calendar-days"></i> Your Bookings</a>
-          <% if(typeof currUserIsHost !== 'undefined' && currUserIsHost) { %>
-            <a class="nav-link" href="/host/bookings">
-              <i class="fa-solid fa-house-chimney"></i> Host Dashboard
+      <div class="navbar-nav ms-auto align-items-center">
+        <a class="nav-link me-3 d-none d-lg-block" href="/listings/new">Add Listing</a>
+        
+        <!-- Notification Dropdown -->
+        <div class="nav-item dropdown d-none d-md-block">
+          <div class="notification-bell" id="notificationMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-regular fa-bell"></i>
+            <% if(typeof globalNewBookingsCount !== 'undefined' && globalNewBookingsCount > 0) { %>
+              <div class="bell-badge"></div>
+            <% } %>
+          </div>
+          <ul class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationMenu">
+            <li class="dropdown-header d-flex justify-content-between align-items-center">
+              <span class="fs-6">Notifications</span>
               <% if(typeof globalNewBookingsCount !== 'undefined' && globalNewBookingsCount > 0) { %>
-                <span class="badge bg-danger rounded-pill"><%= globalNewBookingsCount %></span>
+                <span class="badge bg-danger rounded-pill"><%= globalNewBookingsCount %> New</span>
               <% } %>
-            </a>
-          <% } %>
-          <% } %>
-            <% if(!currUser) {%>
-              <a class="nav-link " href="/signup"><b>SignUp</b></a>
-              <a class="nav-link" href="/login"><b>Log in</b></a>
-              <%} %>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <% if(typeof globalNewBookings !== 'undefined' && globalNewBookings.length > 0) { %>
+              <% for(let booking of globalNewBookings) { %>
+                <li>
+                  <a class="dropdown-item notification-item" href="/host/bookings">
+                    <div class="d-flex align-items-start gap-3">
+                      <div class="noti-icon bg-info-subtle"><i class="fa-solid fa-calendar-check text-info"></i></div>
+                      <div>
+                        <p class="mb-0 fw-semibold text-wrap">New Booking: <%= booking.listing ? booking.listing.title : 'Listing' %></p>
+                        <small class="text-muted text-wrap"><%= booking.user ? booking.user.username : 'A guest' %> booked for <%= booking.guests %> guests.</small>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              <% } %>
+            <% } else { %>
+               <li><p class="dropdown-item text-center text-muted mb-0 py-3">No new notifications</p></li>
+            <% } %>
 
-                <% if(currUser) {%>
-                  <a class="nav-link" href="/logout"><b>Log out</b></a>
-                  <%} %>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-center text-primary fw-semibold py-2" href="/host/bookings">See All Activity</a></li>
+          </ul>
+        </div>
+
+        <!-- User Profile Dropdown -->
+        <div class="nav-item dropdown">
+          <div class="nav-user-menu" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+             <i class="fa-solid fa-bars" style="font-size: 0.9rem; color: #222222;"></i>
+             <div class="user-icon">
+                <i class="fa-solid fa-circle-user"></i>
+             </div>
+          </div>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+            <% if(!currUser) { %>
+              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#signupModal"><b>Sign up</b></a></li>
+              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Log in</a></li>
+            <% } else { %>
+              <li><h6 class="dropdown-header">Hello, <%= currUser.username %>!</h6></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/bookings">Your Bookings</a></li>
+              <% if(typeof currUserIsHost !== 'undefined' && currUserIsHost) { %>
+                <li><a class="dropdown-item" href="/host/bookings">Host Dashboard 
+                  <% if(typeof globalNewBookingsCount !== 'undefined' && globalNewBookingsCount > 0) { %>
+                    <span class="badge bg-danger rounded-pill ms-1"><%= globalNewBookingsCount %></span>
+                  <% } %>
+                </a></li>
+              <% } %>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="/logout">Log out</a></li>
+            <% } %>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

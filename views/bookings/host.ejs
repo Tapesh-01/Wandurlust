@@ -25,14 +25,19 @@
             <div class="row mb-4">
                 <div class="col-md-4">
                     <div class="card text-center p-3 border-0 shadow-sm">
-                        <h2 class="text-danger mb-0"><%= bookings.length %></h2>
+                        <h2 class="text-danger mb-0">
+                            <%= bookings.filter(b => (!b.status || b.status === 'active')).length %>
+                        </h2>
                         <p class="text-muted mb-0">Total Bookings</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card text-center p-3 border-0 shadow-sm">
                         <h2 class="text-success mb-0">
-                            ₹<%= bookings.reduce((sum, b) => sum + b.totalPrice, 0).toLocaleString('en-IN') %>
+                            ₹<%= bookings.reduce((sum, b) => {
+                                const isActive = !b.status || b.status === 'active';
+                                return isActive ? sum + b.totalPrice : sum;
+                            }, 0).toLocaleString('en-IN') %>
                         </h2>
                         <p class="text-muted mb-0">Total Earnings</p>
                     </div>
@@ -59,6 +64,7 @@
                                     <th>Guests</th>
                                     <th>Total</th>
                                     <th>Status</th>
+                                    <th>Condition</th>
                                     <th>Booked On</th>
                                     <th>Action</th>
                                 </tr>
@@ -87,14 +93,55 @@
                                                 <span class="badge bg-secondary rounded-pill">Viewed</span>
                                             <% } %>
                                         </td>
+                                        <td>
+                                            <% if (booking.status === 'cancelled_by_host') { %>
+                                                <span class="text-danger fw-bold"><i class="fa-solid fa-ban"></i> You Cancelled</span>
+                                            <% } else if (booking.status === 'cancelled_by_guest') { %>
+                                                <span class="text-warning fw-bold"><i class="fa-solid fa-user-xmark"></i> Guest Cancelled</span>
+                                            <% } else { %>
+                                                <% if (new Date() > new Date(booking.checkOut)) { %>
+                                                    <span class="text-info fw-bold" style="color: #00838f !important;"><i class="fa-solid fa-clock-rotate-left"></i> Completed</span>
+                                                <% } else { %>
+                                                    <span class="text-success fw-bold"><i class="fa-solid fa-circle-check"></i> Active</span>
+                                                <% } %>
+                                            <% } %>
+                                        </td>
                                         <td class="text-muted small"><%= new Date(booking.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
                                         <td>
-                                            <form method="POST" action="/bookings/<%= booking._id %>?_method=DELETE">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                                    onclick="return confirm('Are you sure you want to cancel this guest\'s booking?')">
+                                            <% 
+                                              const isPast = new Date() > new Date(booking.checkOut); 
+                                              const isActive = !booking.status || booking.status === 'active';
+                                            %>
+                                            <% if (isActive && !isPast) { %>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#hostCancelModal-<%= booking._id %>">
                                                     Cancel
                                                 </button>
-                                            </form>
+                                                
+                                                <!-- Host Cancel Modal -->
+                                                <div class="modal fade" id="hostCancelModal-<%= booking._id %>" tabindex="-1" aria-labelledby="hostCancelModalLabel-<%= booking._id %>" aria-hidden="true">
+                                                  <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                      <div class="modal-header border-0 pb-0">
+                                                        <h5 class="modal-title text-danger" id="hostCancelModalLabel-<%= booking._id %>"><i class="fa-solid fa-triangle-exclamation"></i> Cancel Guest Booking</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                      </div>
+                                                      <div class="modal-body pb-2 text-start p-3 text-wrap text-break" style="max-height: 200px; overflow-y: auto;">
+                                                        Are you sure you want to cancel the booking for <b style="color:black;"><%= booking.user ? booking.user.username : 'Unknown' %></b> at <b style="color:black;"><%= booking.listing.title %></b>?
+                                                      </div>
+                                                      <div class="modal-footer border-0 pt-0">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Booking</button>
+                                                        <form method="POST" action="/bookings/<%= booking._id %>?_method=DELETE" id="hostCancelForm-<%= booking._id %>" class="m-0" onsubmit="event.preventDefault(); const form = this; const btn = form.querySelector('button'); btn.disabled = true; btn.innerHTML = '<i class=\'fa-solid fa-spinner fa-spin\'></i> Cancelling...'; setTimeout(() => { form.submit(); }, 3000);">
+                                                            <button type="submit" class="btn btn-danger">Yes, Cancel Booking</button>
+                                                        </form>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                            <% } else if (!isActive) { %>
+                                                <button class="btn btn-sm btn-outline-secondary" disabled>Cancelled</button>
+                                            <% } else { %>
+                                                <button class="btn btn-sm btn-outline-secondary" disabled>Completed</button>
+                                            <% } %>
                                         </td>
                                     </tr>
                                 <% } %>

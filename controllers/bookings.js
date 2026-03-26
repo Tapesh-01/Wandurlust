@@ -37,6 +37,7 @@ module.exports.createBooking = async (req, res) => {
     // Check for date conflicts (overlapping bookings)
     const existingBookings = await Booking.find({
         listing: id,
+        status: { $nin: ['cancelled_by_guest', 'cancelled_by_host'] }, // Ignore cancelled bookings
         $or: [
             // Case 1: New check-in is during an existing booking
             { checkIn: { $lte: checkInDate }, checkOut: { $gt: checkInDate } },
@@ -100,7 +101,10 @@ module.exports.simulatePayment = async (req, res) => {
 
 module.exports.showUserBookings = async (req, res) => {
     const bookings = await Booking.find({ user: req.user._id })
-        .populate("listing")
+        .populate({
+            path: 'listing',
+            populate: { path: 'owner' } // Need owner to show who canceled
+        })
         .sort({ createdAt: -1 });
 
     res.render("bookings/index.ejs", { bookings });
@@ -108,9 +112,36 @@ module.exports.showUserBookings = async (req, res) => {
 
 module.exports.cancelBooking = async (req, res) => {
     let { id } = req.params;
-    await Booking.findByIdAndDelete(id);
-    req.flash("success", "Booking cancelled successfully!");
-    res.redirect("/bookings");
+    const booking = await Booking.findById(id).populate("listing");
+    
+    if (!booking) {
+        req.flash("error", "Booking not found.");
+        return res.redirect("/bookings");
+    }
+
+    // Determine who is cancelling
+    if (req.user._id.equals(booking.user)) {
+        // Enforce 1-hour limit for guests
+        const ONE_HOUR = 60 * 60 * 1000;
+        if (Date.now() - new Date(booking.createdAt).getTime() > ONE_HOUR) {
+            req.flash("error", "You can only cancel a booking within 1 hour of making it.");
+            return res.redirect("/bookings");
+        }
+        booking.status = 'cancelled_by_guest';
+        req.flash("success", "You have successfully cancelled your booking.");
+    } else if (req.user._id.equals(booking.listing.owner)) {
+        booking.status = 'cancelled_by_host';
+        req.flash("success", "You have cancelled the guest's booking.");
+    } else {
+        req.flash("error", "Unauthorized action.");
+        return res.redirect("/bookings");
+    }
+
+    await booking.save();
+    
+    // Redirect back to the page they came from
+    const redirectUrl = req.headers.referer || "/bookings";
+    res.redirect(redirectUrl);
 };
 
 module.exports.getHostBookings = async (req, res) => {

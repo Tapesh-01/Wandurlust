@@ -56,14 +56,65 @@
                                                         booking.totalPrice.toLocaleString('en-IN') %></span>
                                             </div>
 
+                                            <div class="mb-3">
+                                                <% if (booking.status === 'cancelled_by_host') { %>
+                                                    <div class="alert alert-danger py-2 mb-0">
+                                                        <i class="fa-solid fa-circle-exclamation"></i> Cancelled by Host
+                                                    </div>
+                                                <% } else if (booking.status === 'cancelled_by_guest') { %>
+                                                    <div class="alert alert-secondary py-2 mb-0">
+                                                        <i class="fa-solid fa-ban"></i> Cancelled
+                                                    </div>
+                                                <% } else { %>
+                                                    <% if (new Date() > new Date(booking.checkOut)) { %>
+                                                        <div class="alert alert-info py-2 mb-0" style="background-color: #e0f7fa; color: #00838f; border-color: #b2ebf2;">
+                                                            <i class="fa-solid fa-clock-rotate-left"></i> Completed
+                                                        </div>
+                                                    <% } else { %>
+                                                        <div class="alert alert-success py-2 mb-0">
+                                                            <i class="fa-solid fa-circle-check"></i> Active
+                                                        </div>
+                                                    <% } %>
+                                                <% } %>
+                                            </div>
+
                                             <div class="d-flex gap-2">
                                                 <a href="/listings/<%= booking.listing._id %>"
                                                     class="btn btn-sm btn-outline-dark flex-grow-1">View Listing</a>
-                                                <form method="POST" action="/bookings/<%= booking._id %>?_method=DELETE"
-                                                    class="flex-grow-1">
-                                                    <button type="submit" class="btn btn-sm btn-danger w-100"
-                                                        onclick="return confirm('Are you sure you want to cancel this booking?')">Cancel</button>
-                                                </form>
+                                                <% 
+                                                   const ONE_HOUR = 60 * 60 * 1000;
+                                                   const canCancel = (Date.now() - new Date(booking.createdAt).getTime()) <= ONE_HOUR;
+                                                   const isPast = new Date() > new Date(booking.checkOut);
+                                                   const isActive = !booking.status || booking.status === 'active';
+                                                %>
+                                                <% if (isActive && !isPast) { %>
+                                                    <% if (canCancel) { %>
+                                                        <button type="button" class="btn btn-sm btn-danger w-100 flex-grow-1" data-bs-toggle="modal" data-bs-target="#cancelModal-<%= booking._id %>">Cancel</button>
+                                                        
+                                                        <!-- Cancel Modal -->
+                                                        <div class="modal fade" id="cancelModal-<%= booking._id %>" tabindex="-1" aria-labelledby="cancelModalLabel-<%= booking._id %>" aria-hidden="true">
+                                                          <div class="modal-dialog modal-dialog-centered">
+                                                            <div class="modal-content">
+                                                              <div class="modal-header border-0 pb-0">
+                                                                <h5 class="modal-title text-danger" id="cancelModalLabel-<%= booking._id %>"><i class="fa-solid fa-triangle-exclamation"></i> Cancel Booking</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                              </div>
+                                                              <div class="modal-body pb-2 text-start">
+                                                                Are you sure you want to cancel your booking for <b style="color:black;"><%= booking.listing.title %></b>?
+                                                              </div>
+                                                              <div class="modal-footer border-0 pt-0">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Booking</button>
+                                                                <form method="POST" action="/bookings/<%= booking._id %>?_method=DELETE" id="cancelForm-<%= booking._id %>" class="m-0" onsubmit="event.preventDefault(); const form = this; const btn = form.querySelector('button'); btn.disabled = true; btn.innerHTML = '<i class=\'fa-solid fa-spinner fa-spin\'></i> Cancelling...'; setTimeout(() => { form.submit(); }, 3000);">
+                                                                    <button type="submit" class="btn btn-danger">Yes, Cancel</button>
+                                                                </form>
+                                                              </div>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                    <% } else { %>
+                                                        <button class="btn btn-sm btn-outline-secondary flex-grow-1 w-100" disabled title="Cancellation window expired (1 hour)">Cancel Unavailable</button>
+                                                    <% } %>
+                                                <% } %>
                                             </div>
                                         </div>
                                     </div>

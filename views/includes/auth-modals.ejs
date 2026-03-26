@@ -1,0 +1,85 @@
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h4 class="modal-title fw-bold" id="loginModalLabel">Welcome to Wandurlust</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-4 py-4">
+        <form action="/login" method="POST" class="needs-validation" novalidate>
+          <input type="hidden" name="redirectUrl" id="loginRedirectUrl" value="">
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="modalUsername" name="username" placeholder="Username" required>
+            <label for="modalUsername">Username</label>
+            <div class="invalid-feedback">Please enter your username.</div>
+          </div>
+          <div class="form-floating mb-4">
+            <input type="password" class="form-control" id="modalPassword" name="password" placeholder="Password" required>
+            <label for="modalPassword">Password</label>
+            <div class="invalid-feedback">Please enter your password.</div>
+          </div>
+          <button type="submit" class="btn btn-danger w-100 py-2 fs-5 fw-semibold mb-3 rounded-3 shadow-sm">Log In</button>
+        </form>
+        <div class="text-center mt-2">
+          <span class="text-muted">Don't have an account?</span>
+          <a href="#" class="text-danger text-decoration-none fw-bold ms-1" data-bs-toggle="modal" data-bs-target="#signupModal">Sign up</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Signup Modal -->
+<div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h4 class="modal-title fw-bold" id="signupModalLabel">Join Wandurlust</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-4 py-4">
+        <form action="/signup" method="POST" class="needs-validation" novalidate>
+          <input type="hidden" name="redirectUrl" id="signupRedirectUrl" value="">
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="modalSignupUsername" name="username" placeholder="Username" required>
+            <label for="modalSignupUsername">Username</label>
+            <div class="invalid-feedback">Username is required.</div>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="email" class="form-control" id="modalSignupEmail" name="email" placeholder="name@example.com" required>
+            <label for="modalSignupEmail">Email address</label>
+            <div class="invalid-feedback">Please provide a valid email.</div>
+          </div>
+          <div class="form-floating mb-4">
+            <input type="password" class="form-control" id="modalSignupPassword" name="password" placeholder="Password" required>
+            <label for="modalSignupPassword">Password</label>
+            <div class="invalid-feedback">Password is required.</div>
+          </div>
+          <button type="submit" class="btn btn-danger w-100 py-2 fs-5 fw-semibold mb-3 rounded-3 shadow-sm">Sign Up</button>
+        </form>
+        <div class="text-center mt-2">
+          <span class="text-muted">Already have an account?</span>
+          <a href="#" class="text-danger text-decoration-none fw-bold ms-1" data-bs-toggle="modal" data-bs-target="#loginModal">Log in</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const path = window.location.pathname;
+    let targetUrl = path;
+    
+    // If on a listing details page, logging in / signing up from modals should aggressively push them to the reserve page
+    if (path.match(/^\/listings\/[a-fA-F0-9]{24}$/)) {
+        targetUrl = path + '/book';
+    }
+    
+    const loginInp = document.getElementById('loginRedirectUrl');
+    const signupInp = document.getElementById('signupRedirectUrl');
+    if (loginInp) loginInp.value = targetUrl;
+    if (signupInp) signupInp.value = targetUrl;
+});
+</script>

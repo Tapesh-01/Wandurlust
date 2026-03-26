@@ -1,8 +1,39 @@
+:root {
+    --bg-color: #ffffff;
+    --text-color: #222222;
+    --secondary-text: #717171;
+    --card-bg: #ffffff;
+    --navbar-bg: rgba(255, 255, 255, 0.95);
+    --footer-bg: #ebebeb;
+    --border-color: #dddddd;
+    --input-bg: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.08);
+    --accent-color: #fe424d;
+    --accent-hover: #e03d47;
+    --glass-blur: blur(10px);
+    --card-shadow-hover: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] {
+    --bg-color: #0f172a;
+    --text-color: #f1f5f9;
+    --secondary-text: #94a3b8;
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --navbar-bg: rgba(15, 23, 42, 0.9);
+    --footer-bg: #1e293b;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --input-bg: #1e293b;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    --accent-color: #fe424d;
+    --accent-hover: #ff5a5f;
+    --card-shadow-hover: rgba(0, 0, 0, 0.6);
+}
+
 body {
     font-family: "Plus Jakarta Sans", sans-serif !important;
-    font-optical-sizing: auto;
-    font-weight: weight;
-    font-style: normal;
+    background-color: var(--bg-color) !important;
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -14,20 +45,30 @@ body {
 
 .navbar {
     height: 5rem;
-    background-color: white;
+    background-color: var(--navbar-bg) !important;
+    backdrop-filter: var(--glass-blur);
+    border-bottom: 1px solid var(--border-color) !important;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.navbar-scrolled {
+    box-shadow: 0 1px 12px var(--shadow-color) !important;
 }
 
 .fa-compass {
-    color: #fe424d;
+    color: var(--accent-color);
     font-size: 2rem;
 }
 
 .nav-link {
-    color: #222222 !important;
+    color: var(--text-color) !important;
+}
+
+.nav-link:hover {
+    color: var(--accent-color) !important;
 }
 
 /* footer */
-
 footer {
     width: 100vw;
     position: relative;
@@ -35,15 +76,14 @@ footer {
     right: 50%;
     margin-left: -50vw;
     margin-right: -50vw;
+    margin-top: auto;
 }
 
-.f-info-links a {
-    text-decoration: none;
-    color: #222222;
-}
-
-.f-info-links a:hover {
-    text-decoration: underline;
+.f-info {
+    text-align: center;
+    padding: 2rem 1rem;
+    background-color: var(--footer-bg);
+    color: var(--secondary-text);
 }
 
 .f-info-links,
@@ -53,38 +93,36 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-bottom: 0.5rem;
+}
+
+.f-info-links a {
+    text-decoration: none;
+    color: var(--text-color);
+    transition: color 0.2s;
+}
+
+.f-info-links a:hover {
+    text-decoration: underline;
+    color: var(--accent-color);
 }
 
 .f-info-socials i {
     font-size: 1.2rem;
     margin-right: 1rem;
+    color: var(--text-color);
+    cursor: pointer;
 }
 
-.f-info {
-    text-align: center;
-    height: 8rem;
-    width: 100%;
-    background-color: #ebebeb;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: space-evenly;
-}
-
-/* cards */
+/* Base Cards */
 .card {
-    border: none !important;
-    margin-bottom: 2rem;
-}
-
-.card-listing {
     border: none !important;
     margin-bottom: 2rem;
 }
 
 .card-img-top {
     border-radius: 1rem !important;
-    width: 100%;
+    width: 100% !important;
     object-fit: cover !important;
 }
 
@@ -93,38 +131,14 @@ footer {
 }
 
 .card-text p {
-    font-weight: 400;
+    font-weight: 400 !important;
 }
 
 .listing-link {
     text-decoration: none;
 }
 
-/* card effect */
-.card-img-overlay {
-    opacity: 0;
-}
-
-.card-img-overlay:hover {
-    opacity: 0.2;
-    background-color: white;
-}
-
-/* New Page */
-
-.add-btn {
-    background-color: #fe424d !important;
-    border: none !important;
-}
-
-/* Edit page */
-.edit-btn {
-    background-color: #fe424d !important;
-    border: none !important;
-}
-
-/* Show-Page */
-
+/* Show Page Specifics */
 .show-img {
     height: 30vh;
 }
@@ -138,326 +152,222 @@ footer {
     padding-right: 0;
 }
 
-/* map */
-
-#map {
-    height: 400px;
-    width: 100%;
-    border-radius: 1rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.map-section {
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-}
-
-.map-section h3 {
-    margin-bottom: 1rem;
-    color: #222222;
-    font-weight: 600;
-}
-
-/* Fullscreen button styling */
-.leaflet-control-fullscreen a {
-    background-color: white;
-    color: #222222;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-}
-
-.leaflet-control-fullscreen a:hover {
-    background-color: #fe424d;
-    color: white;
-}
-
-.fullscreen-icon {
-    display: inline-block;
-}
-
-/* Layer control styling */
-.leaflet-control-layers {
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.leaflet-control-layers-toggle {
-    background-color: white;
-    border-radius: 8px;
-}
-
-.leaflet-control-layers-expanded {
-    padding: 10px;
-    background-color: white;
-    border-radius: 8px;
-}
-
-.leaflet-control-layers label {
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.leaflet-control-layers label:hover {
-    color: #fe424d;
-    font-weight: 500;
-}
-
-/* Geocoding search control styling */
-.leaflet-control-geocoder {
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
-    background: white;
-}
-
-.leaflet-control-geocoder-form {
-    background: white;
-    border-radius: 8px;
-    padding: 4px;
-}
-
-.leaflet-control-geocoder-form input {
-    border-radius: 6px;
-    border: 2px solid #ddd;
-    padding: 10px 14px;
-    font-size: 15px;
-    width: 280px;
-    transition: all 0.3s ease;
-}
-
-.leaflet-control-geocoder-form input:focus {
-    outline: none;
-    border-color: #fe424d;
-    box-shadow: 0 0 0 3px rgba(254, 66, 77, 0.15);
-}
-
-.leaflet-control-geocoder-form button {
-    background-color: #fe424d;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 14px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.leaflet-control-geocoder-form button:hover {
-    background-color: #e63946;
-}
-
-.leaflet-control-geocoder-alternatives {
-    border-radius: 6px;
-    max-height: 250px;
-    overflow-y: auto;
-    margin-top: 4px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.leaflet-control-geocoder-alternatives a {
-    padding: 10px 14px;
-    transition: background-color 0.2s;
-    border-bottom: 1px solid #f0f0f0;
-    font-size: 14px;
-}
-
-.leaflet-control-geocoder-alternatives a:hover {
-    background-color: #ffe5e7;
-    color: #fe424d;
-}
-
-.leaflet-control-geocoder-alternatives a:last-child {
-    border-bottom: none;
-}
-
-/* Expanded search box styling */
-.leaflet-control-geocoder-expanded {
-    width: auto !important;
-}
 
 
-/* search bar */
-.search-container {
-    width: 100%;
-    padding: 2rem 0 1rem 0;
-    display: flex;
-    justify-content: center;
-}
-
-.search-form {
-    width: 100%;
-    max-width: 800px;
-}
-
-.search-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    background-color: white;
-    border: 2px solid #dddddd;
-    border-radius: 2rem;
-    padding: 0.5rem 1rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
-
-.search-wrapper:focus-within {
-    border-color: #fe424d;
-    box-shadow: 0 4px 12px rgba(254, 66, 77, 0.2);
-}
-
-.search-icon {
-    color: #717171;
-    font-size: 1.2rem;
-    margin-right: 0.8rem;
-}
-
-.search-input {
-    flex: 1;
-    border: none;
-    outline: none;
-    font-size: 1rem;
-    padding: 0.5rem;
-    color: #222222;
-}
-
-/* Remove up/down spinners from number inputs */
-.search-input[type="number"]::-webkit-outer-spin-button,
-.search-input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-.search-input[type="number"] {
-    -moz-appearance: textfield;
-}
-
-.search-input::placeholder {
-    color: #717171;
-}
-
-.search-btn {
-    background-color: #fe424d;
-    color: white;
-    border: none;
-    border-radius: 1.5rem;
-    padding: 0.6rem 1.5rem;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.search-btn:hover {
-    background-color: #e03d47;
-    transform: scale(1.05);
-}
-
-.search-btn i {
-    font-size: 0.9rem;
-}
-
-.clear-search-btn {
-    background-color: #f7f7f7;
-    color: #222222;
-    border: none;
-    border-radius: 1.5rem;
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-left: 0.5rem;
-}
-
-.clear-search-btn:hover {
-    background-color: #ebebeb;
-    color: #222222;
-}
-
-.clear-search-btn i {
-    font-size: 0.9rem;
-}
-
-/* Responsive search bar */
-@media (max-width: 768px) {
-    .search-wrapper {
-        flex-wrap: wrap;
-        padding: 0.8rem;
-    }
-
-    .search-input {
-        width: 100%;
-        margin-bottom: 0.5rem;
-    }
-
-    .search-btn,
-    .clear-search-btn {
-        font-size: 0.85rem;
-        padding: 0.5rem 1rem;
-    }
-}
-
-/* Booking Styles */
-
-.reserve-btn {
-    background-color: #fe424d !important;
-    border: none !important;
+/* Buttons */
+.add-btn, .edit-btn, .reserve-btn {
+    background-color: var(--accent-color) !important;
     color: white !important;
-    font-weight: 600;
-    padding: 0.75rem 2rem;
+    border: none !important;
     border-radius: 0.5rem;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
     transition: all 0.3s ease;
 }
 
-.reserve-btn:hover {
-    background-color: #e03d47 !important;
+.add-btn:hover, .edit-btn:hover, .reserve-btn:hover {
+    background-color: var(--accent-hover) !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(254, 66, 77, 0.3);
 }
 
-.booking-form-card {
+
+
+.search-input {
+    background-color: transparent !important;
     border: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 1rem;
+    outline: none;
+    color: var(--text-color);
+    padding: 0.5rem;
 }
 
-.booking-form-card .card-body {
-    padding: 2rem;
+.search-input::placeholder {
+    color: var(--secondary-text);
+}
+
+.search-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border-radius: 1.5rem;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+}
+
+/* Profile Menu */
+.nav-user-menu {
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-color) !important;
+    color: var(--text-color);
+    border-radius: 2rem;
+    padding: 5px 5px 5px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nav-user-menu:hover {
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.user-icon {
+    font-size: 1.8rem;
+    color: var(--secondary-text);
+}
+
+.dropdown-menu {
+    background-color: var(--bg-color) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 4px 12px var(--shadow-color) !important;
+    border-radius: 1rem !important;
+}
+
+.dropdown-item {
+    color: var(--text-color) !important;
+}
+
+.dropdown-item:hover {
+    background-color: var(--footer-bg) !important;
+}
+
+.notification-bell {
+    color: var(--text-color);
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.notification-bell:hover {
+    background-color: var(--footer-bg);
+}
+
+/* Notification Dropdown Custom Styles */
+.notification-dropdown {
+    width: 320px;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.notification-item {
+    padding: 1rem !important;
+    white-space: normal !important;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s;
+}
+
+.notification-item:hover {
+    background-color: var(--footer-bg) !important;
+}
+
+.noti-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+[data-theme="dark"] .bg-info-subtle { background-color: rgba(13, 202, 240, 0.15) !important; }
+[data-theme="dark"] .bg-success-subtle { background-color: rgba(25, 135, 84, 0.15) !important; }
+
+.notification-bell::after {
+    display: none !important;
+}
+.theme-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.3s ease;
+    margin-right: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle-btn:hover {
+    background-color: var(--footer-bg);
+}
+
+.theme-toggle-btn:active {
+    transform: scale(0.9);
+}
+
+/* Map */
+#map {
+    height: 400px;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+[data-theme="dark"] .leaflet-tile-pane {
+    filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+/* Booking Cards */
+.booking-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px var(--shadow-color);
 }
 
 .total-price-display {
-    background-color: #f0f9ff;
-    border-color: #3b82f6;
-    border-radius: 0.75rem;
-    padding: 1rem;
+    background-color: var(--card-bg);
+    border: 1px solid var(--accent-color);
+    color: var(--text-color);
 }
 
-.booking-card {
-    border: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 1rem;
-    transition: all 0.3s ease;
+/* Utility */
+.text-muted {
+    color: var(--secondary-text) !important;
 }
 
-.booking-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+.border-bottom {
+    border-bottom-color: var(--border-color) !important;
 }
 
-.booking-card .card-img-top {
-    border-radius: 1rem 1rem 0 0;
+/* Global Dark Overrides */
+[data-theme="dark"] .bg-light,
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .container,
+[data-theme="dark"] .container-fluid,
+[data-theme="dark"] .row,
+[data-theme="dark"] .col,
+[data-theme="dark"] .list-group-item {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
 }
 
-.booking-details {
-    font-size: 0.95rem;
+[data-theme="dark"] .card {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
 }
 
-.booking-details i {
-    color: #fe424d;
-    width: 20px;
+[data-theme="dark"] .dropdown-menu {
+    background-color: var(--footer-bg) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .listing-link:hover .card-img-overlay {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.filter {
+    transition: all 0.2s ease;
+}
+
+.filter:hover {
+    color: var(--accent-color) !important;
+}
+
+/* Ensure body background is always prioritized */
+html[data-theme="dark"], 
+html[data-theme="dark"] body {
+    background-color: var(--bg-color) !important;
 }

@@ -66,11 +66,19 @@ app.use(async (req, res, next) => {
       if (res.locals.currUserIsHost) {
         const listingIds = listings.map(l => l._id);
         const Booking = require('./models/booking.js'); // Require here to avoid circular dependency issues at top level
+        
         const newBookingsCount = await Booking.countDocuments({ 
             listing: { $in: listingIds },
             isNewBooking: true
         });
+        
+        const latestNewBookings = await Booking.find({ 
+            listing: { $in: listingIds },
+            isNewBooking: true
+        }).populate("listing", "title").populate("user", "username").sort({ createdAt: -1 }).limit(5);
+
         res.locals.globalNewBookingsCount = newBookingsCount;
+        res.locals.globalNewBookings = latestNewBookings;
       }
     }
   } catch (e) {

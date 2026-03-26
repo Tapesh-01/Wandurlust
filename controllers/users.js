@@ -7,7 +7,7 @@ module.exports.renderSignupForm = (req, res) => {
 
 module.exports.signup = async (req, res) => {
     try{
-         let {username, email, password} = req.body;
+         let {username, email, password, redirectUrl} = req.body;
          const newUser = new User({email, username});
          const registeredUser = await User.register(newUser, password);
          console.log(registeredUser);
@@ -17,7 +17,7 @@ module.exports.signup = async (req, res) => {
                 return(next);
             }
          req.flash("success", "Welcome to Wanderlust!");
-         res.redirect(req.session.redirectUrl || "/listings");
+         res.redirect(req.session.redirectUrl || redirectUrl || "/listings");
         });
     } catch(e){
         req.flash("error", e.message);
@@ -32,7 +32,7 @@ module.exports.renderLoginForm = (req, res)  =>  {
 
 module.exports.login =  async (req, res) =>  {
     req.flash("success","Welcome to Wandurlust! You are logged in");
-    let redirectUrl = res.locals.redirectUrl || "/listings";
+    let redirectUrl = res.locals.redirectUrl || req.body.redirectUrl || "/listings";
     res.redirect(redirectUrl);
 };
 
