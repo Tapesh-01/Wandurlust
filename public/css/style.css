@@ -232,10 +232,22 @@ footer {
 }
 
 .notification-bell {
+    position: relative;
     color: var(--text-color);
     padding: 8px;
     border-radius: 50%;
     transition: background-color 0.2s;
+}
+
+.bell-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 10px;
+    height: 10px;
+    background-color: var(--accent-color);
+    border-radius: 50%;
+    border: 1.5px solid var(--bg-color);
 }
 
 .notification-bell:hover {
