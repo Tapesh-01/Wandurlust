@@ -16,11 +16,19 @@
       margin-right: 2rem;
       margin-top: 2rem;
       opacity: 0.7;
+      text-decoration: none;
+      color: inherit;
     }
 
-    .filter:hover {
+    .filter:hover, .filter.active {
       opacity: 1;
       cursor: pointer;
+      color: #fe424d;
+    }
+    
+    .filter.active {
+      border-bottom: 2px solid #fe424d;
+      padding-bottom: 5px;
     }
 
     .filter p {
@@ -51,50 +59,52 @@
 
 
   <div id="filters">
-    <div class="filter">
+    <% const currentCat = typeof category !== 'undefined' ? category : ''; %>
+    
+    <a href="/listings?category=Trending" class="filter <%= currentCat === 'Trending' ? 'active' : '' %>">
       <div><i class="fa-solid fa-fire"></i></div>
       <p>Trending</p>
-    </div>
-    <div class="filter">
+    </a>
+    <a href="/listings?category=Rooms" class="filter <%= currentCat === 'Rooms' ? 'active' : '' %>">
       <div><i class="fa-solid fa-bed"></i></div>
       <p>Rooms</p>
-    </div>
-    <div class="filter">
+    </a>
+    <a href="/listings?category=Iconic Cities" class="filter <%= currentCat === 'Iconic Cities' ? 'active' : '' %>">
       <div><i class="fa-solid fa-mountain-city"></i></div>
       <p>Iconic Cities</p>
-    </div>
-    <div class="filter">
+    </a>
+    <a href="/listings?category=Mountains" class="filter <%= currentCat === 'Mountains' ? 'active' : '' %>">
       <div><i class="fa-solid fa-mountain"></i></div>
       <p>Mountains</p>
-    </div>
-    <div class="filter">
+    </a>
+    <a href="/listings?category=Castels" class="filter <%= currentCat === 'Castels' ? 'active' : '' %>">
       <div><i class="fa-solid fa-fort-awesome"></i></div>
       <p>Castels</p>
-    </div>
-    <div class="filter">
+    </a>
+    <a href="/listings?category=Amezing Pool" class="filter <%= currentCat === 'Amezing Pool' ? 'active' : '' %>">
       <div><i class="fa-solid fa-person-swimming"></i></div>
       <p>Amezing Pool</p>
-    </div>
-    <div class="filter">
+    </a>
+    <a href="/listings?category=Camping" class="filter <%= currentCat === 'Camping' ? 'active' : '' %>">
       <div><i class="fa-solid fa-campground"></i></div>
       <p>Camping</p>
-    </div>
-    <div class="filter">
+    </a>
+    <a href="/listings?category=Farms" class="filter <%= currentCat === 'Farms' ? 'active' : '' %>">
       <div><i class="fa-solid fa-cow"></i></div>
       <p>Farms</p>
-    </div>
-    <div class="filter">
+    </a>
+    <a href="/listings?category=Arctic" class="filter <%= currentCat === 'Arctic' ? 'active' : '' %>">
       <div><i class="fa-solid fa-snowflake"></i></div>
       <p>Arctic</p>
-    </div>
-    <div class="filter">
+    </a>
+    <a href="/listings?category=Domes" class="filter <%= currentCat === 'Domes' ? 'active' : '' %>">
       <div><i class="fa-solid fa-igloo"></i></div>
       <p>Domes</p>
-    </div>
-    <div class="filter">
+    </a>
+    <a href="/listings?category=Boats" class="filter <%= currentCat === 'Boats' ? 'active' : '' %>">
       <div><i class="fa-solid fa-ship"></i></div>
       <p>Boats</p>
-    </div>
+    </a>
 
     <div class="tax-toggle">
       <div class="form-check-reverse form-switch">
@@ -103,9 +113,24 @@
           Display total after taxes
         </label>
       </div>
-
     </div>
   </div>
+
+  <!-- Clear filter option if a category is selected -->
+  <% if(typeof category !== 'undefined' && category) { %>
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+      <h5 class="m-0">Showing results for <b><%= category %></b></h5>
+      <a href="/listings" class="btn btn-sm btn-outline-secondary">Clear Filter</a>
+    </div>
+  <% } %>
+
+  <% if(allListings.length === 0) { %>
+    <div class="alert alert-warning mt-4 text-center">
+      <h4><i class="fa-solid fa-magnifying-glass"></i> No Listings Found</h4>
+      <p>We couldn't find any listings in the selected category.</p>
+      <a href="/listings" class="btn btn-dark mt-2">View All Listings</a>
+    </div>
+  <% } %>
 
   <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3 ">
     <% for(let listing of allListings) { %>

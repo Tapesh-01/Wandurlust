@@ -35,6 +35,25 @@
             <input name="listing[country]" placeholder="India" type="text" class="form-control" required />
             <div class="invalid-feedback">Country name should be valid</div>
           </div>
+          
+          <div class="mb-3 col-md-4">
+            <label for="category" class="form-label">Category</label>
+            <select name="listing[category]" class="form-select" required>
+              <option value="" disabled selected>Select Category</option>
+              <option value="Trending">Trending</option>
+              <option value="Rooms">Rooms</option>
+              <option value="Iconic Cities">Iconic Cities</option>
+              <option value="Mountains">Mountains</option>
+              <option value="Castels">Castels</option>
+              <option value="Amezing Pool">Amezing Pool</option>
+              <option value="Camping">Camping</option>
+              <option value="Farms">Farms</option>
+              <option value="Arctic">Arctic</option>
+              <option value="Domes">Domes</option>
+              <option value="Boats">Boats</option>
+            </select>
+            <div class="invalid-feedback">Please select a category.</div>
+          </div>
 
           <div class="mb-md-3">
             <label for="location" class="form-label">Location</label>

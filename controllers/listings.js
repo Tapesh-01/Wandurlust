@@ -1,7 +1,7 @@
 const Listing = require("../models/listing");
 
 module.exports.index = async (req, res) => {
-  const { search, maxPrice } = req.query;
+  const { search, maxPrice, category } = req.query;
   
   let query = {};
   
@@ -19,9 +19,14 @@ module.exports.index = async (req, res) => {
     query.price = { $lte: parseInt(maxPrice) };
   }
 
+  // 3. Build Category Condition
+  if (category) {
+    query.category = category;
+  }
+
   const allListings = await Listing.find(query);
 
-  res.render("listings/index.ejs", { allListings, search, maxPrice });
+  res.render("listings/index.ejs", { allListings, search, maxPrice, category });
 };
 
 module.exports.renderNewForm = (req, res) => {
