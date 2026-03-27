@@ -25,6 +25,10 @@ const bookingSchema = new Schema({
         required: true,
         min: 1
     },
+    guestNames: {
+        type: [String],
+        default: []
+    },
     totalPrice: {
         type: Number,
         required: true

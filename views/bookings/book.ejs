@@ -57,6 +57,12 @@
                             <div class="invalid-feedback">Please enter number of guests (min 1, max <%= listing.maxGuests || 10 %>)</div>
                         </div>
 
+                        <!-- Guest Names Section -->
+                        <div id="guestNamesSection" class="mb-3">
+                            <label class="form-label fw-semibold">Guest Names</label>
+                            <div id="guestNameFields"></div>
+                        </div>
+
                         <!-- Total Price Display -->
                         <div class="alert alert-info total-price-display" role="alert" style="display: none;">
                             <div class="d-flex justify-content-between align-items-center">
@@ -86,6 +92,29 @@
         const totalPriceDisplay = document.querySelector('.total-price-display');
         const totalPriceElement = document.getElementById('totalPrice');
         const priceBreakdownElement = document.getElementById('priceBreakdown');
+        const guestNameFields = document.getElementById('guestNameFields');
+
+        function renderGuestNameFields(count) {
+            guestNameFields.innerHTML = '';
+            const labels = ['Primary Guest', 'Guest 2', 'Guest 3', 'Guest 4', 'Guest 5',
+                            'Guest 6', 'Guest 7', 'Guest 8', 'Guest 9', 'Guest 10'];
+            for (let i = 0; i < count; i++) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'mb-2';
+                wrapper.innerHTML = `
+                    <label class="form-label text-muted small mb-1">${labels[i] || 'Guest ' + (i + 1)}</label>
+                    <input type="text"
+                           class="form-control form-control-sm"
+                           name="booking[guestNames][]"
+                           placeholder="Enter full name"
+                           required>
+                `;
+                guestNameFields.appendChild(wrapper);
+            }
+        }
+
+        // Initialize with 1 guest
+        renderGuestNameFields(1);
 
         function calculateTotal() {
             const checkIn = new Date(checkInInput.value);
@@ -119,7 +148,11 @@
         });
 
         checkOutInput.addEventListener('change', calculateTotal);
-        guestsInput.addEventListener('input', calculateTotal);
+        guestsInput.addEventListener('input', function() {
+            calculateTotal();
+            const count = Math.max(1, Math.min(parseInt(this.value) || 1, parseInt(this.max) || 10));
+            renderGuestNameFields(count);
+        });
 
         // Form validation
         (function () {
