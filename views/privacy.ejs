@@ -1,0 +1,323 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+  .privacy-hero {
+    background: linear-gradient(135deg, #111111 0%, #2d0000 100%);
+    color: white;
+    padding: 64px 0 48px;
+    margin-bottom: 0;
+  }
+  .privacy-hero h1 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .privacy-hero p {
+    color: #bbb;
+    font-size: 1rem;
+    margin-top: 8px;
+  }
+  .privacy-hero .badge-updated {
+    display: inline-block;
+    background: rgba(254,66,77,0.18);
+    color: #fe424d;
+    border: 1px solid rgba(254,66,77,0.35);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
+  }
+
+  .privacy-nav {
+    position: sticky;
+    top: 72px;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    z-index: 100;
+    padding: 0;
+  }
+  .privacy-nav .nav-link {
+    color: #555;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 14px 18px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .privacy-nav .nav-link:hover,
+  .privacy-nav .nav-link.active {
+    color: #fe424d;
+    border-bottom-color: #fe424d;
+  }
+
+  .privacy-body {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  .privacy-section {
+    margin-bottom: 56px;
+    scroll-margin-top: 120px;
+  }
+  .privacy-section h2 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #111;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .privacy-section h2 .sec-icon {
+    background: #fff0f0;
+    color: #fe424d;
+    border-radius: 8px;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .privacy-section p,
+  .privacy-section li {
+    color: #444;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+  .privacy-section ul {
+    padding-left: 20px;
+  }
+  .privacy-section ul li {
+    margin-bottom: 6px;
+  }
+  .privacy-section ul li::marker {
+    color: #fe424d;
+  }
+
+  .highlight-box {
+    background: #fff8f8;
+    border-left: 4px solid #fe424d;
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-size: 14px;
+    color: #555;
+  }
+
+  .contact-card {
+    background: linear-gradient(135deg, #111 0%, #2d0000 100%);
+    border-radius: 16px;
+    padding: 32px;
+    color: white;
+    margin-top: 40px;
+  }
+  .contact-card h3 {
+    font-weight: 800;
+    margin-bottom: 8px;
+    font-size: 1.2rem;
+  }
+  .contact-card p { color: #bbb; font-size: 14px; margin-bottom: 4px; }
+  .contact-card a { color: #fe424d; text-decoration: none; font-weight: 600; }
+  .contact-card a:hover { text-decoration: underline; }
+</style>
+
+<!-- Hero -->
+<div class="privacy-hero">
+  <div class="container">
+    <div class="privacy-body" style="padding-top:0; padding-bottom:0;">
+      <span class="badge-updated">Last Updated: March 2026</span>
+      <h1>Privacy &amp; Terms</h1>
+      <p>How WandurLust collects, uses, and protects your data — and the terms that govern your use of our platform.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Sticky nav -->
+<div class="privacy-nav d-none d-md-block">
+  <div class="container">
+    <div class="privacy-body" style="padding:0;">
+      <nav class="d-flex flex-wrap gap-0">
+        <a href="#data" class="nav-link">Data We Collect</a>
+        <a href="#usage" class="nav-link">How We Use It</a>
+        <a href="#security" class="nav-link">Security</a>
+        <a href="#cookies" class="nav-link">Cookies</a>
+        <a href="#cancellation" class="nav-link">Cancellation</a>
+        <a href="#rights" class="nav-link">Your Rights</a>
+        <a href="#terms" class="nav-link">Terms of Use</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Body -->
+<div class="container">
+  <div class="privacy-body">
+
+    <!-- 1. Data We Collect -->
+    <div class="privacy-section" id="data">
+      <h2>
+        <span class="sec-icon"><i class="fa-solid fa-database"></i></span>
+        1. Data We Collect
+      </h2>
+      <p>When you use WandurLust, we collect the following types of information:</p>
+      <ul>
+        <li><strong>Account Information</strong> — name, email address, and password (stored as a secure hash).</li>
+        <li><strong>Booking Details</strong> — check-in/check-out dates, number of guests, guest names, and total amount paid.</li>
+        <li><strong>Listing Information</strong> — property title, location, country, pricing, and photos (for hosts).</li>
+        <li><strong>Technical Data</strong> — IP address, browser type, and session data collected automatically.</li>
+        <li><strong>Communications</strong> — any messages you send to our support team.</li>
+      </ul>
+      <div class="highlight-box">
+        <i class="fa-solid fa-circle-info me-2" style="color:#fe424d;"></i>
+        We only collect data that is necessary to provide our services. We do <strong>not</strong> collect financial card details — payments are processed by third-party gateways.
+      </div>
+    </div>
+
+    <!-- 2. How We Use It -->
+    <div class="privacy-section" id="usage">
+      <h2>
+        <span class="sec-icon"><i class="fa-solid fa-gears"></i></span>
+        2. How We Use Your Data
+      </h2>
+      <p>Your data is used strictly for the following purposes:</p>
+      <ul>
+        <li>To create and manage your account.</li>
+        <li>To process reservations and generate booking confirmation tickets (PDF).</li>
+        <li>To show your booking history and allow cancellations within the eligible window.</li>
+        <li>To allow hosts to view their guest bookings and earnings.</li>
+        <li>To send you booking confirmation and important platform notifications.</li>
+        <li>To improve platform performance and user experience.</li>
+        <li>To comply with legal obligations.</li>
+      </ul>
+      <p>We <strong>never sell, rent, or share</strong> your personal information with third parties for marketing purposes.</p>
+    </div>
+
+    <!-- 3. Security -->
+    <div class="privacy-section" id="security">
+      <h2>
+        <span class="sec-icon"><i class="fa-solid fa-shield-halved"></i></span>
+        3. Data Security
+      </h2>
+      <p>We take the security of your data seriously and implement the following measures:</p>
+      <ul>
+        <li><strong>Password Hashing</strong> — Passwords are hashed using bcrypt and are never stored in plain text.</li>
+        <li><strong>Session Security</strong> — Sessions are managed with signed, encrypted cookies with a limited expiry window.</li>
+        <li><strong>HTTPS</strong> — All data transmitted between your browser and our servers is encrypted via SSL/TLS.</li>
+        <li><strong>Access Control</strong> — Only authenticated users can access their own bookings. Hosts can only view bookings on their own listings.</li>
+        <li><strong>Database Security</strong> — Our database is hosted on a secure cloud infrastructure (MongoDB Atlas) with IP whitelisting and role-based access.</li>
+      </ul>
+      <div class="highlight-box">
+        <i class="fa-solid fa-triangle-exclamation me-2" style="color:#fe424d;"></i>
+        We recommend using a strong, unique password for your account and logging out from shared or public devices.
+      </div>
+    </div>
+
+    <!-- 4. Cookies -->
+    <div class="privacy-section" id="cookies">
+      <h2>
+        <span class="sec-icon"><i class="fa-solid fa-cookie-bite"></i></span>
+        4. Cookies &amp; Sessions
+      </h2>
+      <p>WandurLust uses cookies for the following purposes:</p>
+      <ul>
+        <li><strong>Session Cookie</strong> — Keeps you logged in as you navigate the site (expires in 7 days).</li>
+        <li><strong>Flash Messages</strong> — Used to display temporary success/error messages after actions like booking or cancellation.</li>
+        <li><strong>Preference Cookies</strong> — May be used to remember your filter preferences on the listings page.</li>
+      </ul>
+      <p>We do <strong>not</strong> use third-party tracking or advertising cookies. You can disable cookies in your browser settings, but some features (like staying logged in) may not work correctly.</p>
+    </div>
+
+    <!-- 5. Cancellation -->
+    <div class="privacy-section" id="cancellation">
+      <h2>
+        <span class="sec-icon"><i class="fa-solid fa-ban"></i></span>
+        5. Cancellation Policy
+      </h2>
+      <p>WandurLust follows a strict, fair cancellation policy to protect both guests and hosts:</p>
+      <ul>
+        <li>Guests may cancel a booking within <strong>1 hour</strong> of placing it for a full refund.</li>
+        <li>After the 1-hour window, bookings are <strong>non-refundable</strong>.</li>
+        <li>Hosts reserve the right to cancel a guest's booking in exceptional circumstances.</li>
+        <li>Cancelled bookings are permanently marked and excluded from host earnings calculations.</li>
+        <li>The availability calendar is automatically updated upon cancellation to allow other guests to book the dates.</li>
+      </ul>
+      <div class="highlight-box">
+        <i class="fa-solid fa-clock me-2" style="color:#fe424d;"></i>
+        The 1-hour cancellation timer starts from the moment of booking confirmation, not payment initiation.
+      </div>
+    </div>
+
+    <!-- 6. Your Rights -->
+    <div class="privacy-section" id="rights">
+      <h2>
+        <span class="sec-icon"><i class="fa-solid fa-user-shield"></i></span>
+        6. Your Rights
+      </h2>
+      <p>As a user of WandurLust, you have the following rights regarding your personal data:</p>
+      <ul>
+        <li><strong>Right to Access</strong> — You can request a copy of the personal data we hold about you.</li>
+        <li><strong>Right to Rectification</strong> — You can correct inaccurate information in your account settings.</li>
+        <li><strong>Right to Deletion</strong> — You can request that we delete your account and associated data.</li>
+        <li><strong>Right to Restriction</strong> — You can ask us to limit how we process your data in certain circumstances.</li>
+        <li><strong>Right to Portability</strong> — You can request your data in a portable, machine-readable format.</li>
+        <li><strong>Right to Object</strong> — You can object to processing of your data for non-essential purposes.</li>
+      </ul>
+      <p>To exercise any of these rights, contact us at <a href="mailto:support@wandurlust.com" style="color:#fe424d; font-weight:600;">support@wandurlust.com</a>.</p>
+    </div>
+
+    <!-- 7. Terms of Use -->
+    <div class="privacy-section" id="terms">
+      <h2>
+        <span class="sec-icon"><i class="fa-solid fa-file-contract"></i></span>
+        7. Terms of Use
+      </h2>
+      <p>By using WandurLust, you agree to the following terms:</p>
+      <ul>
+        <li>You must be at least 18 years of age to create an account or make a booking.</li>
+        <li>You are responsible for maintaining the confidentiality of your login credentials.</li>
+        <li>Listings must be accurate — hosts must not misrepresent their properties.</li>
+        <li>Guests must respect property rules set by hosts and local laws.</li>
+        <li>Any fraudulent activity, fake bookings, or abuse of the platform will result in immediate account suspension.</li>
+        <li>WandurLust reserves the right to remove listings or accounts that violate community standards.</li>
+        <li>This platform is provided "as is" — WandurLust is not liable for disruptions caused by events beyond our control (force majeure).</li>
+        <li>These terms may be updated periodically. Continued use of the platform constitutes acceptance of the updated terms.</li>
+      </ul>
+    </div>
+
+    <!-- Contact Card -->
+    <div class="contact-card" id="contact">
+      <h3><i class="fa-solid fa-headset me-2"></i> Questions or Concerns?</h3>
+      <p>If you have any questions about this Privacy &amp; Terms policy, reach out to us:</p>
+      <p>📧 Email: <a href="mailto:support@wandurlust.com">support@wandurlust.com</a></p>
+      <p>📍 Address: WandurLust Pvt. Ltd., Hospitality Division, Harinagar, Durg, CG, India 490022</p>
+      <p style="margin-top:16px; font-size:13px; color:#777;">This document was last updated in March 2026 and is effective immediately.</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Highlight active nav link on scroll
+  const sections = document.querySelectorAll('.privacy-section, #contact');
+  const navLinks = document.querySelectorAll('.privacy-nav .nav-link');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.privacy-nav a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>

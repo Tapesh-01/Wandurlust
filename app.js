@@ -121,6 +121,11 @@ app.get("/", (req, res) => {
   res.render("home.ejs");
 });
 
+// Privacy & Terms page
+app.get("/privacy", (req, res) => {
+  res.render("privacy.ejs");
+});
+
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
