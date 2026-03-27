@@ -85,7 +85,7 @@
     </div>
 
     <script>
-        const pricePerNight = <%= listing.price %>;
+        const pricePerNight = Number("<%= listing.price %>");
         const checkInInput = document.getElementById('checkIn');
         const checkOutInput = document.getElementById('checkOut');
         const guestsInput = document.getElementById('guests');
