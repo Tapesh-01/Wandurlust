@@ -4,23 +4,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wanderlust - Explore the World</title>
+    <title>Wanderlust - Find Your Perfect Escape</title>
+    <!-- Google Fonts: Playfair Display for Elegance & Inter for Cleanliness -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/home.css">
 </head>
 
 <body>
-    <div class="hero-section">
-        <video autoplay muted loop playsinline id="hero-video">
-            <source src="/images/front page vid.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <div class="brand-name">WANDERLUST</div>
+    <header class="navbar-wrapper">
+        <div class="logo">Wanderlust</div>
+    </header>
+
+    <main class="hero-section">
+        <img src="/images/hero-sunset-v3.jpg" alt="Hero Image" id="hero-image">
+        
         <div class="hero-content">
-            <h1 class="hero-title">EXPLORE</h1>
-            <p class="hero-subtitle">EXPLORE THE WORLD WITH YOUR LOVED ONES</p>
-            <a href="/listings" class="get-started-btn">GET STARTED</a>
+            <h1 class="hero-title">
+                Explore the world<br>
+                <span>with your loved ones</span>
+            </h1>
+            <a href="/listings" class="get-started-btn">EXPLORE NOW <i class="fa-solid fa-arrow-right-long"></i></a>
         </div>
-    </div>
+
+        <div class="right-side-ui">
+            <%- include("./includes/stats-card.ejs") %>
+        </div>
+    </main>
 </body>
 
 </html>

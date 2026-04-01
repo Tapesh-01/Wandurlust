@@ -1,5 +1,13 @@
-/* Landing Page Hero Section */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&family=Poppins:wght@300;400;500;600&display=swap');
+/* Wanderlust Premium Landing Page CSS */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+    --primary-font: 'Inter', sans-serif;
+    --heading-font: 'Playfair Display', serif;
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --accent-red: #ff385c;
+}
 
 * {
     margin: 0;
@@ -8,243 +16,247 @@
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--primary-font);
+    background-color: #000;
+    color: #fff;
     overflow-x: hidden;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   NAVBAR & HEADER
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.navbar-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 90px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 5%;
+    z-index: 1000;
+    background: transparent;
+}
+
+.logo {
+    font-family: var(--heading-font);
+    font-size: 2.3rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    cursor: pointer;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+
+.logo:hover {
+    opacity: 0.8;
+}
+
+.nav-icon {
+    font-size: 1.3rem;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   HERO SECTION
+   ───────────────────────────────────────────────────────────────────────────── */
 
 .hero-section {
     position: relative;
     width: 100%;
     height: 100vh;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
-    overflow: hidden; /* Added to contain video */
-    color: white;
-    text-align: center;
+    padding: 0 10%;
+    overflow: hidden;
 }
 
-#hero-video {
+#hero-image {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100vh; /* Swapped for rotation */
-    height: 100vw; /* Swapped for rotation */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    z-index: 0;
-    transform: translate(-50%, -50%) rotate(-90deg);
+    z-index: -1;
 }
 
-/* Enhanced gradient overlay for better text readability */
-.hero-section::before {
+.hero-section::after {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg,
-            rgba(0, 0, 0, 0.4) 0%,
-            rgba(0, 0, 0, 0.25) 50%,
-            rgba(0, 0, 0, 0.4) 100%);
-    z-index: 1;
+    background: linear-gradient(to right, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 100%);
+    z-index: 0;
 }
 
-/* All content above the overlay */
 .hero-content {
     position: relative;
-    z-index: 2;
-    padding: 20px;
-    animation: fadeInUp 1.2s ease-out;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.brand-name {
-    position: absolute;
-    top: 40px;
-    left: 40px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    letter-spacing: 6px;
-    z-index: 2;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
-    animation: fadeIn 1s ease-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
+    z-index: 10;
+    max-width: 1000px;
 }
 
 .hero-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 9rem;
-    font-weight: 900;
-    margin-bottom: 30px;
-    letter-spacing: 20px;
-    text-shadow: 4px 4px 12px rgba(0, 0, 0, 0.8);
-    line-height: 1;
-    background: linear-gradient(to right, #ffffff, #f0f0f0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: titlePulse 3s ease-in-out infinite;
+    font-family: var(--heading-font);
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: 700; /* Bold White as requested */
+    line-height: 0.95;
+    margin-bottom: 70px;
+    letter-spacing: -2px;
+    text-shadow: 2px 2px 20px rgba(0,0,0,0.1);
 }
 
-@keyframes titlePulse {
-
-    0%,
-    100% {
-        text-shadow: 4px 4px 12px rgba(0, 0, 0, 0.8);
-    }
-
-    50% {
-        text-shadow: 4px 4px 20px rgba(255, 255, 255, 0.3);
-    }
+.hero-title span {
+    font-weight: 700; /* Bold White as requested */
+    font-style: italic;
+    color: #fff;
+    opacity: 1;
+    display: block;
+    margin-top: 5px;
 }
 
-.hero-subtitle {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.8rem;
-    margin-bottom: 60px;
-    letter-spacing: 4px;
-    font-weight: 300;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
-    line-height: 1.6;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    color: #ffffff;
-    opacity: 0.95;
+.accent-text {
+    color: var(--accent-red);
+    font-weight: 600; /* Highlighted accent */
 }
 
 .get-started-btn {
-    display: inline-block;
-    padding: 20px 70px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 600;
-    letter-spacing: 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    padding: 18px 45px;
+    background: #fff;
     color: #000;
-    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
-    border: none;
     text-decoration: none;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    text-transform: uppercase;
-    border-radius: 50px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    position: relative;
-    overflow: hidden;
+    font-weight: 600;
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
-.get-started-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transition: left 0.5s;
-}
-
-.get-started-btn:hover::before {
-    left: 100%;
+.get-started-btn i {
+    transition: transform 0.3s ease;
+    font-size: 1.1rem;
 }
 
 .get-started-btn:hover {
-    background: transparent;
+    background: var(--accent-red);
     color: #fff;
-    border: 2px solid #fff;
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 15px 40px rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(255, 56, 92, 0.4);
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-    .hero-title {
-        font-size: 7rem;
-        letter-spacing: 15px;
-    }
+.get-started-btn:hover i {
+    transform: translateX(8px);
+}
 
-    .hero-subtitle {
+/* ─────────────────────────────────────────────────────────────────────────────
+   RIGHT SIDE UI (STATS)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.right-side-ui {
+    position: absolute;
+    right: 8%;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+}
+
+.stats-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 35px 30px;
+    border-radius: 20px;
+    width: 280px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s ease;
+}
+
+.stats-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stats-header {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.stat-item {
+    text-align: left;
+}
+
+.stat-val {
+    display: block;
+    font-family: var(--heading-font);
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 992px) {
+    .search-container {
+        display: none;
+    }
+    .logo {
         font-size: 1.5rem;
-        letter-spacing: 3px;
     }
-
-    .brand-name {
-        font-size: 1.5rem;
-        letter-spacing: 4px;
+    .hero-section {
+        padding: 0 5%;
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
+    .d-none-mobile {
+        display: none;
+    }
+    .user-menu {
+        gap: 15px;
+    }
     .hero-title {
-        font-size: 5rem;
-        letter-spacing: 10px;
+        font-size: 3.2rem;
+        letter-spacing: -1px;
     }
-
-    .hero-subtitle {
-        font-size: 1.2rem;
-        letter-spacing: 2px;
-        padding: 0 20px;
-    }
-
-    .brand-name {
-        font-size: 1.2rem;
-        top: 20px;
-        left: 20px;
-        letter-spacing: 3px;
-    }
-
     .get-started-btn {
-        padding: 16px 50px;
-        font-size: 1rem;
-        letter-spacing: 2px;
+        width: 100%;
+        text-align: center;
+        padding: 16px 30px;
     }
-}
-
-@media (max-width: 480px) {
-    .hero-title {
-        font-size: 3.5rem;
-        letter-spacing: 5px;
-        margin-bottom: 20px;
-    }
-
-    .hero-subtitle {
-        font-size: 1rem;
-        letter-spacing: 1px;
-        margin-bottom: 40px;
-        padding: 0 15px;
-    }
-
-    .brand-name {
-        font-size: 1rem;
-        letter-spacing: 2px;
-    }
-
-    .get-started-btn {
-        padding: 14px 40px;
-        font-size: 0.9rem;
-        letter-spacing: 2px;
-    }
-}
+}
