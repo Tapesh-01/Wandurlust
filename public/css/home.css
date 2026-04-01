@@ -114,7 +114,6 @@ body {
 
 .hero-title span {
     font-weight: 700; /* Bold White as requested */
-    font-style: italic;
     color: #fff;
     opacity: 1;
     display: block;
