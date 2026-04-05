@@ -36,8 +36,16 @@
 *   **Nodemailer**: Email handling (where applicable).
 
 ---
-
-## 🚀 Getting Started
+38: 
+39: ## 📚 Project Documentation
+40: 
+41: For a deep dive into the project's technical aspects and setup, refer to the following documents:
+42: *   [**System Architecture**](./docs/system_architecture.md): Detailed overview of the MVC architecture, database schema, and security protocols.
+43: *   [**Setup & Run Guide**](./docs/setup_guide.md): Comprehensive instructions for local environment setup and configuration.
+44: 
+45: ---
+46: 
+47: ## 🚀 Getting Started
 
 Follow these instructions to set up the project locally on your machine.
 
