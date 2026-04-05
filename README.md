@@ -51,7 +51,7 @@ Make sure you have the following installed:
 
 1.  **Clone the repository**
     ```bash
-    git clone https://github.com/yourusername/wandurlust.git
+    git clone https://github.com/Tapesh-01/Wandurlust.git
     cd wandurlust
     ```
 
@@ -107,7 +107,7 @@ Wandurlust/
 ---
 
 ## 🤝 Contributing
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/yourusername/wandurlust/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/Tapesh-01/Wandurlust/issues).
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
