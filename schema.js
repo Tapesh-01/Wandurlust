@@ -7,9 +7,11 @@ module.exports.listingSchema = Joi.object({
         location: Joi.string().required(),
         country: Joi.string().required(),
         price: Joi.number().required().min(0),
-        image: Joi.string().allow("", null),
+        image: Joi.any().optional(),
+        category: Joi.string().valid('Trending', 'Rooms', 'Iconic Cities', 'Mountains', 'Castels', 'Amezing Pool', 'Camping', 'Farms', 'Arctic', 'Domes', 'Boats').default('Trending'),
+        maxGuests: Joi.number().min(1).default(10)
     }).required(),
-});
+}).unknown(true);  // allow deleteImages, coverImage etc.
 
 module.exports.reviewSchema = Joi.object({
     review: Joi.object({

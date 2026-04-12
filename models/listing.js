@@ -8,10 +8,19 @@ const listingSchema = new Schema({
     required: true
   },
   description: String,
+  // OLD field — kept for backward compat with existing DB records
   image: {
     url: String,
     filename: String,
   },
+  // NEW field — used for multi-image uploads
+  images: [
+    {
+      url: String,
+      filename: String,
+    }
+  ],
+
 
   price: Number,
   location: String,
@@ -40,7 +49,10 @@ const listingSchema = new Schema({
 
 listingSchema.post("findOneAndDelete", async (listing) => {
   if (listing) {
+    const Review = require("./review.js");
+    const Booking = require("./booking.js");
     await Review.deleteMany({ _id: { $in: listing.reviews } });
+    await Booking.deleteMany({ listing: listing._id });
   }
 });
 

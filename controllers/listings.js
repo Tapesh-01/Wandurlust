@@ -1,7 +1,8 @@
 const Listing = require("../models/listing");
+const Booking = require("../models/booking");
 
 module.exports.index = async (req, res) => {
-  const { search, maxPrice, category } = req.query;
+  const { search, maxPrice, category, guests, dates } = req.query;
   
   let query = {};
   
@@ -22,6 +23,33 @@ module.exports.index = async (req, res) => {
   // 3. Build Category Condition
   if (category) {
     query.category = category;
+  }
+
+  // 4. Build Guests Limit Condition
+  if (guests && !isNaN(guests) && parseInt(guests) > 0) {
+    query.maxGuests = { $gte: parseInt(guests) };
+  }
+
+  // 5. Build Dates Availability Conflict Condition
+  if (dates && dates.includes("to")) {
+    const datesArr = dates.split(" to ");
+    if (datesArr.length === 2) {
+      const searchStart = new Date(datesArr[0]);
+      const searchEnd = new Date(datesArr[1]);
+      
+      // Find all bookings that overlap with the requested dates
+      // Overlap logic: booking.checkIn < searchEnd AND booking.checkOut > searchStart
+      const conflictingBookings = await Booking.find({
+        checkIn: { $lt: searchEnd },
+        checkOut: { $gt: searchStart }
+      }).select('listing');
+      
+      const conflictingListingIds = conflictingBookings.map(b => b.listing);
+      
+      if (conflictingListingIds.length > 0) {
+        query._id = { $nin: conflictingListingIds };
+      }
+    }
   }
 
   const allListings = await Listing.find(query);
@@ -53,11 +81,12 @@ module.exports.showListing = async (req, res) => {
 };
 
 module.exports.createListing = async (req, res, next) => {
-  let url = req.file.path;
-  let filename = req.file.filename;
   const newListing = new Listing(req.body.listing);
   newListing.owner = req.user._id;
-  newListing.image = { url, filename };
+  // Map all uploaded files to {url, filename} objects
+  if (req.files && req.files.length > 0) {
+    newListing.images = req.files.map(f => ({ url: f.path, filename: f.filename }));
+  }
   await newListing.save();
   req.flash("success", "New Listing Created!");
   res.redirect("/listings");
@@ -70,21 +99,41 @@ module.exports.renderEditForm = async (req, res) => {
     req.flash("error", "Listing you requested for does not exist");
     return res.redirect("/listings");
   }
-  let originalImageUrl = listing.image.url;
-  originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_250");
-  res.render("listings/edit.ejs", { listing, originalImageUrl });
+  res.render("listings/edit.ejs", { listing });
 };
 
 module.exports.updateListing = async (req, res) => {
   let { id } = req.params;
-  let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+  let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing }, { new: true });
 
-  if (typeof req.file !== "undefined") {
-    let url = req.file.path;
-    let filename = req.file.filename;
-    listing.image = { url, filename };
-    await listing.save();
+  // Append newly uploaded images to the images[] array
+  if (req.files && req.files.length > 0) {
+    const newImages = req.files.map(f => ({ url: f.path, filename: f.filename }));
+    listing.images.push(...newImages);
   }
+
+  // Remove images that the user checked to delete
+  if (req.body.deleteImages) {
+    const toDelete = Array.isArray(req.body.deleteImages)
+      ? req.body.deleteImages
+      : [req.body.deleteImages];
+    listing.images = listing.images.filter(img => !toDelete.includes(img.filename));
+    if (listing.image && listing.image.filename && toDelete.includes(listing.image.filename)) {
+      listing.image = { url: undefined, filename: undefined };
+    }
+  }
+
+  // Reorder images so that coverImage is first (index 0)
+  if (req.body.coverImage && listing.images.length > 0) {
+    const coverFilename = req.body.coverImage;
+    const coverIdx = listing.images.findIndex(img => img.filename === coverFilename);
+    if (coverIdx > 0) {
+      const [coverImg] = listing.images.splice(coverIdx, 1);
+      listing.images.unshift(coverImg);
+    }
+  }
+
+  await listing.save();
   req.flash("success", "Listing Updated!");
   res.redirect(`/listings/${id}`);
 };
@@ -95,3 +144,8 @@ module.exports.destroyListing = async (req, res) => {
   req.flash("success", "Listing Deleted!");
   res.redirect("/listings");
 }
+
+module.exports.userListings = async (req, res) => {
+  const allListings = await Listing.find({ owner: req.user._id });
+  res.render("listings/user_listings.ejs", { allListings });
+};

@@ -7,18 +7,21 @@ const multer = require('multer');
 const{storage} = require("../cloudConfig.js");
 const upload = multer({ storage});
 
+// USER LISTINGS ROUTE (UNIQUE ROUTE TO PREVENT CONFLICTS)
+router.get("/mylistings", isLoggedIn, wrapAsync(listingController.userListings));
+
 // INDEX + CREATE
 router.
 route("/")
   .get(wrapAsync(listingController.index))
   .post(
     isLoggedIn,
+    upload.array("listing[images]", 5),
     validateListing,
-    upload.single("listing[image]"),
     wrapAsync(listingController.createListing)
   );
 
-// NEW ROUTE (THIS WAS MISSING)
+// NEW ROUTE
 router.get(
   "/new",
   isLoggedIn,
@@ -32,7 +35,7 @@ router.get(
   .put(
   isLoggedIn,
   isOwner,
-  upload.single("listing[image]"),
+  upload.array("listing[images]", 5),
   validateListing,
   wrapAsync(listingController.updateListing))
 .delete(

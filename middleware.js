@@ -25,7 +25,17 @@ module.exports.isLoggedIn = (req, res, next)  =>  {
   module.exports.isOwner = async (req, res, next) =>  {
     let { id } = req.params;
     let listing = await Listing.findById(id);
-    if(!listing.owner._id.equals(res.locals.currUser._id)){
+    
+    // Safety check: ensure listing exists and owner is defined
+    if (!listing || !listing.owner) {
+      req.flash("error" ," Listing not found or owner undefined");
+      return res.redirect("/listings");
+    }
+
+    // Use .equals() for ObjectId comparison
+    // listing.owner might be a populated object or a raw ObjectId
+    const ownerId = listing.owner._id || listing.owner;
+    if(!ownerId.equals(res.locals.currUser._id)){
       req.flash("error" ," You are not the owner of this listing");
       return res.redirect(`/listings/${id}`);
     }

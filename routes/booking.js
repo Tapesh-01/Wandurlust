@@ -32,6 +32,13 @@ router.get(
     wrapAsync(bookingController.showUserBookings)
 );
 
+// Download booking ticket
+router.get(
+    "/bookings/:id/ticket",
+    isLoggedIn,
+    wrapAsync(bookingController.downloadTicket)
+);
+
 // Cancel a booking
 router.delete(
     "/bookings/:id",
