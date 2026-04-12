@@ -74,7 +74,7 @@
                                     <tr>
                                         <td>
                                             <a href="/listings/<%= booking.listing._id %>" class="text-decoration-none text-dark fw-semibold">
-                                                <img src="<%= booking.listing.image.url %>" alt="" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;" class="me-2">
+                                                <img src="<%= (booking.listing.images && booking.listing.images.length > 0) ? booking.listing.images[0].url : (booking.listing.image && booking.listing.image.url) ? booking.listing.image.url : 'https://placehold.co/40x40/ffe4e6/fe424d?text=?' %>" alt="" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;" class="me-2">
                                                 <%= booking.listing.title %>
                                             </a>
                                         </td>

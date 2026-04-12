@@ -9,7 +9,10 @@
             <div class="card mb-4">
                 <div class="row g-0">
                     <div class="col-md-4">
-                        <img src="<%= listing.image.url %>" class="img-fluid rounded-start" alt="<%= listing.title %>"
+                        <img 
+                            src="<%= (listing.images && listing.images.length > 0) ? listing.images[0].url : (listing.image && listing.image.url) ? listing.image.url : 'https://placehold.co/400x200/ffe4e6/fe424d?text=No+Image' %>" 
+                            class="img-fluid rounded-start" 
+                            alt="<%= listing.title %>"
                             style="height: 200px; object-fit: cover; width: 100%;">
                     </div>
                     <div class="col-md-8">
