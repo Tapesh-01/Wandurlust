@@ -9,20 +9,160 @@
         <a class="nav-link" href="/listings">Explore</a>
       </div>
 
-      <div class="navbar-nav mx-auto">
-        <form method="GET" action="/listings" class="d-flex" role="search">
-          <input class="form-control me-2 search-input rounded-pill shadow-sm" type="search" name="search" placeholder="Search destinations..."
-              value="<%= typeof search !== 'undefined' ? search : '' %>" style="width: 250px;" />
-          <button type="submit" class="btn btn-danger rounded-pill px-4 shadow-sm">
-            <i class="fa-solid fa-magnifying-glass me-2"></i>Search
-          </button>
+      <style>
+        .airbnb-search-bar { display: flex; align-items: center; background-color: #fff; border: 1px solid #ddd; border-radius: 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); height: 60px; position: relative; width: 650px; justify-content: space-between; transition: 0.2s;}
+        .airbnb-search-bar:hover { box-shadow: 0 3px 6px rgba(0,0,0,0.15); }
+        .search-section { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 0 24px; border-radius: 40px; cursor: pointer; position: relative; height: 100%; transition: 0.2s;}
+        .search-section:hover { background-color: #ebebeb; }
+        .search-section.active { background-color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 10; }
+        .search-label { font-size: 0.75rem; font-weight: 600; color: #222; margin-bottom: 0px; }
+        .search-value { font-size: 0.85rem; color: #717171; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .search-divider { height: 32px; width: 1px; background-color: #ddd; }
+        .btn-search-round { background-color: #FF385C; color: white; border: none; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer; }
+        .btn-search-round:hover { background-color: #e31c5f; }
+        
+        .search-dropdown-menu { position: absolute; top: 75px; background: white; border-radius: 32px; box-shadow: 0 8px 28px rgba(0,0,0,0.15); padding: 16px 0; z-index: 1000; visibility: hidden; opacity: 0; pointer-events: none; transition: opacity 0.2s; min-width: 400px; border: 1px solid #ddd;}
+        .search-section.active .search-dropdown-menu { visibility: visible; opacity: 1; pointer-events: auto; }
+        
+        .where-item { display: flex; align-items: center; padding: 12px 32px; cursor: pointer; transition: 0.2s; }
+        .where-item:hover { background-color: #f7f7f7; }
+        .where-icon { width: 48px; height: 48px; background-color: #f1f1f1; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 16px; font-size: 1.2rem; }
+        .where-item-text b { display: block; color: #222; font-weight: 500;}
+        .where-item-text span { font-size: 0.85rem; color: #717171;}
+
+        .search-input-mock { border: none; background: transparent; padding: 0; font-size: 0.85rem; color: #222; width: 100%; outline: none; }
+        .search-input-mock::placeholder { color: #717171; }
+      </style>
+
+      <div class="navbar-nav mx-auto d-none d-lg-flex position-relative me-4">
+        <form method="GET" action="/listings" id="airbnbSearchForm">
+        <div class="airbnb-search-bar" id="searchBarGroup">
+          
+          <!-- Route 1: Where -->
+          <div class="search-section" id="whereSection" onclick="document.getElementById('whereInput').focus()">
+            <div class="search-label">Where</div>
+            <input type="text" name="search" id="whereInput" class="search-input-mock" placeholder="Search destinations" value="<%= typeof search !== 'undefined' ? search : '' %>" autocomplete="off" onfocus="toggleSearchMenu('where')" onclick="toggleSearchMenu('where')">
+            
+            <div class="search-dropdown-menu" style="left:0;" id="whereDropdown" onclick="event.stopPropagation()">
+               <div class="px-4 pb-2 pt-2"><b class="small" style="font-size:0.8rem">Suggested destinations</b></div>
+               
+               <!-- Default Nearby Option -->
+               <div class="where-item" onclick="selectDestination('Nearby')">
+                  <div class="where-icon"><i class="fa-solid fa-paper-plane" style="color: #4b84ff; font-size:1.1rem;"></i></div>
+                  <div class="where-item-text"><b>Nearby</b><span>Find what's around you</span></div>
+               </div>
+
+               <!-- Popular Database Locations -->
+               <% if(typeof topLocations !== 'undefined' && topLocations.length > 0) { %>
+                  <% for(let loc of topLocations) { %>
+                     <div class="where-item" onclick="selectDestination('<%= loc %>')">
+                        <div class="where-icon"><i class="fa-solid fa-location-dot" style="color: #222; font-size:1.1rem;"></i></div>
+                        <div class="where-item-text"><b><%= loc %></b><span>Frequent destination</span></div>
+                     </div>
+                  <% } %>
+               <% } %>
+            </div>
+          </div>
+          
+          <div class="search-divider"></div>
+
+          <!-- Route 2: When -->
+          <div class="search-section pe-2" style="flex: 1.2;" id="whenSection" onclick="toggleSearchMenu('when')">
+            <div class="d-flex align-items-center justify-content-between h-100">
+               <div>
+                  <div class="search-label">When</div>
+                  <div class="search-value" id="whenValue">Add dates</div>
+                  <input type="hidden" name="dates" id="datesInput">
+               </div>
+               <button type="submit" class="btn-search-round" onclick="event.stopPropagation(); document.getElementById('airbnbSearchForm').submit();">
+                 <i class="fa-solid fa-magnifying-glass"></i>
+               </button>
+            </div>
+            
+            <div class="search-dropdown-menu text-center" style="left:-200px; min-width: 650px; width: max-content; padding: 10px; border-radius: 20px;" id="whenDropdown" onclick="event.stopPropagation()">
+               <input class="d-none" type="text" id="inlineCalendar" placeholder="Select Dates">
+            </div>
+          </div>
+        </div>
         </form>
       </div>
 
+      <script>
+        document.addEventListener('click', function(e) {
+           if(!e.target.closest('#searchBarGroup')){
+              document.querySelectorAll('.search-section').forEach(el => el.classList.remove('active'));
+           }
+        });
+
+        function toggleSearchMenu(section) {
+           const sections = ['where', 'when'];
+           sections.forEach(s => {
+              if(s === section) {
+                 document.getElementById(s + 'Section').classList.toggle('active');
+              } else {
+                 document.getElementById(s + 'Section').classList.remove('active');
+              }
+           });
+        }
+    
+        function selectDestination(dest) {
+           document.getElementById('whereInput').value = dest;
+           toggleSearchMenu('where');
+        }
+
+        // Initialize Flatpickr when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+           if(typeof flatpickr !== 'undefined') {
+               flatpickr("#inlineCalendar", {
+                   inline: true,
+                   mode: "range",
+                   minDate: "today",
+                   showMonths: 2,
+                   onChange: function(selectedDates, dateStr, instance) {
+                       document.getElementById('datesInput').value = dateStr;
+                       if (selectedDates.length === 2) {
+                           let d1 = selectedDates[0].toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                           let d2 = selectedDates[1].toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                           document.getElementById('whenValue').innerText = d1 + ' - ' + d2;
+                           document.getElementById('whenValue').style.color = '#222';
+                           document.getElementById('whenValue').style.fontWeight = '500';
+                       } else if (selectedDates.length === 1) {
+                           document.getElementById('whenValue').innerText = selectedDates[0].toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                           document.getElementById('whenValue').style.color = '#222';
+                           document.getElementById('whenValue').style.fontWeight = '500';
+                       } else {
+                           document.getElementById('whenValue').innerText = "Add dates";
+                           document.getElementById('whenValue').style.color = '#717171';
+                           document.getElementById('whenValue').style.fontWeight = 'normal';
+                       }
+                   }
+               });
+           }
+        });
+      </script>
+
       <div class="navbar-nav ms-auto align-items-center">
         <a class="nav-link me-3 d-none d-lg-block" href="/listings/new">Add Listing</a>
-        
-        <!-- Notification Dropdown -->
+
+        <!-- ☀️ Dark Mode Toggle -->
+        <button class="theme-toggle-btn me-1" id="themeToggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+          <i class="fa-solid fa-moon" id="themeIcon"></i>
+        </button>
+
+        <!-- 💬 Messages / Inbox icon -->
+        <% if(currUser) { %>
+          <a href="/inbox" class="position-relative me-2 d-none d-md-flex align-items-center justify-content-center text-decoration-none"
+             style="width:40px;height:40px;border-radius:50%;border:1px solid #ddd;color:#222;transition:background 0.2s;"
+             title="Messages">
+            <i class="fa-regular fa-comment-dots"></i>
+            <% if(typeof unreadMsgCount !== 'undefined' && unreadMsgCount > 0) { %>
+              <span class="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-danger" style="font-size:0.6rem;padding:3px 5px;">
+                <%= unreadMsgCount > 9 ? '9+' : unreadMsgCount %>
+              </span>
+            <% } %>
+          </a>
+        <% } %>
+
         <div class="nav-item dropdown d-none d-md-block">
           <div class="notification-bell" id="notificationMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa-regular fa-bell"></i>
@@ -76,14 +216,14 @@
             <% } else { %>
               <li><h6 class="dropdown-header">Hello, <%= currUser.username %>!</h6></li>
               <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/listings/mylistings">My Listings</a></li>
               <li><a class="dropdown-item" href="/bookings">Your Bookings</a></li>
-              <% if(typeof currUserIsHost !== 'undefined' && currUserIsHost) { %>
-                <li><a class="dropdown-item" href="/host/bookings">Host Dashboard 
-                  <% if(typeof globalNewBookingsCount !== 'undefined' && globalNewBookingsCount > 0) { %>
-                    <span class="badge bg-danger rounded-pill ms-1"><%= globalNewBookingsCount %></span>
-                  <% } %>
-                </a></li>
-              <% } %>
+
+              <li><a class="dropdown-item" href="/host/bookings">Host Dashboard 
+                <% if(typeof globalNewBookingsCount !== 'undefined' && globalNewBookingsCount > 0) { %>
+                  <span class="badge bg-danger rounded-pill ms-1"><%= globalNewBookingsCount %></span>
+                <% } %>
+              </a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item text-danger" href="/logout">Log out</a></li>
             <% } %>

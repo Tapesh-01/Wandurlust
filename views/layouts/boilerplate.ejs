@@ -5,6 +5,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title> WanderLust </title>
+  <!-- 🌙 Apply saved theme BEFORE render to prevent flash -->
+  <script>
+    (function() {
+      const saved = localStorage.getItem('wandurlust-theme');
+      if (saved === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="/css/style.css" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -30,6 +39,9 @@
     rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js"></script>
 
+  <!-- Flatpickr Datepicker -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 </head>
 
 <body>
@@ -46,6 +58,8 @@
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
+      <!-- Flatpickr JS -->
+      <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
       <script>
         document.addEventListener('DOMContentLoaded', () => {
           // Navbar scroll effect
@@ -57,8 +71,76 @@
               navbar.classList.remove('navbar-scrolled');
             }
           });
+
+          // ── Dark Mode Toggle ──────────────────────────────────
+          const toggleBtn = document.getElementById('themeToggle');
+          const themeIcon = document.getElementById('themeIcon');
+
+          function applyTheme(theme) {
+            if (theme === 'dark') {
+              document.documentElement.setAttribute('data-theme', 'dark');
+              if (themeIcon) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+              }
+            } else {
+              document.documentElement.removeAttribute('data-theme');
+              if (themeIcon) {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+              }
+            }
+          }
+
+          // Sync icon with current state on page load
+          const currentTheme = localStorage.getItem('wandurlust-theme') || 'light';
+          applyTheme(currentTheme);
+
+          // Toggle on click
+          if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+              const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+              const newTheme = isDark ? 'light' : 'dark';
+              localStorage.setItem('wandurlust-theme', newTheme);
+              applyTheme(newTheme);
+
+              // Spin animation on toggle
+              toggleBtn.style.transform = 'rotate(360deg)';
+              setTimeout(() => { toggleBtn.style.transform = ''; }, 500);
+            });
+          }
         });
       </script>
+
+      <!-- Global Socket.io for Real-time Notifications -->
+      <% if (currUser) { %>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            const globalSocket = io();
+            // Join a private room for this specific user
+            globalSocket.emit("join_private", "<%= currUser._id %>");
+
+            // Listen for new messages when NOT on the chat page itself
+            globalSocket.on("new_notification", () => {
+                // If we are currently IN the chat window, we shouldn't bump the badge 
+                // (or handle it gracefully), but for simplicity, bump the badge.
+                // Re-fetch or manually bump red badge in navbar:
+                const badgeElements = document.querySelectorAll('.fa-comment-dots + span.badge');
+                if (badgeElements.length > 0) {
+                    badgeElements.forEach(badge => {
+                        let currentCount = parseInt(badge.innerText.replace('+','')) || 0;
+                        let newCount = currentCount + 1;
+                        badge.innerText = newCount > 9 ? '9+' : newCount;
+                    });
+                } else {
+                    const messageIcons = document.querySelectorAll('[title="Messages"]');
+                    messageIcons.forEach(icon => {
+                        icon.innerHTML += `<span class="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-danger" style="font-size:0.6rem;padding:3px 5px;">1</span>`;
+                    });
+                }
+            });
+        </script>
+      <% } %>
 </body>
 
-</html>
+</html>
