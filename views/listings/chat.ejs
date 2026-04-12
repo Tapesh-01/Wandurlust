@@ -1,0 +1,170 @@
+<% layout("/layouts/boilerplate") %>
+<div class="row mt-3 chat-container-wrapper">
+    <div class="col-md-8 offset-md-2">
+        <div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
+            <div class="card-header bg-dark text-white d-flex align-items-center gap-3 py-3">
+                <a href="/listings/<%= listing._id %>" class="text-white">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <div class="chat-header-info">
+                    <h5 class="mb-0">Chat with <%= partnerUser ? partnerUser.username : listing.owner.username %></h5>
+                    <small class="text-white-50">Regarding: <%= listing.title %></small>
+                </div>
+            </div>
+
+            <div class="card-body p-4" id="chatWindow" style="height: 500px; overflow-y: auto; background: var(--bg-color);">
+                <% if (chats && chats.length > 0) { %>
+                    <% chats.forEach(chat => { %>
+                        <div class="message-wrapper mb-3 d-flex <%= chat.sender._id.toString() === currUser._id.toString() ? 'justify-content-end' : 'justify-content-start' %>" id="msg-wrapper-<%= chat._id %>">
+                            <div class="message-bubble p-3 rounded-4 <%= chat.sender._id.toString() === currUser._id.toString() ? 'bg-primary text-white' : 'bg-light text-dark' %>" style="max-width: 80%; position: relative;">
+                                <div class="message-text"><%= chat.message %></div>
+                                <div class="message-time text-end mt-1" style="font-size: 0.7rem; opacity: 0.8;">
+                                    <%= new Date(chat.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
+                                </div>
+                                
+                                <% if(chat.sender._id.toString() === currUser._id.toString()) { %>
+                                    <!-- Delete Button (Only for sender) -->
+                                    <button class="btn btn-sm btn-link text-white position-absolute p-0" style="top: -5px; right: -20px; font-size: 0.8rem;" onclick="deleteMessage('<%= chat._id %>')" title="Delete Message">
+                                        <i class="fa-solid fa-trash-can text-danger"></i>
+                                    </button>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="text-center text-muted py-5 no-msgs-indicator">
+                        <i class="fa-regular fa-comment-dots fa-3x mb-3 opacity-25"></i>
+                        <p>No messages yet. Say hi!</p>
+                    </div>
+                <% } %>
+            </div>
+
+            <div class="card-footer bg-white border-top-0 p-3" style="background: var(--bg-color) !important;">
+                <form id="chatForm" class="d-flex gap-2">
+                    <input type="text" id="msgInput" class="form-control rounded-pill px-4" placeholder="Type a message..." autocomplete="off" required>
+                    <button type="submit" class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; flex-shrink: 0;">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    const chatWindow = document.getElementById('chatWindow');
+    const chatForm = document.getElementById('chatForm');
+    const msgInput = document.getElementById('msgInput');
+    
+    // IDs
+    const currentUserId = "<%= currUser._id %>";
+    // If I am the owner, the partner is whoever opened the chat (handled via generic setup, 
+    // but here in single listing context, if current is owner, this view logic is a bit tricky.
+    // For simplicity, we just use URL context to chat with owner, but if owner is viewing inbox, they are redirected here? 
+    // Wait, the original setup was for guest messaging host. Let's keep it simple for now.)
+    const listingOwnerId = "<%= listing.owner._id %>";
+    
+    // For general room ID logic, we must know the partner.
+    // Since inbox links here, if I am the owner, I need the guest ID. 
+    // To fix this globally, the room ID should just include the users.
+    const urlParams = new URLSearchParams(window.location.search);
+    const partnerId = urlParams.get('partner') || listingOwnerId; 
+
+    // Important: we need the room id consistent.
+    const sortedIds = [currentUserId, partnerId].sort();
+    const roomId = `${sortedIds[0]}_${sortedIds[1]}_<%= listing._id %>`;
+
+    socket.emit("join_chat", roomId);
+
+    const scrollToBottom = () => {
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    };
+    scrollToBottom();
+
+    // -- Read Receipt Logic --
+    // When this chat window is opened, mark messages sent by the partner as read
+    function markAsRead() {
+        fetch("/chats/mark-read", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ partnerId: partnerId, listingId: "<%= listing._id %>" })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                // optionally hide the red badge in the navbar immediately on UI
+                const navBadge = document.querySelector('.fa-comment-dots').nextElementSibling;
+                if(navBadge) navBadge.remove(); // crude but effective locally
+            }
+        });
+    }
+    // Call immediately and when we receive a message
+    markAsRead();
+
+    // -- Delete Logic --
+    window.deleteMessage = function(msgId) {
+        if(confirm("Delete this message?")) {
+            fetch(`/chats/${msgId}`, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    socket.emit("delete_request", { roomId: roomId, msgId: msgId });
+                    document.getElementById(`msg-wrapper-${msgId}`).remove();
+                }
+            });
+        }
+    }
+
+    // -- Send Message --
+    chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const msg = msgInput.value.trim();
+        if (msg) {
+            // we let server handle ID generation or we just send it via REST?
+            // Actually our socket logic in app.js saves it. 
+            socket.emit("send_message", {
+                sender: currentUserId,
+                receiver: partnerId,
+                listing: "<%= listing._id %>",
+                message: msg,
+                roomId: roomId
+            });
+            msgInput.value = '';
+            const indicator = document.querySelector('.no-msgs-indicator');
+            if(indicator) indicator.remove();
+        }
+    });
+
+    // -- Receive Realtime Events --
+    socket.on("receive_message", (data) => {
+        // If we are actively in the chat, mark as read
+        if(data.sender.toString() !== currentUserId.toString()) {
+            markAsRead();
+        }
+
+        const isFromMe = data.sender.toString() === currentUserId.toString();
+        const msgId = data.msgId || `temp-${Date.now()}`; // Need server to pass msgId
+        
+        const msgHtml = `
+            <div class="message-wrapper mb-3 d-flex ${isFromMe ? 'justify-content-end' : 'justify-content-start'}" id="msg-wrapper-${msgId}">
+                <div class="message-bubble p-3 rounded-4 ${isFromMe ? 'bg-primary text-white' : 'bg-light text-dark'}" style="max-width: 80%; position: relative;">
+                    <div class="message-text">${data.message}</div>
+                    <div class="message-time text-end mt-1" style="font-size: 0.7rem; opacity: 0.8;">
+                        ${new Date(data.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                    ${isFromMe ? `<button class="btn btn-sm btn-link text-white position-absolute p-0" style="top: -5px; right: -20px; font-size: 0.8rem;" onclick="deleteMessage('${msgId}')" title="Delete Message"><i class="fa-solid fa-trash-can text-danger"></i></button>` : ''}
+                </div>
+            </div>
+        `;
+        chatWindow.insertAdjacentHTML('beforeend', msgHtml);
+        scrollToBottom();
+    });
+
+    // Receive Real-time Delete
+    socket.on("message_deleted", (msgId) => {
+        const el = document.getElementById(`msg-wrapper-${msgId}`);
+        if(el) el.remove();
+    });
+</script>

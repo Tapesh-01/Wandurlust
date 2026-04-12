@@ -1,0 +1,120 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+  .inbox-hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    padding: 3rem 0 2rem;
+    color: #fff;
+    margin-bottom: 2rem;
+  }
+  .convo-card {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #ebebeb);
+    border-radius: 14px;
+    padding: 1rem 1.2rem;
+    transition: box-shadow 0.2s, transform 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+  .convo-card:hover {
+    box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+    color: inherit;
+  }
+  .convo-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fe424d, #ff6584);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .convo-thumb {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+  .convo-time {
+    font-size: 0.78rem;
+    color: #888;
+    white-space: nowrap;
+  }
+  .convo-msg {
+    font-size: 0.88rem;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 360px;
+  }
+  [data-theme="dark"] .convo-card { background: #1e1e1e; border-color: #333; }
+  [data-theme="dark"] .convo-msg { color: #aaa; }
+</style>
+
+<!-- ── Hero Header ── -->
+<div class="inbox-hero">
+  <div class="container">
+    <h2 class="fw-bold mb-1"><i class="fa-solid fa-inbox me-2"></i>Inbox</h2>
+    <p class="text-white-50 mb-0">All your conversations in one place</p>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <% if (conversations && conversations.length > 0) { %>
+    <p class="text-muted small mb-3"><%= conversations.length %> conversation<%= conversations.length > 1 ? 's' : '' %></p>
+
+    <% for(let convo of conversations) { %>
+      <%
+        const listingImg = (convo.listing.images && convo.listing.images.length > 0)
+          ? convo.listing.images[0].url
+          : (convo.listing.image && convo.listing.image.url)
+            ? convo.listing.image.url
+            : 'https://placehold.co/56x56/ffe4e6/fe424d?text=?';
+        const initials = convo.partner.username.charAt(0).toUpperCase();
+        const since = new Date(convo.lastTime).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+      %>
+      <a href="/listings/<%= convo.listing._id %>/chat?partner=<%= convo.partner._id %>" class="convo-card">
+        <div class="d-flex align-items-center gap-3">
+          <!-- Listing thumbnail -->
+          <img src="<%= listingImg %>" class="convo-thumb" alt="<%= convo.listing.title %>">
+
+          <!-- Partner avatar -->
+          <div class="convo-avatar"><%= initials %></div>
+
+          <!-- Body -->
+          <div class="flex-grow-1 overflow-hidden">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="fw-semibold">@<%= convo.partner.username %></span>
+              <span class="convo-time"><%= since %></span>
+            </div>
+            <div class="text-muted small mb-0"><%= convo.listing.title %></div>
+            <div class="convo-msg mt-1">"<%= convo.lastMsg %>"</div>
+          </div>
+
+          <i class="fa-solid fa-chevron-right text-muted"></i>
+        </div>
+      </a>
+    <% } %>
+
+  <% } else { %>
+    <!-- Empty state -->
+    <div class="text-center py-5 mt-4">
+      <i class="fa-regular fa-comment-dots fa-4x text-muted opacity-25 mb-4 d-block"></i>
+      <h5 class="fw-semibold">No messages yet</h5>
+      <p class="text-muted">Find a listing you like and message the host!</p>
+      <a href="/listings" class="btn btn-dark rounded-pill px-4 mt-2">
+        <i class="fa-solid fa-compass me-2"></i>Explore Listings
+      </a>
+    </div>
+  <% } %>
+</div>
