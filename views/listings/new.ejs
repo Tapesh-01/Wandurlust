@@ -18,9 +18,38 @@
         </div>
 
         <div class="mb-3">
-          <label for="image" class="form-label">Upload Listing Image</label>
-          <input name="listing[image]" type="file" class="form-control" required />
-          required
+          <label for="images" class="form-label">Upload Listing Photos <span class="text-muted fw-normal">(Up to 5 images)</span></label>
+          <input name="listing[images]" id="imageInput" type="file" class="form-control" accept="image/*" multiple required />
+          <div class="form-text text-muted">Select up to 5 photos. First image will be the cover photo.</div>
+          <!-- Preview Strip -->
+          <div id="imagePreview" class="d-flex gap-2 mt-2 flex-wrap"></div>
+          <script>
+            document.getElementById('imageInput').addEventListener('change', function() {
+              const preview = document.getElementById('imagePreview');
+              preview.innerHTML = '';
+              const files = Array.from(this.files).slice(0, 5);
+              files.forEach((file, i) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                  const wrapper = document.createElement('div');
+                  wrapper.style.cssText = 'position:relative;display:inline-block;';
+                  const img = document.createElement('img');
+                  img.src = e.target.result;
+                  img.style.cssText = 'width:80px;height:60px;object-fit:cover;border-radius:8px;border:2px solid ' + (i === 0 ? '#fe424d' : '#ddd');
+                  img.title = i === 0 ? 'Cover photo' : 'Photo ' + (i+1);
+                  if (i === 0) {
+                    const badge = document.createElement('span');
+                    badge.textContent = 'Cover';
+                    badge.style.cssText = 'position:absolute;bottom:2px;left:2px;background:#fe424d;color:#fff;font-size:9px;padding:1px 4px;border-radius:4px;';
+                    wrapper.appendChild(badge);
+                  }
+                  wrapper.appendChild(img);
+                  preview.appendChild(wrapper);
+                };
+                reader.readAsDataURL(file);
+              });
+            });
+          </script>
         </div>
 
         <div class="row">

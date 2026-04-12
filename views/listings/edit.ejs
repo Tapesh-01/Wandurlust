@@ -20,17 +20,159 @@
         <div class="invalid-feedback">Please enter a short description</div>
       </div>
 
-      <div class="mb-3">
-        Original Listing Image <br/>
-        <img src="<%= originalImageUrl %>" />
+      <!-- ════ Current Photos Manager ════ -->
+      <div class="mb-4">
+        <label class="form-label fw-semibold">Current Photos</label>
+        <% 
+          const editImgs = (listing.images && listing.images.length > 0) 
+            ? listing.images 
+            : (listing.image && listing.image.url) 
+              ? [listing.image] 
+              : [];
+        %>
+        <% if (editImgs.length > 0) { %>
+
+          <!-- Cover image tracker — submitted with form -->
+          <input type="hidden" name="coverImage" id="coverImageInput" value="<%= editImgs[0].filename || '' %>">
+
+          <div class="d-flex gap-3 flex-wrap mb-1" id="currentPhotosGrid">
+            <% editImgs.forEach(function(img, i) { %>
+              <div class="position-relative photo-card" id="photoCard-<%= i %>" data-filename="<%= img.filename %>">
+                
+                <!-- Photo thumbnail -->
+                <img 
+                  src="<%= img.url ? img.url.replace('/upload', '/upload/w_150') : img.url %>"
+                  style="width:110px;height:80px;object-fit:cover;border-radius:10px;border:3px solid <%= i===0 ? '#fe424d':'#ddd' %>;display:block;"
+                  class="photo-thumb">
+
+                <!-- Delete checkbox (hidden) — submitted with form -->
+                <input type="checkbox" name="deleteImages" value="<%= img.filename %>" class="d-none del-chk" id="delChk-<%= i %>">
+
+                <!-- ✕ Remove button — instantly removes from UI -->
+                <button type="button"
+                  class="remove-photo-btn position-absolute border-0 text-white rounded-circle d-flex align-items-center justify-content-center"
+                  style="top:-8px;right:-8px;width:22px;height:22px;font-size:12px;background:#333;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,0.3);"
+                  data-index="<%= i %>"
+                  title="Remove this photo">✕</button>
+
+                <!-- ★ Set Cover button (hide on cover photo) -->
+                <button type="button"
+                  class="set-cover-btn position-absolute border-0 rounded"
+                  style="bottom:4px;left:4px;font-size:9px;padding:2px 5px;background:rgba(0,0,0,0.5);color:#fff;cursor:pointer;<%= i===0 ? 'display:none;' : '' %>"
+                  data-index="<%= i %>"
+                  title="Set as cover photo">★ Cover</button>
+
+                <!-- Cover badge -->
+                <span class="cover-badge position-absolute"
+                  style="bottom:4px;left:4px;background:#fe424d;color:#fff;font-size:9px;padding:2px 5px;border-radius:4px;pointer-events:none;<%= i!==0 ? 'display:none;' : '' %>">
+                  <i class="fa-solid fa-star" style="font-size:7px;"></i> Cover
+                </span>
+
+              </div>
+            <% }); %>
+          </div>
+
+          <div class="form-text text-muted">
+            Click <b style="color:#333;">✕</b> to remove · Click <b style="color:#fe424d;">★ Cover</b> to set as cover photo
+          </div>
+
+        <% } else { %>
+          <p class="text-muted">No photos uploaded yet.</p>
+        <% } %>
       </div>
 
+      <!-- ════ Add More Photos ════ -->
       <div class="mb-3">
-        <label for="image" class="form-label">Upload New Image</label>
-        <input name="listing[image]" 
-        type="file" 
-        class="form-control"  />
+        <label class="form-label fw-semibold">Add More Photos <span class="text-muted fw-normal">(optional)</span></label>
+        <input name="listing[images]" id="newImgInput" type="file" class="form-control" accept="image/*" multiple />
+        <div id="newImgPreview" class="d-flex gap-2 mt-2 flex-wrap"></div>
       </div>
+
+      <script>
+        (function() {
+          // ── REMOVE PHOTO: instantly remove from DOM + check hidden checkbox ──
+          document.querySelectorAll('.remove-photo-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              const idx     = this.dataset.index;
+              const card    = document.getElementById('photoCard-' + idx);
+              const chk     = document.getElementById('delChk-' + idx);
+              
+              // Mark for deletion
+              chk.checked = true;
+              
+              // Animate removal
+              card.style.transition = 'all 0.25s ease';
+              card.style.transform  = 'scale(0.7)';
+              card.style.opacity    = '0';
+              setTimeout(function() { card.style.display = 'none'; }, 250);
+
+              // If this was cover, assign cover to next visible card
+              const coverInput = document.getElementById('coverImageInput');
+              if (coverInput && coverInput.value === card.dataset.filename) {
+                const remainingCards = document.querySelectorAll('.photo-card:not([style*="display: none"])');
+                remainingCards.forEach(function(c) {
+                  if (c.id !== card.id) {
+                    coverInput.value = c.dataset.filename || '';
+                    c.querySelector('.cover-badge').style.display = '';
+                    c.querySelector('.set-cover-btn').style.display = 'none';
+                    const thumb = c.querySelector('.photo-thumb');
+                    thumb.style.border = '3px solid #fe424d';
+                    return;
+                  }
+                });
+              }
+            });
+          });
+
+          // ── SET COVER: update visual cover badge + hidden coverImage field ──
+          document.querySelectorAll('.set-cover-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              const idx  = this.dataset.index;
+              const card = document.getElementById('photoCard-' + idx);
+              const coverInput = document.getElementById('coverImageInput');
+
+              // Reset all cards
+              document.querySelectorAll('.photo-card').forEach(function(c) {
+                const thumb = c.querySelector('.photo-thumb');
+                const badge = c.querySelector('.cover-badge');
+                const setCoverBtn = c.querySelector('.set-cover-btn');
+                thumb.style.border = '3px solid #ddd';
+                badge.style.display = 'none';
+                if (setCoverBtn) setCoverBtn.style.display = '';
+              });
+
+              // Mark this card as cover
+              const thumb = card.querySelector('.photo-thumb');
+              const badge = card.querySelector('.cover-badge');
+              thumb.style.border = '3px solid #fe424d';
+              badge.style.display = '';
+              this.style.display = 'none';
+
+              // Update hidden field
+              if (coverInput) coverInput.value = card.dataset.filename || '';
+            });
+          });
+
+          // ── NEW IMAGE PREVIEW ──
+          const newImgInput = document.getElementById('newImgInput');
+          if (newImgInput) {
+            newImgInput.addEventListener('change', function() {
+              const preview = document.getElementById('newImgPreview');
+              preview.innerHTML = '';
+              Array.from(this.files).slice(0, 5).forEach(function(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                  const img = document.createElement('img');
+                  img.src = e.target.result;
+                  img.style.cssText = 'width:80px;height:60px;object-fit:cover;border-radius:8px;border:2px solid #ddd;';
+                  preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+              });
+            });
+          }
+        })();
+      </script>
 
       <div class="row">
         <div class="mb-3 col-md-4">

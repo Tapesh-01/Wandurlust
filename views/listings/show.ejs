@@ -1,44 +1,246 @@
 <% layout("/layouts/boilerplate") %>
-  <div class="row mt-3">
-    <div class="col-8 offset-3">
-      <h3>
-        <%= listing.title %>
-      </h3>
-    </div>
+  <!-- ═══ Professional Image Gallery Carousel ═══ -->
+  <div class="gallery-wrapper col-8 offset-2 mt-4 mb-3">
+    <% 
+      // Backward compat: support both old `image` field and new `images[]` array
+      let imgs = [];
+      if (listing.images && listing.images.length > 0) {
+        imgs = listing.images;
+      } else if (listing.image && listing.image.url) {
+        imgs = [listing.image]; // wrap old single image in array
+      }
+    %>
+    
+    <% if (imgs.length > 0) { %>
+      <!-- Main Carousel -->
+      <div id="listingCarousel" class="carousel slide carousel-fade gallery-carousel" data-bs-ride="carousel">
+        <!-- Image Counter Badge -->
+        <div class="gallery-counter">
+          <i class="fa-solid fa-images me-1"></i>
+          <span id="carouselCounter">1</span> / <%= imgs.length %>
+        </div>
 
-    <div class="card col-6 offset-3 show-card listing-card">
-      <img src="<%= listing.image.url %>" class="card-img-top show-img" alt="listing_image">
-      <div class="card-body">
-        <p class="card-text"> <i>
-            <%= listing.owner ? listing.owner.username : 'Unknown Host' %>
-          </i></p>
+        <!-- Slides -->
+        <div class="carousel-inner gallery-inner">
+          <% imgs.forEach(function(img, i) { %>
+            <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+              <img src="<%= img.url %>" class="d-block w-100 gallery-main-img" alt="Listing photo <%= i+1 %>">
+            </div>
+          <% }); %>
+        </div>
 
-        <p class="card-text">
-          <%= listing.description %>
-        </p>
-        <p class="card-text">
-          &#8377;<%= listing.price.toLocaleString("en-IN") %>
-        </p>
-        <p class="card-text">
-          <%= listing.location %>
-        </p>
-        <p class="card-text">
-          <%= listing.country %>
-        </p>
+        <!-- Navigation Arrows (only if more than 1 image) -->
+        <% if (imgs.length > 1) { %>
+          <button class="carousel-control-prev gallery-control" type="button" data-bs-target="#listingCarousel" data-bs-slide="prev">
+            <span class="gallery-arrow-btn"><i class="fa-solid fa-chevron-left"></i></span>
+          </button>
+          <button class="carousel-control-next gallery-control" type="button" data-bs-target="#listingCarousel" data-bs-slide="next">
+            <span class="gallery-arrow-btn"><i class="fa-solid fa-chevron-right"></i></span>
+          </button>
+        <% } %>
       </div>
-    </div>
 
-    <br />
+      <!-- Thumbnail Strip -->
+      <% if (imgs.length > 1) { %>
+        <div class="gallery-thumbs mt-2 d-flex gap-2">
+          <% imgs.forEach(function(img, i) { %>
+            <img
+              src="<%= img.url %>"
+              class="gallery-thumb <%= i === 0 ? 'active' : '' %>"
+              data-index="<%= i %>"
+              alt="Thumb <%= i+1 %>"
+            >
+          <% }); %>
+        </div>
+      <% } %>
 
-    <!-- Reserve Button -->
-    <div class="text-center mb-3 mt-4">
+    <% } else { %>
+      <div class="gallery-placeholder">
+        <i class="fa-solid fa-image fa-3x mb-3"></i>
+        <p>No images uploaded yet</p>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Gallery CSS -->
+  <style>
+    .gallery-wrapper { position: relative; }
+    .gallery-carousel { border-radius: 1.2rem; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+    .gallery-inner { background: #111; }
+    .gallery-main-img {
+      height: 480px;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+      cursor: zoom-in;
+    }
+    .gallery-main-img:hover { transform: scale(1.03); }
+    .gallery-counter {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 2rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      z-index: 20;
+      backdrop-filter: blur(6px);
+    }
+    .gallery-control { width: auto; padding: 0 10px; }
+    .gallery-arrow-btn {
+      background: rgba(255,255,255,0.92);
+      color: #222;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: all 0.2s ease;
+    }
+    .gallery-arrow-btn:hover { background: #fff; transform: scale(1.1); box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
+    .gallery-thumbs { overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+    .gallery-thumb {
+      width: 80px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 0.6rem;
+      cursor: pointer;
+      opacity: 0.6;
+      border: 2px solid transparent;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .gallery-thumb:hover { opacity: 0.9; }
+    .gallery-thumb.active { opacity: 1; border-color: #fe424d; }
+    .gallery-placeholder {
+      height: 340px;
+      background: var(--footer-bg);
+      border-radius: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--secondary-text);
+    }
+    /* Lightbox overlay */
+    .gallery-lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+    .gallery-lightbox.open { display: flex; }
+    .lightbox-img { max-width: 90vw; max-height: 90vh; border-radius: 0.8rem; object-fit: contain; }
+    .lightbox-close {
+      position: absolute;
+      top: 20px; right: 24px;
+      color: #fff;
+      font-size: 2rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+  </style>
+
+  <!-- Lightbox Overlay -->
+  <div class="gallery-lightbox" id="galleryLightbox">
+    <button class="lightbox-close" id="lightboxClose"><i class="fa-solid fa-xmark"></i></button>
+    <img src="" alt="Fullscreen view" class="lightbox-img" id="lightboxImg">
+  </div>
+
+  <!-- Gallery JS -->
+  <script>
+    (function() {
+      const carousel = document.getElementById('listingCarousel');
+      if (!carousel) return;
+
+      const counter = document.getElementById('carouselCounter');
+      const thumbs = document.querySelectorAll('.gallery-thumb');
+      const mainImgs = document.querySelectorAll('.gallery-main-img');
+      const lightbox = document.getElementById('galleryLightbox');
+      const lightboxImg = document.getElementById('lightboxImg');
+      const lightboxClose = document.getElementById('lightboxClose');
+
+      // Update counter & active thumb on carousel slide
+      carousel.addEventListener('slid.bs.carousel', function(e) {
+        const idx = e.to;
+        if (counter) counter.textContent = idx + 1;
+        thumbs.forEach((t, i) => t.classList.toggle('active', i === idx));
+      });
+
+      // Click thumb → jump to slide
+      thumbs.forEach(thumb => {
+        thumb.addEventListener('click', function() {
+          const bsCarousel = bootstrap.Carousel.getOrCreateInstance(carousel);
+          bsCarousel.to(parseInt(this.dataset.index));
+        });
+      });
+
+      // Click main image → open lightbox
+      mainImgs.forEach(img => {
+        img.addEventListener('click', function() {
+          lightboxImg.src = this.src;
+          lightbox.classList.add('open');
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      // Close lightbox
+      if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+      if (lightbox) lightbox.addEventListener('click', function(e) {
+        if (e.target === lightbox) closeLightbox();
+      });
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeLightbox();
+      });
+      function closeLightbox() {
+        lightbox.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    })();
+  </script>
+
+  <!-- Listing Info Card -->
+  <div class="col-8 offset-2">
+    <h3 class="mt-2"><%= listing.title %></h3>
+    <p class="text-muted mb-1">
+      <i class="fa-solid fa-location-dot me-1"></i><%= listing.location %>, <%= listing.country %>
+      &nbsp;·&nbsp;<i class="fa-solid fa-users me-1"></i>Up to <%= listing.maxGuests %> guests
+      &nbsp;·&nbsp;<i class="fa-solid fa-tag me-1"></i><%= listing.category %>
+    </p>
+    <p class="text-muted mb-2">Hosted by <b><%= listing.owner ? listing.owner.username : 'Unknown Host' %></b></p>
+    <hr>
+    <p style="font-size:1.05rem;"><%= listing.description %></p>
+    <h5 class="fw-bold mb-3" style="color: var(--accent-color);">
+      &#8377;<%= listing.price.toLocaleString("en-IN") %> <small class="text-muted fw-normal fs-6">/ night</small>
+    </h5>
+    <hr>
+
+    <!-- Action Buttons (Reserve & Chat) -->
+    <div class="d-flex gap-3 align-items-center mb-4 mt-3">
       <% if (currUser) { %>
-        <a href="/listings/<%= listing._id %>/book" class="btn reserve-btn btn-lg">
-          <i class="fa-solid fa-calendar-check"></i> Reserve Now
+        <a href="/listings/<%= listing._id %>/book" class="btn reserve-btn btn-lg px-4 py-2">
+          <i class="fa-solid fa-calendar-check me-2"></i> Reserve Now
         </a>
+        
+        <% if (listing.owner && !listing.owner._id.equals(currUser._id)) { %>
+          <a href="/listings/<%= listing._id %>/chat" class="btn btn-outline-dark btn-lg px-4 py-2 rounded-pill chat-trigger-btn">
+            <i class="fa-solid fa-comment-dots me-2"></i> Message Host
+          </a>
+        <% } %>
+
       <% } else { %>
-        <button type="button" class="btn reserve-btn btn-lg" data-bs-toggle="modal" data-bs-target="#loginModal">
-          <i class="fa-solid fa-calendar-check"></i> Reserve Now
+        <button type="button" class="btn reserve-btn btn-lg px-4 py-2" data-bs-toggle="modal" data-bs-target="#loginModal">
+          <i class="fa-solid fa-calendar-check me-2"></i> Reserve Now
+        </button>
+        <button type="button" class="btn btn-outline-dark btn-lg px-4 py-2 rounded-pill" data-bs-toggle="modal" data-bs-target="#loginModal">
+          <i class="fa-solid fa-comment-dots me-2"></i> Message Host
         </button>
       <% } %>
     </div>

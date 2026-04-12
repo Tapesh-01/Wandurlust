@@ -55,9 +55,6 @@
     }
   </style>
 
-  <!-- Search Bar -->
-
-
   <div id="filters">
     <% const currentCat = typeof category !== 'undefined' ? category : ''; %>
     
@@ -132,38 +129,106 @@
     </div>
   <% } %>
 
-  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3 ">
-    <% for(let listing of allListings) { %>
+  <!-- ═══ SKELETON LOADER (ghost cards) ═══ -->
+  <style>
+    @keyframes shimmer {
+      0% { background-position: -700px 0; }
+      100% { background-position: 700px 0; }
+    }
+    .skeleton-card {
+      width: 20rem;
+      border-radius: 1rem;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .skeleton-img {
+      height: 20rem;
+      border-radius: 1rem;
+      background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+      background-size: 700px 100%;
+      animation: shimmer 1.4s infinite linear;
+    }
+    .skeleton-line {
+      height: 14px;
+      border-radius: 6px;
+      margin-top: 10px;
+      background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+      background-size: 700px 100%;
+      animation: shimmer 1.4s infinite linear;
+    }
+    .skeleton-line.short { width: 55%; }
+    [data-theme="dark"] .skeleton-img,
+    [data-theme="dark"] .skeleton-line {
+      background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+      background-size: 700px 100%;
+    }
+    /* Real cards hidden initially, then fade in */
+    #realListings { opacity: 0; transition: opacity 0.5s ease; }
+    #realListings.loaded { opacity: 1; }
+  </style>
 
+  <!-- Ghost Cards -->
+  <div id="skeletonGrid" class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
+    <% for(let i = 0; i < 6; i++) { %>
+      <div class="col">
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-line" style="width:80%;"></div>
+          <div class="skeleton-line short"></div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Real Listings (hidden at first) -->
+  <div id="realListings" class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
+    <% for(let listing of allListings) { %>
       <a href="/listings/<%= listing._id %>" class="listing-link">
         <div class="card col card-listing" style="width: 20rem;">
-          <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image" style="height: 20rem" />
+          <img 
+            src="<%= 
+              (listing.images && listing.images.length > 0) 
+                ? listing.images[0].url 
+                : (listing.image && listing.image.url) 
+                  ? listing.image.url 
+                  : 'https://placehold.co/400x300/ffe4e6/fe424d?text=No+Image'
+            %>" 
+            class="card-img-top" 
+            alt="listing_image" 
+            style="height: 20rem" />
           <div class="card-img-overlay"></div>
           <div class="card-body">
             <p class="card-text">
-              <b>
-                <%= listing.title %>
-              </b>
+              <b><%= listing.title %></b>
               <br>
               &#8377; <%= listing.price.toLocaleString("en-IN") %> / night
             </p>
             <i class="tax-info"> &nbsp; &nbsp;+18% GST</i>
-
           </div>
         </div>
       </a>
-      <% } %>
+    <% } %>
+  </div>
 
-        <script>
-          let taxSwitch = document.getElementById("switchCheckDefault");
-          taxSwitch.addEventListener("click", () => {
-            let taxInfo = document.getElementsByClassName("tax-info");
-            for (info of taxInfo) {
-              if (info.style.display != "inline") {
-                info.style.display = "inline";
-              } else {
-                info.style.display = "none";
-              }
-            }
-          });
-        </script>
+  <script>
+    // Simulate skeleton → real content transition
+    window.addEventListener('DOMContentLoaded', function() {
+      const skeleton = document.getElementById('skeletonGrid');
+      const real = document.getElementById('realListings');
+
+      // Give images time to start loading, then reveal
+      setTimeout(function() {
+        skeleton.style.display = 'none';
+        real.classList.add('loaded');
+      }, 700);
+    });
+
+    // Tax toggle
+    let taxSwitch = document.getElementById("switchCheckDefault");
+    taxSwitch.addEventListener("click", () => {
+      let taxInfo = document.getElementsByClassName("tax-info");
+      for (info of taxInfo) {
+        info.style.display = (info.style.display != "inline") ? "inline" : "none";
+      }
+    });
+  </script>
