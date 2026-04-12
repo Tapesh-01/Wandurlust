@@ -344,7 +344,7 @@ footer {
     border-bottom-color: var(--border-color) !important;
 }
 
-/* Global Dark Overrides */
+/* Global Dark Overrides & Readability Fixes */
 [data-theme="dark"] .bg-light,
 [data-theme="dark"] .bg-white,
 [data-theme="dark"] .container,
@@ -356,9 +356,29 @@ footer {
     color: var(--text-color) !important;
 }
 
+/* Force dark text to be readable in dark mode */
+[data-theme="dark"] .text-dark, 
+[data-theme="dark"] .text-black,
+[data-theme="dark"] .fw-bold.text-dark,
+[data-theme="dark"] b, 
+[data-theme="dark"] strong {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] .small,
+[data-theme="dark"] .text-white-50 {
+    color: var(--secondary-text) !important;
+}
+
 [data-theme="dark"] .card {
     background-color: var(--card-bg) !important;
     border: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .card-title,
+[data-theme="dark"] .card-text {
+    color: var(--text-color) !important;
 }
 
 [data-theme="dark"] .dropdown-menu {
@@ -366,8 +386,29 @@ footer {
     border-color: var(--border-color) !important;
 }
 
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background-color: var(--input-bg) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .form-control::placeholder {
+    color: var(--secondary-text) !important;
+    opacity: 0.6;
+}
+
 [data-theme="dark"] .listing-link:hover .card-img-overlay {
     background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsiveness Fixes */
+@media (max-width: 768px) {
+    .navbar-brand { font-size: 1.5rem; }
+    .show-img { height: 25vh; }
+    .btns { flex-direction: column; gap: 10px; }
+    .edit-btn, .reserve-btn { width: 100%; }
+    .gallery-main-img { height: 300px !important; }
 }
 
 .filter {
