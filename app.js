@@ -1,4 +1,4 @@
-if (process.env.NODE_env != "production") {
+if (process.env.NODE_ENV != "production") {
   require('dotenv').config();
 }
 
@@ -58,63 +58,74 @@ app.use(async (req, res, next) => {
   res.locals.error = req.flash("error");
   res.locals.currUser = req.user;
   res.locals.currUserIsHost = false;
-  try {
-    if (req.user) {
-      const listings = await Listing.find({ owner: req.user._id });
-      res.locals.currUserIsHost = listings.length > 0;
+  res.locals.unreadMsgCount = 0;
+  
+  if (req.user) {
+    try {
+      const Listing = require("./models/listing.js");
+      const Booking = require('./models/booking.js');
+      const Chat = require('./models/chat.js');
+      
+      // Check if user is a host (has at least one listing)
+      const userListings = await Listing.find({ owner: req.user._id }).select('_id');
+      res.locals.currUserIsHost = userListings.length > 0;
       
       if (res.locals.currUserIsHost) {
-        const listingIds = listings.map(l => l._id);
-        const Booking = require('./models/booking.js'); // Require here to avoid circular dependency issues at top level
-        
-        const newBookingsCount = await Booking.countDocuments({ 
-            listing: { $in: listingIds },
-            isNewBooking: true
-        });
-        
-        const latestNewBookings = await Booking.find({ 
-            listing: { $in: listingIds },
-            isNewBooking: true
-        }).populate("listing", "title").populate("user", "username").sort({ createdAt: -1 }).limit(5);
-
+        const listingIds = userListings.map(l => l._id);
+        const [newBookingsCount, latestNewBookings] = await Promise.all([
+          Booking.countDocuments({ listing: { $in: listingIds }, isNewBooking: true }),
+          Booking.find({ listing: { $in: listingIds }, isNewBooking: true })
+            .populate("listing", "title")
+            .populate("user", "username")
+            .sort({ createdAt: -1 })
+            .limit(5)
+        ]);
         res.locals.globalNewBookingsCount = newBookingsCount;
         res.locals.globalNewBookings = latestNewBookings;
       }
+
+      // Count all unread messages received by this user
+      res.locals.unreadMsgCount = await Chat.countDocuments({ receiver: req.user._id, isRead: false });
+    } catch (e) {
+      console.warn("Middleware Host Check Error:", e.message);
     }
-  } catch (e) {
-    res.locals.currUserIsHost = false;
   }
   next();
 });
 
 
-
-// app.get("/demouser", async (req, res) => {
-//     let fakeUser = new User({
-//         email: "student@gmail.com",
-//         username: "delta-student",
-//     });
-
-//     let registeredUser = await User.register(fakeUser, "helloworld");
-//     res.send(registeredUser);
-// });
-
+const { Server } = require("socket.io");
+const http = require("http");
 
 // -------------------- DATABASE --------------------
 const MONGO_URL = process.env.ATLASDB_URL || "mongodb://127.0.0.1:27017/wanderlust";
 
 mongoose
   .connect(MONGO_URL)
-  .then(() => console.log("Connected to DB"))
+  .then(async () => {
+    console.log("Connected to DB");
+    try {
+      const Listing = require("./models/listing.js");
+      // Aggregate to find most frequent locations
+      const topLocs = await Listing.aggregate([
+        { $group: { _id: "$location", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 4 }
+      ]);
+      app.locals.topLocations = topLocs.map(l => l._id).filter(l => l);
+    } catch (e) {
+      console.log("Failed to load top locations:", e);
+      app.locals.topLocations = [];
+    }
+  })
   .catch((err) => console.log(err));
-
-
 
 // -------------------- ROUTES --------------------
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 const bookingRouter = require("./routes/booking.js");
+const Chat = require("./models/chat.js");
 
 // Root route - Landing Page
 app.get("/", (req, res) => {
@@ -124,6 +135,104 @@ app.get("/", (req, res) => {
 // Privacy & Terms page
 app.get("/privacy", (req, res) => {
   res.render("privacy.ejs");
+});
+
+// ── Chat: single room ──
+app.get("/listings/:id/chat", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    req.flash("error", "You must be logged in to chat!");
+    return res.redirect("/login");
+  }
+  const { id } = req.params;
+  const partnerId = req.query.partner;
+  const listing = await Listing.findById(id).populate("owner");
+  
+  const targetUser = partnerId ? partnerId : listing.owner._id;
+
+  const chats = await Chat.find({
+    listing: id,
+    $or: [
+      { sender: req.user._id, receiver: targetUser },
+      { sender: targetUser, receiver: req.user._id }
+    ]
+  }).populate("sender", "username").sort({ createdAt: 1 });
+
+  let partnerUser;
+  if(targetUser.toString() === listing.owner._id.toString()) {
+      partnerUser = listing.owner;
+  } else {
+      partnerUser = await User.findById(targetUser);
+  }
+
+  res.render("listings/chat.ejs", { listing, chats, partnerUser });
+});
+
+// ── Mark Chat Read API ──
+app.post("/chats/mark-read", async (req, res) => {
+  if (req.isAuthenticated()) {
+    const { partnerId, listingId } = req.body;
+    await Chat.updateMany(
+      { sender: partnerId, receiver: req.user._id, listing: listingId, isRead: false },
+      { $set: { isRead: true } }
+    );
+    res.json({ success: true });
+  } else {
+    res.json({ success: false });
+  }
+});
+
+// ── Delete Chat Message API ──
+app.delete("/chats/:msgId", async (req, res) => {
+  if (req.isAuthenticated()) {
+    const { msgId } = req.params;
+    // Ensure only the sender can delete their message
+    const deleted = await Chat.findOneAndDelete({ _id: msgId, sender: req.user._id });
+    if(deleted) {
+      res.json({ success: true });
+    } else {
+      res.json({ success: false, msg: "Unauthorized or not found" });
+    }
+  } else {
+    res.json({ success: false });
+  }
+});
+
+// ── Inbox: all conversations for logged-in user ──
+app.get("/inbox", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    req.flash("error", "Please login to view your inbox.");
+    return res.redirect("/login");
+  }
+
+  // Get all messages involving this user, most recent first
+  const allChats = await Chat.find({
+    $or: [{ sender: req.user._id }, { receiver: req.user._id }]
+  })
+    .populate("sender", "username")
+    .populate("receiver", "username")
+    .populate("listing", "title images image")
+    .sort({ createdAt: -1 });
+
+  // Group by listing+partner to show 1 row per conversation
+  const seen = new Set();
+  const conversations = [];
+  for (const chat of allChats) {
+    const partnerId = chat.sender._id.toString() === req.user._id.toString()
+      ? chat.receiver._id.toString()
+      : chat.sender._id.toString();
+    const key = `${chat.listing._id}-${partnerId}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      conversations.push({
+        listing: chat.listing,
+        partner: chat.sender._id.toString() === req.user._id.toString() ? chat.receiver : chat.sender,
+        lastMsg: chat.message,
+        lastTime: chat.createdAt
+      });
+    }
+  }
+
+  res.render("inbox.ejs", { conversations });
 });
 
 app.use("/listings", listingRouter);
@@ -142,7 +251,56 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error.ejs", { message });
 });
 
-// -------------------- SERVER --------------------
-app.listen(8080, () => {
+// -------------------- SERVER & SOCKETS --------------------
+const server = http.createServer(app);
+const io = new Server(server);
+
+io.on("connection", (socket) => {
+  console.log("New User Connected:", socket.id);
+
+  socket.on("join_private", (userId) => {
+    socket.join(`user_${userId}`);
+    console.log(`User joined private room: user_${userId}`);
+  });
+
+  socket.on("join_chat", (chatId) => {
+    socket.join(chatId);
+    console.log(`User joined chat room: ${chatId}`);
+  });
+
+  socket.on("send_message", async (data) => {
+    try {
+      const { sender, receiver, listing, message, roomId } = data;
+      const newChat = new Chat({ sender, receiver, listing, message });
+      await newChat.save();
+      
+      // Emit to the specific chat room
+      io.to(roomId).emit("receive_message", {
+        msgId: newChat._id,
+        message,
+        sender,
+        createdAt: newChat.createdAt
+      });
+
+      // Emit global notification to the receiver's private room
+      io.to(`user_${receiver}`).emit("new_notification");
+
+    } catch (e) {
+      console.error("Socket send_message error:", e);
+    }
+  });
+
+  socket.on("delete_request", (data) => {
+    const { roomId, msgId } = data;
+    io.to(roomId).emit("message_deleted", msgId);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User Disconnected");
+  });
+});
+
+server.listen(8080, () => {
   console.log("Server is listening on port 8080");
 });
+// Restarted!
