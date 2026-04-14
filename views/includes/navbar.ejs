@@ -34,7 +34,7 @@
         .search-input-mock::placeholder { color: #717171; }
       </style>
 
-      <div class="navbar-nav mx-auto d-none d-lg-flex position-relative me-4">
+      <div class="navbar-nav mx-auto d-none d-md-flex position-relative me-4">
         <form method="GET" action="/listings" id="airbnbSearchForm">
         <div class="airbnb-search-bar" id="searchBarGroup">
           
@@ -74,9 +74,9 @@
                   <div class="search-value" id="whenValue">Add dates</div>
                   <input type="hidden" name="dates" id="datesInput">
                </div>
-               <button type="submit" class="btn-search-round" onclick="event.stopPropagation(); document.getElementById('airbnbSearchForm').submit();">
-                 <i class="fa-solid fa-magnifying-glass"></i>
-               </button>
+                <button type="submit" class="btn-search-round">
+                   <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
             </div>
             
             <div class="search-dropdown-menu text-center" style="left:-200px; min-width: 650px; width: max-content; padding: 10px; border-radius: 20px;" id="whenDropdown" onclick="event.stopPropagation()">
