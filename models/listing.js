@@ -44,6 +44,17 @@ const listingSchema = new Schema({
     type: String,
     enum: ['Trending', 'Rooms', 'Iconic Cities', 'Mountains', 'Castels', 'Amezing Pool', 'Camping', 'Farms', 'Arctic', 'Domes', 'Boats'],
     default: 'Trending'
+  },
+  geometry: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      required: true
+    },
+    coordinates: {
+      type: [Number],
+      required: true
+    }
   }
 });
 

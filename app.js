@@ -255,6 +255,9 @@ app.use((err, req, res, next) => {
 const server = http.createServer(app);
 const io = new Server(server);
 
+// Attach io to app so it's accessible in controllers
+app.set("socketio", io);
+
 io.on("connection", (socket) => {
   console.log("New User Connected:", socket.id);
 

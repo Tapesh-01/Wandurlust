@@ -20,8 +20,8 @@ module.exports.index = async (req, res) => {
     query.price = { $lte: parseInt(maxPrice) };
   }
 
-  // 3. Build Category Condition
-  if (category) {
+  // 3. Build Category Condition (Only if NO search is present)
+  if (category && !search) {
     query.category = category;
   }
 
@@ -80,14 +80,57 @@ module.exports.showListing = async (req, res) => {
   res.render("listings/show.ejs", { listing });
 };
 
+// Free Geocoding helper using Nominatim (OpenStreetMap)
+async function getCoordinates(location, country) {
+  try {
+    const query = encodeURIComponent(`${location}, ${country}`);
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`;
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'WandurLust/1.0' }
+    });
+    const data = await response.json();
+    if (data && data.length > 0) {
+      return {
+        type: 'Point',
+        coordinates: [parseFloat(data[0].lon), parseFloat(data[0].lat)]
+      };
+    }
+    return null;
+  } catch (e) {
+    console.error("Geocoding Error:", e.message);
+    return null;
+  }
+}
+
 module.exports.createListing = async (req, res, next) => {
   const newListing = new Listing(req.body.listing);
   newListing.owner = req.user._id;
+
+  // Set geometry using free Nominatim API
+  const geometry = await getCoordinates(req.body.listing.location, req.body.listing.country);
+  if (geometry) {
+    newListing.geometry = geometry;
+  } else {
+    req.flash("error", "Location not found, please try a clearer city/country name.");
+    return res.redirect("/listings/new");
+  }
+
   // Map all uploaded files to {url, filename} objects
   if (req.files && req.files.length > 0) {
     newListing.images = req.files.map(f => ({ url: f.path, filename: f.filename }));
   }
   await newListing.save();
+  
+  // REAL-TIME: Emit new listing to all clients for Global Map update
+  try {
+    const io = req.app.get("socketio");
+    if (io) {
+      io.emit("new_listing", newListing);
+    }
+  } catch (err) {
+    console.error("Socket emit error:", err);
+  }
+
   req.flash("success", "New Listing Created!");
   res.redirect("/listings");
 }
@@ -104,7 +147,16 @@ module.exports.renderEditForm = async (req, res) => {
 
 module.exports.updateListing = async (req, res) => {
   let { id } = req.params;
+  
+  // Geocode the new location using Nominatim
+  const geometry = await getCoordinates(req.body.listing.location, req.body.listing.country);
+
   let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing }, { new: true });
+
+  // Update geometry if found
+  if (geometry) {
+    listing.geometry = geometry;
+  }
 
   // Append newly uploaded images to the images[] array
   if (req.files && req.files.length > 0) {
