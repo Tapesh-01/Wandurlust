@@ -57,25 +57,28 @@
 ```text
 Wandurlust/
 │
-├── controllers/       # Route logic and business operations
+├── controllers/       # Route handlers and business logic
+├── init/              # Database initialization and seeding scripts
 ├── models/            # Mongoose schemas (Listing, User, Review, Booking, Chat)
-├── public/            # Static assets (CSS, JS, Images)
-├── routes/            # Express router files
-│   ├── listing.js
-│   ├── review.js
-│   ├── user.js
-│   ├── booking.js
-│   └── ai.js          # ← NEW: WanderBot AI chat route
-├── services/          # ← NEW: Business logic services
-│   └── wanderbot.js   # ← NEW: Gemini API calls, DB context building, weather fetch
-├── utils/             # Utility classes and helper functions
+├── public/            # Static assets (Custom CSS, JS, Images)
+├── routes/            # Express router modules
+│   ├── listing.js     # Property operations
+│   ├── review.js      # Review operations
+│   ├── user.js        # Authentication and profile routes
+│   ├── booking.js     # Booking process and history
+│   └── ai.js          # WanderBot AI interaction endpoint
+├── services/          # External API & business logic integration
+│   └── wanderbot.js   # Gemini AI orchestration & data processing
+├── utils/             # Error handling and helper utilities
 ├── views/             # EJS templates and UI components
+├── classroom/         # Project prototyping and testing sandboxes
 │
-├── .env               # Environment variables (see setup below)
-├── app.js             # Main application entry point
-├── middleware.js       # Custom Express middlewares
-├── schema.js          # Joi validation schemas
-└── package.json       # Project dependencies and scripts
+├── .env               # Secrets and API configurations
+├── app.js             # Main server and Socket.io entry point
+├── cloudConfig.js     # Cloudinary and storage configuration
+├── middleware.js      # Authentication and validation middlewares
+├── schema.js          # Joi data validation schemas
+└── package.json       # Dependencies and start scripts
 ```
 
 ---
