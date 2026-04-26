@@ -8,14 +8,15 @@ const Booking = require("../models/booking.js");
 
 // ── Model fallback chain (first available wins) ──────────────────────────────
 const GEMINI_MODELS = [
+  "gemini-1.5-flash",
   "gemini-2.0-flash",
   "gemini-2.0-flash-lite",
-  "gemini-1.5-flash",
 ];
 
 // ── Raw REST call to Gemini (no SDK) ────────────────────────────────────────
 async function callGemini(apiKey, model, contents) {
   let lastErr = null;
+  // Try v1beta first as it's almost always supported for free tier
   for (const ver of ["v1beta", "v1"]) {
     const url = `https://generativelanguage.googleapis.com/${ver}/models/${model}:generateContent?key=${apiKey}`;
     try {
@@ -31,11 +32,10 @@ async function callGemini(apiKey, model, contents) {
         return { ok: true, text: data.candidates[0].content.parts[0].text };
       }
       
-      // If we get a real error from Google, keep it but let the loop try next version/model
       lastErr = { ok: false, code: data.error?.code || res.status, msg: data.error?.message || "Unknown error" };
       
-      // If it's a 429 quota error, we should probably stop and report it
-      if (lastErr.code === 429) return lastErr;
+      // If we got a 429, it means the key is hitting its limit for THIS model
+      if (lastErr.code === 429) break; 
       
     } catch (e) {
       lastErr = { ok: false, code: 503, msg: e.message };
