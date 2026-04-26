@@ -1,6 +1,6 @@
 /**
  * wanderbot.js — WanderBot AI Service
- * Handles all Gemini API calls + live context building (DB listings)
+ * Standardized for Gemini 1.5 Flash (Reliable Free Tier)
  */
 
 const Listing = require("../models/listing.js");
@@ -8,59 +8,35 @@ const Booking = require("../models/booking.js");
 
 const GEMINI_MODELS = [
   "gemini-1.5-flash",
+  "gemini-1.5-flash-latest",
   "gemini-1.5-flash-8b",
-  "gemini-2.0-flash",
-  "gemini-2.0-flash-lite",
 ];
 
 async function callGemini(apiKey, model, contents) {
-  let lastErr = null;
-  // Using v1beta for widest compatibility
-  for (const ver of ["v1beta", "v1"]) {
-    const url = `https://generativelanguage.googleapis.com/${ver}/models/${model}:generateContent?key=${apiKey}`;
-    try {
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents }),
-        signal: AbortSignal.timeout(15000),
-      });
-      const data = await res.json();
-
-      if (data.candidates && data.candidates[0]) {
-        return { ok: true, text: data.candidates[0].content.parts[0].text };
-      }
-      
-      lastErr = { ok: false, code: data.error?.code || res.status, msg: data.error?.message || "Unknown error" };
-      if (lastErr.code === 429) return lastErr; 
-      
-    } catch (e) {
-      lastErr = { ok: false, code: 503, msg: e.message };
-    }
-  }
-  return lastErr || { ok: false, code: 404 };
-}
-
-async function getWeather(location) {
+  // Free tier keys strongly prefer v1beta for these models
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
   try {
-    const r = await fetch(`https://wttr.in/${encodeURIComponent(location)}?format=3`, { signal: AbortSignal.timeout(4000) });
-    return r.ok ? (await r.text()).trim() : null;
-  } catch { return null; }
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents }),
+      signal: AbortSignal.timeout(15000),
+    });
+    const data = await res.json();
+
+    if (data.candidates && data.candidates[0]) {
+      return { ok: true, text: data.candidates[0].content.parts[0].text };
+    }
+    return { ok: false, code: data.error?.code || res.status, msg: data.error?.message || "Unknown error" };
+  } catch (e) {
+    return { ok: false, code: 503, msg: e.message };
+  }
 }
 
 async function buildSystemPrompt() {
-  const listings = await Listing.find({}).select("title price location country category description").limit(15).lean();
-  const listingLines = listings.map(l => `• ${l.title} | ${l.location} | ₹${l.price}`).join("\n");
-  
-  return `You are WanderBot 🌍, the AI assistant for WanderLust.
-  
-=== CURRENT LISTINGS ===
-${listingLines || "No listings yet."}
-
-Rules:
-1. Use listing data above for queries.
-2. Answer any travel questions.
-3. Keep it short and use emojis. 🌍`;
+  const listings = await Listing.find({}).select("title location price").limit(10).lean();
+  const listingCtx = listings.map(l => `• ${l.title} in ${l.location} (₹${l.price})`).join("\n");
+  return `You are WanderBot for WanderLust.\n\nLISTINGS:\n${listingCtx}\n\nBe helpful, short, and use emojis.`;
 }
 
 async function wanderbotReply(message, history = []) {
@@ -68,14 +44,16 @@ async function wanderbotReply(message, history = []) {
   if (!apiKey) return { error: true };
 
   const systemPrompt = await buildSystemPrompt();
-
-  // Simple, standard payload (System Context as the first turn)
+  
+  // Cleanest possible "Chat history" format for Gemini
   const contents = [
-    { role: "user",  parts: [{ text: `SYSTEM CONTEXT: ${systemPrompt}\n\nUSER MESSAGE: ${message}` }] },
-    ...history.slice(-4).map(m => ({ 
+    { role: "user", parts: [{ text: systemPrompt }] },
+    { role: "model", parts: [{ text: "Understood. I will help users find stays and answer travel questions using this data." }] },
+    ...history.slice(-4).map(m => ({
       role: m.role === "model" ? "model" : "user",
-      parts: [{ text: m.text }] 
-    })).filter(m => m.parts[0].text !== message) // prevent duplicates
+      parts: [{ text: m.text }]
+    })),
+    { role: "user", parts: [{ text: message }] }
   ];
 
   let lastError = null;
