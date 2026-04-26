@@ -15,6 +15,7 @@ const GEMINI_MODELS = [
 
 // ── Raw REST call to Gemini (no SDK) ────────────────────────────────────────
 async function callGemini(apiKey, model, contents) {
+  let lastErr = null;
   for (const ver of ["v1beta", "v1"]) {
     const url = `https://generativelanguage.googleapis.com/${ver}/models/${model}:generateContent?key=${apiKey}`;
     try {
@@ -29,14 +30,18 @@ async function callGemini(apiKey, model, contents) {
       if (data.candidates && data.candidates[0]) {
         return { ok: true, text: data.candidates[0].content.parts[0].text };
       }
-      if (data.error?.code === 429) return { ok: false, code: 429 };
-      if (data.error?.code !== 404) return { ok: false, code: data.error?.code || 500 };
-      // 404 = model not on this API version → try next version
+      
+      // If we get a real error from Google, keep it but let the loop try next version/model
+      lastErr = { ok: false, code: data.error?.code || res.status, msg: data.error?.message || "Unknown error" };
+      
+      // If it's a 429 quota error, we should probably stop and report it
+      if (lastErr.code === 429) return lastErr;
+      
     } catch (e) {
-      return { ok: false, code: 503, msg: e.message };
+      lastErr = { ok: false, code: 503, msg: e.message };
     }
   }
-  return { ok: false, code: 404 };
+  return lastErr || { ok: false, code: 404 };
 }
 
 // ── Live weather via wttr.in (no API key needed) ─────────────────────────────
