@@ -15,16 +15,21 @@ const GEMINI_MODELS = [
 ];
 
 // ── Raw REST call to Gemini (no SDK) ────────────────────────────────────────
-async function callGemini(apiKey, model, contents) {
+async function callGemini(apiKey, model, contents, systemInstruction) {
   let lastErr = null;
   // Try v1beta first as it's almost always supported for free tier
   for (const ver of ["v1beta", "v1"]) {
     const url = `https://generativelanguage.googleapis.com/${ver}/models/${model}:generateContent?key=${apiKey}`;
     try {
+      const payload = { contents };
+      if (systemInstruction) {
+        payload.system_instruction = { parts: [{ text: systemInstruction }] };
+      }
+
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents }),
+        body: JSON.stringify(payload),
         signal: AbortSignal.timeout(15000),
       });
       const data = await res.json();
@@ -32,12 +37,12 @@ async function callGemini(apiKey, model, contents) {
       if (data.candidates && data.candidates[0]) {
         return { ok: true, text: data.candidates[0].content.parts[0].text };
       }
-
+      
       lastErr = { ok: false, code: data.error?.code || res.status, msg: data.error?.message || "Unknown error" };
-
+      
       // If we got a 429, it means the key is hitting its limit for THIS model
-      if (lastErr.code === 429) break;
-
+      if (lastErr.code === 429) break; 
+      
     } catch (e) {
       lastErr = { ok: false, code: 503, msg: e.message };
     }
@@ -60,12 +65,10 @@ async function getWeather(location) {
 
 // ── Build dynamic system prompt with LIVE data ───────────────────────────────
 async function buildSystemPrompt() {
-  // 1. All listings from DB (auto-updates as new listings are added)
   const listings = await Listing.find({})
     .select("title price location country category maxGuests description")
     .lean();
 
-  // 2. Which listings are currently booked (checking today's date)
   const today = new Date();
   const activeBookings = await Booking.find({
     status: "active",
@@ -76,7 +79,6 @@ async function buildSystemPrompt() {
     .lean();
   const bookedIds = new Set(activeBookings.map((b) => b.listing.toString()));
 
-  // 3. Format listing data as readable lines (Shortened to save tokens/quota)
   const listingLines = listings
     .map((l) => {
       const status = bookedIds.has(l._id.toString()) ? "Booked" : "Available";
@@ -84,7 +86,6 @@ async function buildSystemPrompt() {
     })
     .join("\n");
 
-  // 4. Live weather for top destination only (save tokens)
   const topLoc = listings.length > 0 ? listings[0].location : null;
   const weatherLine = topLoc ? await getWeather(topLoc) : null;
   const weatherInfo = weatherLine ? `• ${weatherLine}` : "Weather data unavailable.";
@@ -108,16 +109,14 @@ Date: ${new Date().toDateString()}`;
 async function wanderbotReply(message, history = []) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    console.error("WanderBot Error: GEMINI_API_KEY is missing from environment variables!");
+    console.error("WanderBot Error: GEMINI_API_KEY is missing!");
     return { error: true };
   }
 
-  const systemPrompt = await buildSystemPrompt();
+  const systemInstruction = await buildSystemPrompt();
 
   const contents = [
-    { role: "user", parts: [{ text: "Who are you and what listings do you have?" }] },
-    { role: "model", parts: [{ text: systemPrompt }] },
-    ...history.map((m) => ({
+    ...history.slice(-4).map((m) => ({ 
       role: m.role === "model" ? "model" : "user",
       parts: [{ text: m.text }],
     })),
@@ -126,11 +125,10 @@ async function wanderbotReply(message, history = []) {
 
   let lastError = null;
   for (const model of GEMINI_MODELS) {
-    const result = await callGemini(apiKey, model, contents);
+    const result = await callGemini(apiKey, model, contents, systemInstruction);
     if (result.ok) return { reply: result.text };
     console.error(`WanderBot Model ${model} failed with code: ${result.code}`, result.msg || "");
     lastError = result;
-    // Don't break on 429, try next model which might have quota
   }
 
   if (lastError?.code === 429) return { quota_exceeded: true };
