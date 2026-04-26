@@ -112,6 +112,8 @@ async function wanderbotReply(message, history = []) {
     console.error("WanderBot Error: GEMINI_API_KEY is missing!");
     return { error: true };
   }
+  // Debug key signature only (safe logging)
+  console.log(`WanderBot Debug: Using Key starting with "${apiKey.substring(0, 5)}" and ending with "${apiKey.substring(apiKey.length - 5)}"`);
 
   const systemInstruction = await buildSystemPrompt();
 
@@ -126,8 +128,11 @@ async function wanderbotReply(message, history = []) {
   let lastError = null;
   for (const model of GEMINI_MODELS) {
     const result = await callGemini(apiKey, model, contents, systemInstruction);
-    if (result.ok) return { reply: result.text };
-    console.error(`WanderBot Model ${model} failed with code: ${result.code}`, result.msg || "");
+    if (result.ok) {
+      console.log(`WanderBot: Success with model ${model}`);
+      return { reply: result.text };
+    }
+    console.error(`WanderBot Debug: Model ${model} failed. Code: ${result.code} | Msg: ${result.msg}`);
     lastError = result;
   }
 
