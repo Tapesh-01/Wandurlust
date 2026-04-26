@@ -8,7 +8,6 @@ const Booking = require("../models/booking.js");
 
 // ── Model fallback chain (first available wins) ──────────────────────────────
 const GEMINI_MODELS = [
-  "gemini-2.5-flash",
   "gemini-2.0-flash",
   "gemini-2.0-flash-lite",
   "gemini-1.5-flash",
@@ -152,7 +151,8 @@ async function wanderbotReply(message, history = []) {
     const result = await callGemini(apiKey, model, contents);
     if (result.ok) return { reply: result.text };
     lastError = result;
-    if (result.code !== 429 && result.code !== 404) break; // hard error, stop
+    // Only stop if we hit a rate limit, otherwise try next model
+    if (result.code === 429) break; 
   }
 
   if (lastError?.code === 429) return { quota_exceeded: true };
