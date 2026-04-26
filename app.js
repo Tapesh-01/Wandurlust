@@ -128,8 +128,36 @@ const bookingRouter = require("./routes/booking.js");
 const Chat = require("./models/chat.js");
 
 // Root route - Landing Page
-app.get("/", (req, res) => {
-  res.render("home.ejs");
+app.get("/", async (req, res) => {
+  try {
+    const Listing = require("./models/listing.js");
+    const Review = require("./models/review.js");
+    
+    // Fetch live stats from the database
+    const [totalStays, highPriceStays, reviews] = await Promise.all([
+      Listing.countDocuments({}),
+      Listing.countDocuments({ price: { $gte: 2000 } }),
+      Review.find({})
+    ]);
+    
+    let avgRating = 4.9; // fallback high rating
+    if (reviews.length > 0) {
+      const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+      avgRating = (sum / reviews.length).toFixed(1);
+    }
+    
+    res.render("home.ejs", { 
+      stats: {
+        stays: totalStays || 0,
+        luxury: highPriceStays || 0,
+        rating: avgRating
+      }
+    });
+  } catch (err) {
+    console.error("Stats fetching error:", err);
+    // fallback if DB not connected (e.g. cache scenario)
+    res.render("home.ejs", { stats: null });
+  }
 });
 
 // Privacy & Terms page

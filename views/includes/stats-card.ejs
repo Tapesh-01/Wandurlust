@@ -2,15 +2,15 @@
     <div class="stats-header">Wanderlust Highlights</div>
     <div class="stats-list">
         <div class="stat-item">
-            <span class="stat-val">12k+</span>
+            <span class="stat-val"><%= typeof stats !== 'undefined' && stats ? stats.stays : '12k+' %><%= typeof stats !== 'undefined' && stats && stats.stays < 50 ? '' : '+' %></span>
             <span class="stat-label">Global Stays</span>
         </div>
         <div class="stat-item">
-            <span class="stat-val">500+</span>
+            <span class="stat-val"><%= typeof stats !== 'undefined' && stats ? stats.luxury : '500+' %><%= typeof stats !== 'undefined' && stats && stats.luxury < 50 ? '' : '+' %></span>
             <span class="stat-label">Luxury Villas</span>
         </div>
         <div class="stat-item">
-            <span class="stat-val">4.9/5</span>
+            <span class="stat-val"><%= typeof stats !== 'undefined' && stats ? stats.rating : '4.9' %>/5</span>
             <span class="stat-label">User Rating</span>
         </div>
     </div>
