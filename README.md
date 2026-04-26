@@ -1,5 +1,7 @@
 # 🌍 Wandurlust
 
+**🌐 Live Demo:** [https://wandurlust-31y0.onrender.com](https://wandurlust-31y0.onrender.com)
+
 **Wandurlust** is a full-stack web application inspired by Airbnb, designed to connect travelers with incredible places to stay. From finding the perfect vacation home to becoming a host and earning money, Wandurlust offers a seamless, premium, and fully featured platform for the modern explorer.
 
 ---
