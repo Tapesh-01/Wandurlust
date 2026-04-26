@@ -240,7 +240,13 @@ app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 app.use("/", bookingRouter);
 
+// -------------------- AI CHATBOT --------------------
+const aiRouter = require("./routes/ai.js");
+app.use("/", aiRouter);
+
+
 // -------------------- 404 HANDLER --------------------
+
 app.use((req, res, next) => {
   next(new ExpressError(404, "Page Not Found!"));
 });

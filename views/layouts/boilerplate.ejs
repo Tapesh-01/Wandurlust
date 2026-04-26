@@ -55,12 +55,11 @@
   <script src="https://cdn.jsdelivr.net/npm/leaflet-arc@1.0.0/dist/leaflet-arc.min.js"></script>
 
   <!-- Leaflet Fullscreen Plugin -->
-
   <link href="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css"
     rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js"></script>
 
-  <!-- Premium Map Popup CSS -->
+  <!-- ── Map Popup Styles ── -->
   <style>
     .leaflet-popup-content-wrapper {
       border-radius: 12px;
@@ -68,45 +67,15 @@
       overflow: hidden;
       box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     }
-    .leaflet-popup-content {
-      margin: 0;
-      width: 200px !important;
-    }
-    .map-popup-card {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    .map-popup-img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-    }
-    .map-popup-info {
-      padding: 12px;
-    }
-    .map-popup-title {
-      font-weight: 700;
-      font-size: 0.95rem;
-      margin-bottom: 4px;
-      color: #222;
-    }
-    .map-popup-price {
-      font-size: 0.85rem;
-      color: #fe424d;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .map-popup-distance {
-      font-size: 0.75rem;
-      color: #666;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
+    .leaflet-popup-content { margin: 0; width: 200px !important; }
+    .map-popup-card { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .map-popup-img { width: 100%; height: 120px; object-fit: cover; }
+    .map-popup-info { padding: 12px; }
+    .map-popup-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; color: #222; }
+    .map-popup-price { font-size: 0.85rem; color: #fe424d; font-weight: 600; margin-bottom: 4px; }
+    .map-popup-distance { font-size: 0.75rem; color: #666; display: flex; align-items: center; gap: 4px; }
     .leaflet-container a.leaflet-popup-close-button {
-      background: white;
-      border-radius: 50%;
-      padding: 4px;
-      margin: 8px;
+      background: white; border-radius: 50%; padding: 4px; margin: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     [data-theme="dark"] .map-popup-title { color: #f8fafc; }
@@ -116,7 +85,87 @@
   <!-- Flatpickr Datepicker -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
-
+  <!-- ── WanderBot Chatbot Styles ── -->
+  <style>
+    /* Floating Button */
+    #wb-fab {
+      position: fixed; bottom: 28px; right: 28px;
+      width: 60px; height: 60px; border-radius: 50%;
+      background: linear-gradient(135deg, #fe424d 0%, #ff6b35 100%);
+      border: none; cursor: pointer;
+      box-shadow: 0 6px 24px rgba(254,66,77,0.5);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999;
+      transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s;
+    }
+    #wb-fab:hover { transform: scale(1.12); box-shadow: 0 10px 32px rgba(254,66,77,0.65); }
+    #wb-fab svg { width: 28px; height: 28px; fill: #fff; transition: opacity 0.2s; }
+    #wb-fab .wb-close-icon { display: none; }
+    #wb-fab.open .wb-open-icon { display: none; }
+    #wb-fab.open .wb-close-icon { display: block; }
+    #wb-fab.open { transform: rotate(0deg) scale(1.05); }
+    /* Chat Window */
+    #wb-window {
+      position: fixed; bottom: 102px; right: 28px;
+      width: 375px; max-height: 540px; border-radius: 20px;
+      background: rgba(255,255,255,0.97); backdrop-filter: blur(20px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06);
+      display: flex; flex-direction: column; z-index: 9998; overflow: hidden;
+      transform: scale(0.85) translateY(20px); transform-origin: bottom right;
+      opacity: 0; pointer-events: none;
+      transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), opacity 0.25s ease;
+    }
+    #wb-window.open { transform: scale(1) translateY(0); opacity: 1; pointer-events: all; }
+    [data-theme="dark"] #wb-window { background: rgba(22,28,45,0.97); box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.07); }
+    /* Header */
+    #wb-header { background: linear-gradient(135deg, #fe424d 0%, #ff6b35 100%); padding: 16px 18px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    #wb-header .wb-avatar { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.4); }
+    #wb-header .wb-info h4 { margin: 0; color: #fff; font-size: 0.95rem; font-weight: 700; }
+    #wb-header .wb-info span { color: rgba(255,255,255,0.85); font-size: 0.75rem; }
+    #wb-header .wb-status { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; display: inline-block; margin-right: 4px; box-shadow: 0 0 6px #4ade80; }
+    /* Messages */
+    #wb-msgs { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
+    #wb-msgs::-webkit-scrollbar { width: 4px; }
+    #wb-msgs::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 4px; }
+    [data-theme="dark"] #wb-msgs::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+    /* Bubbles */
+    .wb-bubble { max-width: 85%; padding: 10px 14px; border-radius: 18px; font-size: 0.875rem; line-height: 1.5; animation: wb-pop 0.25s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes wb-pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .wb-bubble.bot { align-self: flex-start; background: #f1f3f8; color: #1a1a2e; border-bottom-left-radius: 5px; }
+    [data-theme="dark"] .wb-bubble.bot { background: #2a2f45; color: #e2e8f0; }
+    .wb-bubble.user { align-self: flex-end; background: linear-gradient(135deg, #fe424d, #ff6b35); color: #fff; border-bottom-right-radius: 5px; }
+    .wb-bubble p { margin: 0 0 6px 0; } .wb-bubble p:last-child { margin: 0; }
+    .wb-bubble strong { font-weight: 700; }
+    .wb-bubble ul, .wb-bubble ol { margin: 4px 0 0 0; padding-left: 18px; }
+    .wb-bubble li { margin-bottom: 2px; }
+    /* Typing dots */
+    .wb-typing { display: flex; gap: 5px; align-items: center; padding: 12px 16px; background: #f1f3f8; border-radius: 18px; border-bottom-left-radius: 5px; align-self: flex-start; }
+    [data-theme="dark"] .wb-typing { background: #2a2f45; }
+    .wb-typing span { width: 7px; height: 7px; border-radius: 50%; background: #fe424d; animation: wb-dot 1.2s infinite; }
+    .wb-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .wb-typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes wb-dot { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+    /* Quick chips */
+    #wb-quick { padding: 8px 16px; display: flex; gap: 6px; flex-wrap: wrap; border-top: 1px solid rgba(0,0,0,0.06); flex-shrink: 0; }
+    [data-theme="dark"] #wb-quick { border-top-color: rgba(255,255,255,0.07); }
+    .wb-chip { background: rgba(254,66,77,0.1); color: #fe424d; border: 1px solid rgba(254,66,77,0.25); border-radius: 20px; padding: 4px 11px; font-size: 0.72rem; cursor: pointer; white-space: nowrap; transition: background 0.2s, color 0.2s; }
+    .wb-chip:hover { background: #fe424d; color: #fff; }
+    /* Input row */
+    #wb-input-row { padding: 12px 14px; display: flex; gap: 8px; border-top: 1px solid rgba(0,0,0,0.06); flex-shrink: 0; background: inherit; }
+    [data-theme="dark"] #wb-input-row { border-top-color: rgba(255,255,255,0.07); }
+    #wb-input { flex: 1; border: 1.5px solid #e2e8f0; border-radius: 24px; padding: 10px 16px; font-size: 0.875rem; outline: none; resize: none; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.4; background: #f8fafc; color: #1a1a2e; max-height: 100px; overflow-y: auto; transition: border-color 0.2s; }
+    [data-theme="dark"] #wb-input { background: #1e2440; border-color: #3a4060; color: #e2e8f0; }
+    #wb-input:focus { border-color: #fe424d; }
+    #wb-send { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #fe424d, #ff6b35); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.2s, opacity 0.2s; opacity: 0.5; }
+    #wb-send:not(:disabled) { opacity: 1; }
+    #wb-send:not(:disabled):hover { transform: scale(1.1); }
+    #wb-send svg { width: 18px; height: 18px; fill: #fff; }
+    /* Responsive */
+    @media (max-width: 480px) {
+      #wb-window { width: calc(100vw - 24px); right: 12px; bottom: 90px; }
+      #wb-fab { right: 16px; bottom: 20px; }
+    }
+  </style>
 
 </head>
 
@@ -136,51 +185,37 @@
         crossorigin="anonymous"></script>
       <!-- Flatpickr JS -->
       <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+      <!-- ── Navbar Scroll + Dark Mode Toggle ── -->
       <script>
         document.addEventListener('DOMContentLoaded', () => {
-          // Navbar scroll effect
+          // Navbar scroll shadow
           window.addEventListener('scroll', () => {
             const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 10) {
-              navbar.classList.add('navbar-scrolled');
-            } else {
-              navbar.classList.remove('navbar-scrolled');
-            }
+            if (navbar) navbar.classList.toggle('navbar-scrolled', window.scrollY > 10);
           });
 
-          // ── Dark Mode Toggle ──────────────────────────────────
+          // Dark Mode Toggle
           const toggleBtn = document.getElementById('themeToggle');
           const themeIcon = document.getElementById('themeIcon');
 
           function applyTheme(theme) {
             if (theme === 'dark') {
               document.documentElement.setAttribute('data-theme', 'dark');
-              if (themeIcon) {
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-              }
+              themeIcon?.classList.replace('fa-moon', 'fa-sun');
             } else {
               document.documentElement.removeAttribute('data-theme');
-              if (themeIcon) {
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
-              }
+              themeIcon?.classList.replace('fa-sun', 'fa-moon');
             }
           }
 
-          // Sync icon with current state on page load
-          const currentTheme = localStorage.getItem('wandurlust-theme') || 'light';
-          applyTheme(currentTheme);
+          applyTheme(localStorage.getItem('wandurlust-theme') || 'light');
 
-          // Toggle on click
           if (toggleBtn) {
             toggleBtn.addEventListener('click', () => {
-              const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-              const newTheme = isDark ? 'light' : 'dark';
+              const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
               localStorage.setItem('wandurlust-theme', newTheme);
               applyTheme(newTheme);
-
-              // Spin animation on toggle
               toggleBtn.style.transform = 'rotate(360deg)';
               setTimeout(() => { toggleBtn.style.transform = ''; }, 500);
             });
@@ -188,19 +223,14 @@
         });
       </script>
 
-      <!-- Global Socket.io for Real-time Notifications -->
+      <!-- ── Global Socket.io for Real-time Notifications ── -->
       <% if (currUser) { %>
         <script src="/socket.io/socket.io.js"></script>
         <script>
             const globalSocket = io();
-            // Join a private room for this specific user
             globalSocket.emit("join_private", "<%= currUser._id %>");
 
-            // Listen for new messages when NOT on the chat page itself
             globalSocket.on("new_notification", () => {
-                // If we are currently IN the chat window, we shouldn't bump the badge 
-                // (or handle it gracefully), but for simplicity, bump the badge.
-                // Re-fetch or manually bump red badge in navbar:
                 const badgeElements = document.querySelectorAll('.fa-comment-dots + span.badge');
                 if (badgeElements.length > 0) {
                     badgeElements.forEach(badge => {
@@ -217,6 +247,143 @@
             });
         </script>
       <% } %>
+
+  <!-- ══════════════ WANDERBOT AI CHATBOT WIDGET ══════════════ -->
+
+  <!-- Floating Button -->
+  <button id="wb-fab" aria-label="Open WanderBot AI Assistant">
+    <svg class="wb-open-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.57 1.38 5.05L3 21l3.95-.38C8.43 21.5 10.15 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.74 0-3.36-.49-4.73-1.33L5 19l.35-2.24A7.939 7.939 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8z"/></svg>
+    <svg class="wb-close-icon" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+  </button>
+
+  <!-- Chat Window -->
+  <div id="wb-window" role="dialog" aria-label="WanderBot AI Chat">
+    <div id="wb-header">
+      <div class="wb-avatar">🌍</div>
+      <div class="wb-info">
+        <h4>WanderBot</h4>
+        <span><span class="wb-status"></span>AI Travel Assistant</span>
+      </div>
+    </div>
+    <div id="wb-msgs" aria-live="polite"></div>
+    <div id="wb-quick">
+      <button class="wb-chip" data-msg="What is WanderLust?">What is WanderLust?</button>
+      <button class="wb-chip" data-msg="How do I book a stay?">How to book?</button>
+      <button class="wb-chip" data-msg="Best travel tips for first-timers?">Travel tips</button>
+      <button class="wb-chip" data-msg="What are the top destinations right now?">Top destinations</button>
+    </div>
+    <div id="wb-input-row">
+      <textarea id="wb-input" rows="1" placeholder="Ask me anything about travel..." aria-label="Chat message"></textarea>
+      <button id="wb-send" disabled aria-label="Send">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── WanderBot Logic ── -->
+  <script>
+  (function() {
+    const fab   = document.getElementById('wb-fab');
+    const win   = document.getElementById('wb-window');
+    const msgs  = document.getElementById('wb-msgs');
+    const input = document.getElementById('wb-input');
+    const send  = document.getElementById('wb-send');
+    const chips = document.querySelectorAll('.wb-chip');
+
+    let history = [], isOpen = false, sending = false, greeted = false;
+
+    function toggleChat() {
+      isOpen = !isOpen;
+      win.classList.toggle('open', isOpen);
+      fab.classList.toggle('open', isOpen);
+      if (isOpen && !greeted) { greet(); greeted = true; }
+      if (isOpen) setTimeout(() => input.focus(), 350);
+    }
+    fab.addEventListener('click', toggleChat);
+
+    function greet() {
+      addMsg('bot', "Hey there, traveller! ✈️ I'm **WanderBot**, your AI travel assistant. Ask me anything — destinations, booking tips, packing lists, or how WanderLust works!");
+    }
+
+    function addMsg(role, text) {
+      const div = document.createElement('div');
+      div.className = `wb-bubble ${role}`;
+      div.innerHTML = renderMarkdown(text);
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+      return div;
+    }
+
+    function showTyping() {
+      const t = document.createElement('div');
+      t.className = 'wb-typing'; t.id = 'wb-typing';
+      t.innerHTML = '<span></span><span></span><span></span>';
+      msgs.appendChild(t); msgs.scrollTop = msgs.scrollHeight;
+    }
+    function hideTyping() { const t = document.getElementById('wb-typing'); if (t) t.remove(); }
+
+    function renderMarkdown(text) {
+      return text
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g,'<em>$1</em>')
+        .replace(/`(.+?)`/g,'<code>$1</code>')
+        .replace(/^• (.+)$/gm,'<li>$1</li>')
+        .replace(/^- (.+)$/gm,'<li>$1</li>')
+        .replace(/^(\d+)\. (.+)$/gm,'<li>$2</li>')
+        .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+        .replace(/\n/g,'<br>');
+    }
+
+    async function sendMessage(text) {
+      if (sending || !text.trim()) return;
+      sending = true; send.disabled = true;
+      input.value = ''; input.style.height = 'auto';
+      addMsg('user', text); showTyping();
+      try {
+        const res = await fetch('/api/ai-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, history })
+        });
+        const data = await res.json();
+        hideTyping();
+        if (data.error === 'quota_exceeded') {
+          addMsg('bot', "⏳ I'm a bit overwhelmed right now! Free API quota is full. Try again in a minute — I'll be right back! 🙏");
+        } else {
+          const reply = data.reply || data.error || "Hmm, something went wrong. Try again! 🙏";
+          addMsg('bot', reply);
+          history.push({ role: 'user', text });
+          history.push({ role: 'model', text: reply });
+          if (history.length > 20) history = history.slice(-20);
+        }
+      } catch(e) {
+        hideTyping();
+        addMsg('bot', "Oops! Can't connect right now. Please try again! 🔌");
+      }
+      sending = false;
+      send.disabled = !input.value.trim();
+      setTimeout(() => input.focus(), 100);
+    }
+
+    input.addEventListener('input', function() {
+      send.disabled = !this.value.trim();
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+    });
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!send.disabled) sendMessage(this.value.trim()); }
+    });
+    send.addEventListener('click', () => sendMessage(input.value.trim()));
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        if (!isOpen) toggleChat();
+        setTimeout(() => sendMessage(chip.dataset.msg), isOpen ? 0 : 400);
+      });
+    });
+  })();
+  </script>
+
 </body>
 
-</html>
+</html>
