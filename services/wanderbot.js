@@ -9,6 +9,7 @@ const Booking = require("../models/booking.js");
 // ── Model fallback chain (first available wins) ──────────────────────────────
 const GEMINI_MODELS = [
   "gemini-1.5-flash",
+  "gemini-1.5-flash-8b",
   "gemini-2.0-flash",
   "gemini-2.0-flash-lite",
 ];
@@ -31,12 +32,12 @@ async function callGemini(apiKey, model, contents) {
       if (data.candidates && data.candidates[0]) {
         return { ok: true, text: data.candidates[0].content.parts[0].text };
       }
-      
+
       lastErr = { ok: false, code: data.error?.code || res.status, msg: data.error?.message || "Unknown error" };
-      
+
       // If we got a 429, it means the key is hitting its limit for THIS model
-      if (lastErr.code === 429) break; 
-      
+      if (lastErr.code === 429) break;
+
     } catch (e) {
       lastErr = { ok: false, code: 503, msg: e.message };
     }
@@ -114,7 +115,7 @@ async function wanderbotReply(message, history = []) {
   const systemPrompt = await buildSystemPrompt();
 
   const contents = [
-    { role: "user",  parts: [{ text: "Who are you and what listings do you have?" }] },
+    { role: "user", parts: [{ text: "Who are you and what listings do you have?" }] },
     { role: "model", parts: [{ text: systemPrompt }] },
     ...history.map((m) => ({
       role: m.role === "model" ? "model" : "user",
