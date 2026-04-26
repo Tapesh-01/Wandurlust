@@ -101,6 +101,10 @@ Date: ${new Date().toDateString()}`;
 // ── Main exported function — call this from the route ────────────────────────
 async function wanderbotReply(message, history = []) {
   const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    console.error("WanderBot Error: GEMINI_API_KEY is missing from environment variables!");
+    return { error: true };
+  }
 
   const systemPrompt = await buildSystemPrompt();
 
@@ -118,6 +122,7 @@ async function wanderbotReply(message, history = []) {
   for (const model of GEMINI_MODELS) {
     const result = await callGemini(apiKey, model, contents);
     if (result.ok) return { reply: result.text };
+    console.error(`WanderBot Model ${model} failed with code: ${result.code}`, result.msg || "");
     lastError = result;
     // Don't break on 429, try next model which might have quota
   }
