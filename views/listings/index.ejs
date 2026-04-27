@@ -199,13 +199,15 @@
             </div>
           <% } %>
           
-          <!-- "See All" Card -->
+          <!-- "See All" Card (Stacked Images Design) -->
           <div class="popular-card d-flex align-items-center justify-content-center">
-            <a href="/listings/explore" class="show-more-card text-decoration-none text-center p-5 rounded-4 border w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="background: var(--footer-bg); color: var(--text-color); border-style: dashed !important; border-width: 2px !important;">
-               <div class="icon-circle rounded-circle bg-white shadow-sm mb-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; color: #222;">
-                 <i class="fa-solid fa-arrow-right"></i>
+            <a href="/listings/explore" class="show-more-card text-decoration-none text-center p-5 rounded-4 border w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+               <div class="image-stack">
+                 <% for(let j=0; j<Math.min(3, allListings.length); j++) { %>
+                   <img src="<%= (allListings[j].images && allListings[j].images.length > 0) ? allListings[j].images[0].url.replace('/upload', '/upload/w_100,h_100,c_fill') : allListings[j].image.url.replace('/upload', '/upload/w_100,h_100,c_fill') %>" class="stack-img" alt="stack">
+                 <% } %>
                </div>
-               <h6 class="fw-bold mb-0">Show more</h6>
+               <h6 class="fw-bold mb-0" style="font-size: 1.1rem; color: var(--text-color);">See all</h6>
             </a>
           </div>
         </div>
