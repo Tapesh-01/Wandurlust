@@ -45,4 +45,35 @@ module.exports.logout = (req, res, next) => {
         res.redirect("/listings"); // Redirect the user to the homepage or listings page
     });
 };
-
+
+module.exports.toggleFavorite = async (req, res) => {
+    try {
+        if (!req.isAuthenticated()) {
+            return res.status(401).json({ success: false, message: 'Must be logged in' });
+        }
+        
+        const { id } = req.params;
+        const user = await User.findById(req.user._id);
+        
+        if (!user.favorites) {
+            user.favorites = [];
+        }
+
+        const isFavorited = user.favorites.includes(id);
+        
+        if (isFavorited) {
+            // Remove from favorites
+            user.favorites.pull(id);
+        } else {
+            // Add to favorites
+            user.favorites.push(id);
+        }
+        
+        await user.save();
+        
+        res.json({ success: true, isFavorited: !isFavorited });
+    } catch (e) {
+        console.error("Toggle Favorite Error:", e);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};

@@ -152,12 +152,72 @@
     #realListings.loaded { opacity: 1; }
   </style>
 
+  <style>
+    /* Premium Airbnb Card Styles */
+    .card-listing { border: none !important; background: transparent !important; cursor: pointer; }
+    .listing-img-wrapper {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+      margin-bottom: 12px;
+      isolation: isolate;
+    }
+    .listing-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    .card-listing:hover .listing-img-wrapper img { transform: scale(1.05); }
+    
+    .guest-favorite-badge {
+      position: absolute;
+      top: 12px; left: 12px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #222;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 10;
+    }
+    
+    .favorite-btn {
+      position: absolute;
+      top: 12px; right: 12px;
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: rgba(0,0,0,0.5);
+      cursor: pointer;
+      z-index: 10;
+      transition: transform 0.1s, color 0.2s;
+      /* Outline effect using stroke */
+      -webkit-text-stroke: 2px white;
+    }
+    .favorite-btn:hover { transform: scale(1.1); }
+    .favorite-btn:active { transform: scale(0.9); }
+    .favorite-btn.favorited {
+      color: #fe424d;
+      -webkit-text-stroke: 0px white;
+    }
+    
+    .card-info { padding: 0 4px; }
+    .card-info b { font-size: 1rem; color: var(--text-color); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-info .text-muted { font-size: 0.95rem; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-info .price { font-weight: 600; color: var(--text-color); margin-top: 6px; font-size: 1rem; }
+    
+    [data-theme="dark"] .guest-favorite-badge { background: rgba(30, 41, 59, 0.95); color: #f1f5f9; }
+  </style>
+
   <!-- Ghost Cards -->
-  <div id="skeletonGrid" class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
-    <% for(let i = 0; i < 6; i++) { %>
+  <div id="skeletonGrid" class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 mt-3 g-4">
+    <% for(let i = 0; i < 8; i++) { %>
       <div class="col">
-        <div class="skeleton-card">
-          <div class="skeleton-img"></div>
+        <div class="skeleton-card w-100">
+          <div class="skeleton-img" style="aspect-ratio: 1/1; height: auto;"></div>
           <div class="skeleton-line" style="width:80%;"></div>
           <div class="skeleton-line short"></div>
         </div>
@@ -166,34 +226,93 @@
   </div>
 
   <!-- Real Listings (hidden at first) -->
-  <div id="realListings" class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
+  <div id="realListings" class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 mt-3 g-4">
     <% for(let listing of allListings) { %>
-      <a href="/listings/<%= listing._id %>" class="listing-link">
-        <div class="card col card-listing" style="width: 20rem;">
-          <img 
-            src="<%= 
-              (listing.images && listing.images.length > 0) 
-                ? listing.images[0].url 
-                : (listing.image && listing.image.url) 
-                  ? listing.image.url 
-                  : 'https://placehold.co/400x300/ffe4e6/fe424d?text=No+Image'
-            %>" 
-            class="card-img-top" 
-            alt="listing_image" 
-            style="height: 20rem" />
-          <div class="card-img-overlay"></div>
-          <div class="card-body">
-            <p class="card-text">
-              <b><%= listing.title %></b>
-              <br>
-              &#8377; <%= listing.price.toLocaleString("en-IN") %> / night
-            </p>
-            <i class="tax-info"> &nbsp; &nbsp;+18% GST</i>
+      <div class="col">
+        <a href="/listings/<%= listing._id %>" class="listing-link d-block">
+          <div class="card card-listing h-100">
+            <div class="listing-img-wrapper">
+              
+              <!-- Guest Favourite Badge (Logic: showing for highly priced or specific listings as demo) -->
+              <% if(listing.price > 2500) { %>
+                <div class="guest-favorite-badge">Guest favourite</div>
+              <% } %>
+              
+              <!-- Favorite Heart Button -->
+              <% 
+                let isFav = false;
+                if(currUser && currUser.favorites) {
+                   isFav = currUser.favorites.some(favId => favId.toString() === listing._id.toString());
+                }
+              %>
+              <button class="favorite-btn <%= isFav ? 'favorited' : '' %>" data-id="<%= listing._id %>" onclick="toggleFavorite(event, this)" aria-label="Save to favorites">
+                <i class="fa-solid fa-heart"></i>
+              </button>
+
+              <img 
+                src="<%= 
+                  (listing.images && listing.images.length > 0) 
+                    ? listing.images[0].url.replace('/upload', '/upload/w_600,h_600,c_fill')
+                    : (listing.image && listing.image.url) 
+                      ? listing.image.url.replace('/upload', '/upload/w_600,h_600,c_fill')
+                      : 'https://placehold.co/600x600/ffe4e6/fe424d?text=No+Image'
+                %>" 
+                alt="listing_image" loading="lazy" />
+            </div>
+            
+            <div class="card-info">
+              <div class="d-flex justify-content-between align-items-center">
+                <b><%= listing.location %>, <%= listing.country %></b>
+                <span style="font-size: 0.9rem;"><i class="fa-solid fa-star"></i> 5.0</span>
+              </div>
+              <span class="text-muted"><%= listing.title %></span>
+              <div class="price">
+                &#8377;<%= listing.price.toLocaleString("en-IN") %> <span class="fw-normal">night</span>
+                <span class="tax-info" style="display:none; font-size:0.85rem; color:#717171; font-weight:normal;">&nbsp;+18% GST</span>
+              </div>
+            </div>
           </div>
-        </div>
-      </a>
+        </a>
+      </div>
     <% } %>
   </div>
+
+  <script>
+    // Toggle Favorite Functionality via AJAX
+    async function toggleFavorite(event, btn) {
+      event.preventDefault(); // Prevent link navigation
+      event.stopPropagation(); // Stop event bubbling
+      
+      const listingId = btn.dataset.id;
+      
+      try {
+        const response = await fetch(`/listings/${listingId}/favorite`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        
+        if (response.status === 401) {
+          // Trigger Login Modal if not authenticated
+          const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+          loginModal.show();
+          return;
+        }
+        
+        if (data.success) {
+          // Toggle UI state
+          if (data.isFavorited) {
+            btn.classList.add('favorited');
+          } else {
+            btn.classList.remove('favorited');
+          }
+        }
+      } catch (err) {
+        console.error('Error toggling favorite:', err);
+      }
+    }
+  </script>
 
   <script>
     // Skeleton → real content

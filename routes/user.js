@@ -26,4 +26,7 @@ router
 
 router.get("/logout", userController.logout);
 
+// Favorite Route
+router.post("/listings/:id/favorite", userController.toggleFavorite);
+
 module.exports = router;
