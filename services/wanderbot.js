@@ -34,17 +34,52 @@ async function callGemini(apiKey, model, contents) {
   }
 }
 
-async function buildSystemPrompt() {
-  const listings = await Listing.find({}).select("title location price").limit(10).lean();
+async function buildSystemPrompt(userQuery = "") {
+  // Extract keywords to search in DB
+  const keywords = userQuery.split(/\s+/).filter(w => w.length > 2);
+  let listings = [];
+  
+  if (keywords.length > 0) {
+    // Search for listings matching keywords in title, location, or country
+    const searchRegex = new RegExp(keywords.join("|"), "i");
+    listings = await Listing.find({
+      $or: [
+        { title: searchRegex },
+        { location: searchRegex },
+        { country: searchRegex }
+      ]
+    }).select("title location price").limit(10).lean();
+  }
+
+  // If few/no matches found, add general featured listings
+  if (listings.length < 5) {
+    const general = await Listing.find({}).select("title location price").limit(10).lean();
+    const seen = new Set(listings.map(l => l._id.toString()));
+    for (const item of general) {
+      if (!seen.has(item._id.toString()) && listings.length < 15) {
+        listings.push(item);
+      }
+    }
+  }
+
   const listingCtx = listings.map(l => `• ${l.title} in ${l.location} (₹${l.price})`).join("\n");
-  return `You are WanderBot for WanderLust.\n\nLISTINGS:\n${listingCtx}\n\nBe helpful, short, and use emojis.`;
+  
+  return `You are WanderBot, the AI assistant for WanderLust travel site.
+
+OUR CURRENT LISTINGS:
+${listingCtx || "No specific matches found in our local database."}
+
+GUIDELINES:
+1. Priority: Recommend stays from the list above if they match the user's request.
+2. Knowledge: If the user asks for a place not in our list, use your general travel knowledge but clarify it's a general recommendation.
+3. Style: Be friendly, concise, and use emojis! ✈️🌍`;
 }
 
 async function wanderbotReply(message, history = []) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return { error: true };
 
-  const systemPrompt = await buildSystemPrompt();
+  const systemPrompt = await buildSystemPrompt(message);
   
   // Cleanest possible "Chat history" format for Gemini
   const contents = [
