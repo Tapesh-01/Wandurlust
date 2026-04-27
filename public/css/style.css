@@ -597,6 +597,28 @@ html[data-theme="dark"] body {
 .slider-nav-btn:hover { background: #f7f7f7; box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
 [data-theme="dark"] .slider-nav-btn:hover { background: #1e293b; }
 
-@media (min-width: 768px) {
-  .popular-card { min-width: 300px; max-width: 300px; }
+/* Show More Card Animations */
+.show-more-card {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  cursor: pointer;
+}
+.show-more-card:hover {
+  transform: scale(1.02);
+  background: #f8f9fa !important;
+  border-color: #222 !important;
+  border-style: solid !important;
+}
+[data-theme="dark"] .show-more-card:hover {
+  background: #1e293b !important;
+}
+.show-more-card .icon-circle {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.show-more-card:hover .icon-circle {
+  transform: translateX(8px);
+  background: #222 !important;
+  color: white !important;
+}
+.show-more-card:active {
+  transform: scale(0.95);
 }
