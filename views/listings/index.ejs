@@ -152,6 +152,67 @@
     #realListings.loaded { opacity: 1; }
   </style>
 
+    <!-- ═══ Popular Homes Horizontal Slider ═══ -->
+    <% if(allListings && allListings.length > 5 && !category) { %>
+      <div class="popular-section">
+        <div class="popular-header">
+          <h3 class="fw-bold mb-0">Popular homes</h3>
+          <div class="d-flex gap-2">
+            <button class="slider-nav-btn" onclick="document.getElementById('popularSlider').scrollBy({left: -320, behavior: 'smooth'})">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button class="slider-nav-btn" onclick="document.getElementById('popularSlider').scrollBy({left: 320, behavior: 'smooth'})">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="popular-slider" id="popularSlider">
+          <% for(let i=0; i<Math.min(6, allListings.length); i++) { 
+             let listing = allListings[i];
+          %>
+            <div class="popular-card">
+              <a href="/listings/<%= listing._id %>" class="listing-link d-block">
+                <div class="card card-listing border-0">
+                  <div class="listing-img-wrapper">
+                    <div class="guest-favorite-badge" style="background: rgba(255,255,255,0.9); font-size: 0.75rem; padding: 2px 8px;">Trending</div>
+                    <img src="<%= 
+                      (listing.images && listing.images.length > 0) 
+                        ? listing.images[0].url.replace('/upload', '/upload/w_600,h_800,c_fill') 
+                        : (listing.image && listing.image.url) 
+                          ? listing.image.url.replace('/upload', '/upload/w_600,h_800,c_fill')
+                          : 'https://placehold.co/600x800/ffe4e6/fe424d?text=Popular'
+                    %>" alt="popular_listing" loading="lazy">
+                  </div>
+                  <div class="card-info mt-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <b class="text-truncate" style="font-size: 0.95rem;"><%= listing.title %></b>
+                      <span class="small"><i class="fa-solid fa-star"></i> <%= (listing.reviews && listing.reviews.length > 0) ? (listing.reviews.reduce((s, r) => s + r.rating, 0) / listing.reviews.length).toFixed(1) : "New" %></span>
+                    </div>
+                    <p class="text-muted small mb-1"><%= listing.location %></p>
+                    <div class="price" style="font-size: 0.9rem;">
+                      &#8377;<%= listing.price.toLocaleString("en-IN") %> <span class="fw-normal">night</span>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+          <% } %>
+          
+          <!-- "See All" Card -->
+          <div class="popular-card d-flex align-items-center justify-content-center">
+            <a href="/listings" class="text-decoration-none text-center p-5 rounded-4 border w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="background: var(--footer-bg); color: var(--text-color); border-style: dashed !important; border-width: 2px !important;">
+               <div class="rounded-circle bg-white shadow-sm mb-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; color: #222;">
+                 <i class="fa-solid fa-arrow-right"></i>
+               </div>
+               <h6 class="fw-bold mb-0">Show more</h6>
+            </a>
+          </div>
+        </div>
+      </div>
+      <hr class="my-5 opacity-25">
+    <% } %>
+
 
   <!-- Ghost Cards -->
   <div id="skeletonGrid" class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-2 mt-3 g-4">

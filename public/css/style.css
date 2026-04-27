@@ -551,4 +551,52 @@ html[data-theme="dark"] body {
 .review-author { font-weight: 600; color: var(--text-color); font-size: 1rem; }
 .review-date { font-size: 0.85rem; color: #717171; }
 .review-rating-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; }
-.review-text { color: var(--text-color); line-height: 1.6; font-size: 1rem; font-weight: 400; margin-bottom: 0;}
+/* ------------------------------------- */
+/* Popular Homes Horizontal Slider       */
+/* ------------------------------------- */
+.popular-section { margin: 40px 0; position: relative; }
+.popular-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.popular-slider {
+  display: flex;
+  overflow-x: auto;
+  gap: 20px;
+  padding: 10px 0 20px 0;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.popular-slider::-webkit-scrollbar { display: none; } /* Hide scrollbar for Chrome/Safari */
+
+.popular-card {
+  min-width: 280px;
+  max-width: 280px;
+  scroll-snap-align: start;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+.popular-card:hover { transform: translateY(-5px); }
+.popular-card .listing-img-wrapper { aspect-ratio: 4 / 5; }
+
+/* Navigation Buttons for Slider */
+.slider-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: 0.2s;
+  z-index: 5;
+}
+.slider-nav-btn:hover { background: #f7f7f7; box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+[data-theme="dark"] .slider-nav-btn:hover { background: #1e293b; }
+
+@media (min-width: 768px) {
+  .popular-card { min-width: 300px; max-width: 300px; }
+}
