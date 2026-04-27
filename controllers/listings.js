@@ -52,7 +52,7 @@ module.exports.index = async (req, res) => {
     }
   }
 
-  const allListings = await Listing.find(query);
+  const allListings = await Listing.find(query).populate("reviews");
 
   res.render("listings/index.ejs", { allListings, search, maxPrice, category });
 };
