@@ -7,9 +7,10 @@ const Listing = require("../models/listing.js");
 const Booking = require("../models/booking.js");
 
 const GEMINI_MODELS = [
-  "gemini-1.5-flash",
-  "gemini-1.5-flash-latest",
-  "gemini-1.5-flash-8b",
+  "gemini-flash-latest",     // Verified Working (Gemini 3 Flash Preview)
+  "gemini-2.5-flash",        // High Performance Fallback
+  "gemini-2.0-flash",        // Reliable Fallback
+  "gemini-1.5-flash-8b-exp", // Experimental fast tier
 ];
 
 async function callGemini(apiKey, model, contents) {
