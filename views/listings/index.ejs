@@ -152,67 +152,6 @@
     #realListings.loaded { opacity: 1; }
   </style>
 
-  <style>
-    /* Premium Airbnb Card Styles */
-    .card-listing { border: none !important; background: transparent !important; cursor: pointer; }
-    .listing-img-wrapper {
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-      aspect-ratio: 1 / 1;
-      margin-bottom: 12px;
-      isolation: isolate;
-    }
-    .listing-img-wrapper img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.3s ease;
-    }
-    .card-listing:hover .listing-img-wrapper img { transform: scale(1.05); }
-    
-    .guest-favorite-badge {
-      position: absolute;
-      top: 12px; left: 12px;
-      background: rgba(255, 255, 255, 0.95);
-      color: #222;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      z-index: 10;
-    }
-    
-    .favorite-btn {
-      position: absolute;
-      top: 12px; right: 12px;
-      background: transparent;
-      border: none;
-      font-size: 1.5rem;
-      color: rgba(0,0,0,0.5);
-      cursor: pointer;
-      z-index: 10;
-      transition: transform 0.1s, color 0.2s;
-      /* Outline effect using stroke */
-      -webkit-text-stroke: 2px white;
-    }
-    .favorite-btn:hover { transform: scale(1.1); }
-    .favorite-btn:active { transform: scale(0.9); }
-    .favorite-btn.favorited {
-      color: #fe424d;
-      -webkit-text-stroke: 0px white;
-    }
-    
-    .card-info { padding: 0 4px; }
-    .card-info b { font-size: 1rem; color: var(--text-color); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-info .text-muted { font-size: 0.95rem; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-info .price { font-weight: 600; color: var(--text-color); margin-top: 6px; font-size: 1rem; }
-    
-    [data-theme="dark"] .guest-favorite-badge { background: rgba(30, 41, 59, 0.95); color: #f1f5f9; }
-    /* Fix for dark mode specificity overriding transparent background */
-    [data-theme="dark"] .card.card-listing { border: none !important; background: transparent !important; }
-  </style>
 
   <!-- Ghost Cards -->
   <div id="skeletonGrid" class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 mt-3 g-4">

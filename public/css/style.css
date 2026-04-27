@@ -424,3 +424,131 @@ html[data-theme="dark"],
 html[data-theme="dark"] body {
     background-color: var(--bg-color) !important;
 }
+
+/* ------------------------------------- */
+/* Premium Airbnb Card Styles (Index)    */
+/* ------------------------------------- */
+.card-listing { border: none !important; background: transparent !important; cursor: pointer; }
+.listing-img-wrapper {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  margin-bottom: 12px;
+  isolation: isolate;
+}
+.listing-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.card-listing:hover .listing-img-wrapper img { transform: scale(1.05); }
+
+.guest-favorite-badge {
+  position: absolute;
+  top: 12px; left: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #222;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 10;
+}
+
+.favorite-btn {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: rgba(0,0,0,0.5);
+  cursor: pointer;
+  z-index: 10;
+  transition: transform 0.1s, color 0.2s;
+  -webkit-text-stroke: 2px white;
+}
+.favorite-btn:hover { transform: scale(1.1); }
+.favorite-btn:active { transform: scale(0.9); }
+.favorite-btn.favorited {
+  color: #fe424d;
+  -webkit-text-stroke: 0px white;
+}
+
+.card-info { padding: 0 4px; }
+.card-info b { font-size: 1rem; color: var(--text-color); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-info .text-muted { font-size: 0.95rem; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-info .price { font-weight: 600; color: var(--text-color); margin-top: 6px; font-size: 1rem; }
+
+[data-theme="dark"] .guest-favorite-badge { background: rgba(30, 41, 59, 0.95); color: #f1f5f9; }
+[data-theme="dark"] .card.card-listing { border: none !important; background: transparent !important; }
+
+/* ------------------------------------- */
+/* Premium Review Styles (Show)          */
+/* ------------------------------------- */
+.premium-rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.premium-rating input { display: none; }
+.premium-rating label {
+  cursor: pointer;
+  font-size: 2rem;
+  color: #ddd;
+  transition: color 0.2s ease, transform 0.2s;
+}
+.premium-rating label:hover,
+.premium-rating label:hover ~ label,
+.premium-rating input:checked ~ label {
+  color: #fe424d;
+}
+.premium-rating label:active { transform: scale(0.9); }
+
+.premium-textarea {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background-color: #fcfcfc;
+  transition: all 0.3s;
+  padding: 12px;
+}
+.premium-textarea:focus {
+  background-color: #fff;
+  border-color: #222;
+  box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
+  outline: none;
+}
+.btn-premium-submit {
+  background: #222;
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 600;
+  border: none;
+  transition: background 0.2s;
+}
+.btn-premium-submit:hover { background: #000; color: #fff; }
+
+.review-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px 16px;
+  margin-top: 24px;
+}
+@media (min-width: 768px) {
+  .review-grid { grid-template-columns: 1fr 1fr; }
+}
+.review-item { display: flex; flex-direction: column; }
+.review-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.review-avatar {
+  width: 48px; height: 48px; border-radius: 50%; background: #222; color: #fff;
+  display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem;
+}
+.review-meta { display: flex; flex-direction: column; }
+.review-author { font-weight: 600; color: var(--text-color); font-size: 1rem; }
+.review-date { font-size: 0.85rem; color: #717171; }
+.review-rating-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; }
+.review-text { color: var(--text-color); line-height: 1.6; font-size: 1rem; font-weight: 400; margin-bottom: 0;}
