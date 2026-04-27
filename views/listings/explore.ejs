@@ -96,34 +96,57 @@
 <div class="explore-wrapper">
   <!-- Left Side: Scrollable List -->
   <div class="list-side" id="listingsList">
-    <div class="mb-4 d-flex justify-content-between align-items-center">
-      <h4 class="fw-bold mb-0">Over <%= allListings.length %> homes found</h4>
-      <div class="d-flex gap-2">
-        <button class="btn btn-sm btn-outline-dark rounded-pill px-3">Filters</button>
+    <div class="mb-4 d-flex justify-content-between align-items-center px-2">
+      <div>
+        <h5 class="fw-bold mb-0">Over <%= allListings.length %> homes</h5>
+        <p class="text-muted small mb-0">Discover the best stays for your next trip</p>
       </div>
+      <button class="btn border rounded-pill px-3 py-2 d-flex align-items-center gap-2 bg-white shadow-sm hover-shadow" style="font-size: 0.85rem; font-weight: 600;">
+        <i class="fa-solid fa-sliders"></i> Filters
+      </button>
     </div>
 
-    <div class="row row-cols-1 row-cols-md-2 g-4">
+    <div class="row row-cols-1 row-cols-xl-2 g-4 px-2">
       <% for(let listing of allListings) { %>
         <div class="col">
-          <div class="explore-card" onmouseenter="highlightMarker('<%= listing._id %>')" onmouseleave="unhighlightMarker('<%= listing._id %>')" onclick="window.location.href='/listings/<%= listing._id %>'">
-            <div class="listing-img-wrapper position-relative">
+          <div class="explore-card h-100" onmouseenter="highlightMarker('<%= listing._id %>')" onmouseleave="unhighlightMarker('<%= listing._id %>')">
+            <div class="listing-img-wrapper position-relative mb-2">
                <!-- Guest Favourite Badge -->
                <% if(listing.price > 2500) { %>
-                  <div class="guest-favorite-badge" style="top:10px; left:10px;">Guest favourite</div>
+                  <div class="guest-favorite-badge" style="top:12px; left:12px; font-size: 0.7rem; padding: 4px 10px;">
+                    <i class="fa-solid fa-trophy me-1" style="color: #FFD700;"></i> Guest favourite
+                  </div>
                <% } %>
-               <img src="<%= (listing.images && listing.images.length > 0) ? listing.images[0].url.replace('/upload', '/upload/w_600,h_400,c_fill') : listing.image.url.replace('/upload', '/upload/w_600,h_400,c_fill') %>" class="w-100 h-100 object-fit-cover" alt="listing_img">
+
+               <!-- Favorite Heart Button -->
+               <% 
+                 let isFav = false;
+                 if(currUser && currUser.favorites) {
+                    isFav = currUser.favorites.some(favId => favId.toString() === listing._id.toString());
+                 }
+               %>
+               <button class="favorite-btn <%= isFav ? 'favorited' : '' %>" data-id="<%= listing._id %>" onclick="toggleFavorite(event, this)" style="top: 12px; right: 12px; font-size: 1.2rem;">
+                 <i class="fa-solid fa-heart"></i>
+               </button>
+
+               <a href="/listings/<%= listing._id %>" class="d-block h-100 w-100">
+                  <img src="<%= (listing.images && listing.images.length > 0) ? listing.images[0].url.replace('/upload', '/upload/w_600,h_400,c_fill') : (listing.image ? listing.image.url.replace('/upload', '/upload/w_600,h_400,c_fill') : '') %>" class="w-100 h-100 object-fit-cover" alt="listing_img" loading="lazy">
+               </a>
             </div>
-            <div class="card-info">
-               <div class="d-flex justify-content-between align-items-start">
-                  <b class="text-truncate" style="font-size: 1.05rem;"><%= listing.location %>, <%= listing.country %></b>
-                  <span class="small"><i class="fa-solid fa-star"></i> <%= (listing.reviews && listing.reviews.length > 0) ? (listing.reviews.reduce((s, r) => s + r.rating, 0) / listing.reviews.length).toFixed(1) : "New" %></span>
-               </div>
-               <p class="text-muted small mb-1"><%= listing.title %></p>
-               <div class="price fw-bold">
-                 &#8377;<%= listing.price.toLocaleString("en-IN") %> <span class="fw-normal">night</span>
-               </div>
-            </div>
+
+            <a href="/listings/<%= listing._id %>" class="text-decoration-none text-dark d-block">
+              <div class="card-info">
+                 <div class="d-flex justify-content-between align-items-start">
+                    <b class="text-truncate" style="font-size: 1rem;"><%= listing.location %>, <%= listing.country %></b>
+                    <span class="small"><i class="fa-solid fa-star"></i> <%= (listing.reviews && listing.reviews.length > 0) ? (listing.reviews.reduce((s, r) => s + r.rating, 0) / listing.reviews.length).toFixed(1) : "New" %></span>
+                 </div>
+                 <p class="text-muted small mb-1 text-truncate"><%= listing.title %></p>
+                 <p class="text-muted small mb-2">Available 8-10 May</p>
+                 <div class="price fw-bold" style="font-size: 0.95rem;">
+                   &#8377;<%= listing.price.toLocaleString("en-IN") %> <span class="fw-normal">night</span>
+                 </div>
+              </div>
+            </a>
           </div>
         </div>
       <% } %>
@@ -136,7 +159,92 @@
   </div>
 </div>
 
+<style>
+  /* Price Markers with Pointer (Airbnb Style) */
+  .price-marker-container {
+    position: relative;
+  }
+  .price-marker {
+    background: white;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 28px;
+    padding: 5px 12px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: #222;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    z-index: 10;
+  }
+  /* The little triangle pointer at the bottom */
+  .price-marker::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid white;
+    transition: all 0.2s ease;
+  }
+  
+  .price-marker:hover, .price-marker.active {
+    background: #222;
+    color: white;
+    transform: scale(1.1);
+    z-index: 1000 !important;
+  }
+  .price-marker:hover::after, .price-marker.active::after {
+    border-top-color: #222;
+  }
+  
+  [data-theme="dark"] .price-marker { background: #1e293b; color: white; border-color: #334155; }
+  [data-theme="dark"] .price-marker::after { border-top-color: #1e293b; }
+  [data-theme="dark"] .price-marker:hover, [data-theme="dark"] .price-marker.active { background: #fe424d; border-color: #fe424d; }
+  [data-theme="dark"] .price-marker:hover::after, [data-theme="dark"] .price-marker.active::after { border-top-color: #fe424d; }
+
+  .hover-shadow:hover { box-shadow: 0 6px 15px rgba(0,0,0,0.1) !important; background-color: #f7f7f7 !important; }
+
+  /* Favorite Heart Styles */
+  .favorite-btn {
+    position: absolute;
+    background: transparent;
+    border: none;
+    color: rgba(0, 0, 0, 0.5);
+    text-shadow: 0 0 2px white;
+    transition: all 0.2s ease;
+    z-index: 5;
+    padding: 0;
+  }
+  .favorite-btn:hover { transform: scale(1.1); color: #fe424d; }
+  .favorite-btn.favorited { color: #fe424d; }
+  [data-theme="dark"] .favorite-btn { color: rgba(255, 255, 255, 0.6); text-shadow: 0 0 2px black; }
+</style>
+
 <script>
+  // Favorite Toggle Logic
+  async function toggleFavorite(event, btn) {
+    event.preventDefault();
+    event.stopPropagation();
+    const listingId = btn.getAttribute("data-id");
+    try {
+      const res = await fetch(`/listings/${listingId}/favorite`, { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        btn.classList.toggle("favorited");
+        // Optional: show a small toast or animation
+      } else if (data.redirect) {
+        window.location.href = data.redirect;
+      }
+    } catch (err) {
+      console.error("Favorite toggle failed", err);
+    }
+  }
+
   // Data for Map
   const listings = <%- JSON.stringify(allListings) %>;
   let map;
