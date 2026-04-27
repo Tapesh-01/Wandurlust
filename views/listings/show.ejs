@@ -258,56 +258,152 @@
 
 
 
+            <style>
+              /* Premium Rating Stars */
+              .premium-rating {
+                display: flex;
+                flex-direction: row-reverse;
+                justify-content: flex-end;
+                gap: 8px;
+              }
+              .premium-rating input { display: none; }
+              .premium-rating label {
+                cursor: pointer;
+                font-size: 2rem;
+                color: #ddd;
+                transition: color 0.2s ease, transform 0.2s;
+              }
+              .premium-rating label:hover,
+              .premium-rating label:hover ~ label,
+              .premium-rating input:checked ~ label {
+                color: #fe424d;
+              }
+              .premium-rating label:active { transform: scale(0.9); }
+
+              /* Premium Textarea */
+              .premium-textarea {
+                border: 1px solid #ddd;
+                border-radius: 12px;
+                background-color: #fcfcfc;
+                transition: all 0.3s;
+                padding: 12px;
+              }
+              .premium-textarea:focus {
+                background-color: #fff;
+                border-color: #222;
+                box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
+                outline: none;
+              }
+              .btn-premium-submit {
+                background: #222;
+                color: #fff;
+                border-radius: 8px;
+                padding: 10px 24px;
+                font-weight: 600;
+                border: none;
+                transition: background 0.2s;
+              }
+              .btn-premium-submit:hover { background: #000; color: #fff; }
+
+              /* Premium Review List */
+              .review-grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 32px 16px;
+                margin-top: 24px;
+              }
+              @media (min-width: 768px) {
+                .review-grid { grid-template-columns: 1fr 1fr; }
+              }
+              .review-item { display: flex; flex-direction: column; }
+              .review-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+              .review-avatar {
+                width: 48px; height: 48px; border-radius: 50%; background: #222; color: #fff;
+                display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem;
+              }
+              .review-meta { display: flex; flex-direction: column; }
+              .review-author { font-weight: 600; color: var(--text-color); font-size: 1rem; }
+              .review-date { font-size: 0.85rem; color: #717171; }
+              .review-rating-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; }
+              .review-text { color: var(--text-color); line-height: 1.6; font-size: 1rem; font-weight: 400; margin-bottom: 0;}
+            </style>
+
             <div class="col-12 col-md-8 offset-md-2 mb-3">
 
               <% if(currUser) {%>
-                <hr />
-                <h4>Leave a Review</h4>
+                <hr class="my-5" />
+                <h4 class="mb-4 fw-bold">Leave a Review</h4>
 
                 <form action="/listings/<%= listing._id %>/reviews" method="post" novalidate class="needs-validation">
 
-                  <div class="mb-3 mt-3">
-                    <label for="rating" class="form-label">Rating</label>
-                    <fieldset class="starability-slot">
-                      <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
-                      <input type="radio" id="first-rate1" name="review[rating]" value="1" />
-                      <label for="first-rate1" title="Terrible">1 star</label>
-                      <input type="radio" id="first-rate2" name="review[rating]" value="2" />
-                      <label for="first-rate2" title="Not good">2 stars</label>
-                      <input type="radio" id="first-rate3" name="review[rating]" value="3" />
-                      <label for="first-rate3" title="Average">3 stars</label>
-                      <input type="radio" id="first-rate4" name="review[rating]" value="4" />
-                      <label for="first-rate4" title="Very good">4 stars</label>
-                      <input type="radio" id="first-rate5" name="review[rating]" value="5" />
-                      <label for="first-rate5" title="Amazing">5 stars</label>
-                    </fieldset>
+                  <div class="mb-4">
+                    <label class="form-label fw-semibold mb-2">Overall Rating</label>
+                    <div class="premium-rating">
+                      <input type="radio" id="star5" name="review[rating]" value="5" />
+                      <label for="star5" title="Amazing"><i class="fa-solid fa-star"></i></label>
+                      <input type="radio" id="star4" name="review[rating]" value="4" />
+                      <label for="star4" title="Very good"><i class="fa-solid fa-star"></i></label>
+                      <input type="radio" id="star3" name="review[rating]" value="3" />
+                      <label for="star3" title="Average"><i class="fa-solid fa-star"></i></label>
+                      <input type="radio" id="star2" name="review[rating]" value="2" />
+                      <label for="star2" title="Not good"><i class="fa-solid fa-star"></i></label>
+                      <input type="radio" id="star1" name="review[rating]" value="1" required />
+                      <label for="star1" title="Terrible"><i class="fa-solid fa-star"></i></label>
+                    </div>
                   </div>
-                  <div class="mb-3">
-                    <label for="comment" class="form-label">Comment</label>
-                    <textarea name="review[comment]" id="comment" cols="30" rows="5" class="form-control" required></textarea>
-                    <div class="invalid-feedback">Please add some comments for review</div>
+                  
+                  <div class="mb-4">
+                    <label for="comment" class="form-label fw-semibold mb-2">Share your experience</label>
+                    <textarea name="review[comment]" id="comment" cols="30" rows="4" class="form-control premium-textarea" placeholder="What did you love about this place?" required></textarea>
+                    <div class="invalid-feedback">Please share your experience.</div>
                   </div>
 
-                  <button class="btn btn-outline-dark">Submit</button>
+                  <button class="btn btn-premium-submit">Post Review</button>
                 </form>
-                <hr />
               <% } %>
 
-              <% if(listing.reviews.length > 0) {%>
-                <div class="row">
-                  <p><b>All Reviews</b></p>
-                  <% for(review of listing.reviews) { %>
-                    <div class="card col-12 col-md-5 ms-md-3 mb-3 p-3">
-                      <div class="card-body p-0">
-                        <h5 class="card-title">@<%= review.author.username%></h5>
-                        <p class="starability-result card-text" data-rating="<%= review.rating %>"></p>
-                        <p class="card-text mb-2"><%= review.comment %></p>
+              <% if(listing.reviews.length > 0) { %>
+                <hr class="my-5" />
+                <h3 class="fw-bold mb-4">
+                  <i class="fa-solid fa-star me-2"></i>
+                  <% 
+                    let total = listing.reviews.reduce((sum, r) => sum + r.rating, 0);
+                    let avg = (total / listing.reviews.length).toFixed(1);
+                  %>
+                  <%= avg %> · <%= listing.reviews.length %> <%= listing.reviews.length === 1 ? 'review' : 'reviews' %>
+                </h3>
+                
+                <div class="review-grid">
+                  <% for(let review of listing.reviews) { %>
+                    <div class="review-item">
+                      <div class="review-header">
+                        <div class="review-avatar">
+                          <%= review.author.username.charAt(0).toUpperCase() %>
+                        </div>
+                        <div class="review-meta">
+                          <span class="review-author"><%= review.author.username %></span>
+                          <span class="review-date">
+                            <%= new Date(review.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) %> 
+                          </span>
+                        </div>
                       </div>
+                      
+                      <div class="review-rating-badge">
+                        <% for(let i=1; i<=5; i++) { %>
+                          <% if(i <= review.rating) { %>
+                            <i class="fa-solid fa-star" style="color: #222; font-size: 0.75rem;"></i>
+                          <% } else { %>
+                            <i class="fa-regular fa-star" style="color: #ddd; font-size: 0.75rem;"></i>
+                          <% } %>
+                        <% } %>
+                      </div>
+                      
+                      <p class="review-text"><%= review.comment %></p>
+                      
                       <% if (currUser && review.author && review.author._id.equals(currUser._id)) { %>
-                      <!-- ✅ Delete Button -->
-                      <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" class="mt-2 text-end">
-                        <button class="btn btn-sm btn-dark">Delete</button>
-                      </form>
+                        <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" class="mt-2">
+                          <button class="btn btn-link text-danger p-0 text-decoration-none fw-semibold" style="font-size: 0.85rem;">Delete review</button>
+                        </form>
                       <% } %>
                     </div>
                   <% } %>
