@@ -154,7 +154,7 @@
 
 
   <!-- Ghost Cards -->
-  <div id="skeletonGrid" class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 mt-3 g-4">
+  <div id="skeletonGrid" class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-2 mt-3 g-4">
     <% for(let i = 0; i < 8; i++) { %>
       <div class="col">
         <div class="skeleton-card w-100">
@@ -167,7 +167,7 @@
   </div>
 
   <!-- Real Listings (hidden at first) -->
-  <div id="realListings" class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 mt-3 g-4">
+  <div id="realListings" class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-2 mt-3 g-4">
     <% for(let listing of allListings) { %>
       <div class="col">
         <a href="/listings/<%= listing._id %>" class="listing-link d-block">
