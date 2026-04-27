@@ -2,8 +2,13 @@
 
 <div class="row mt-4">
     <div class="col-10 offset-1">
-        <h3 class="mb-1"><i class="fa-solid fa-house-chimney"></i> Host Dashboard</h3>
-        <p class="text-muted mb-4">Bookings received on your listings</p>
+        <div class="d-flex align-items-center mb-1">
+            <a href="/listings" class="btn rounded-circle me-3 shadow-sm border" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--bg-color); color: var(--text-color); border-color: var(--border-color) !important;">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+            <h3 class="mb-0 fw-bold"><i class="fa-solid fa-house-chimney"></i> Host Dashboard</h3>
+        </div>
+        <p class="text-muted mb-4 ms-5 ps-2">Bookings received on your listings</p>
 
         <% if (listings.length === 0) { %>
             <div class="text-center py-5">
