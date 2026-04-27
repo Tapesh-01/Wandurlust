@@ -76,4 +76,14 @@ module.exports.toggleFavorite = async (req, res) => {
         console.error("Toggle Favorite Error:", e);
         res.status(500).json({ success: false, message: 'Server error' });
     }
+};
+
+module.exports.showWishlist = async (req, res) => {
+    const user = await User.findById(req.user._id).populate({
+        path: "favorites",
+        populate: {
+            path: "reviews"
+        }
+    });
+    res.render("users/wishlist.ejs", { allListings: user.favorites });
 };

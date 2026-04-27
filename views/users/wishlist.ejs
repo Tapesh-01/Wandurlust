@@ -1,0 +1,110 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-4">
+  <div class="d-flex align-items-center mb-4">
+    <a href="/listings" class="btn btn-outline-dark rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+      <i class="fa-solid fa-chevron-left"></i>
+    </a>
+    <h2 class="mb-0 fw-bold">My Wishlist</h2>
+  </div>
+
+  <% if(allListings && allListings.length > 0) { %>
+    <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-2 g-4">
+      <% for(let listing of allListings) { %>
+        <div class="col" id="listing-<%= listing._id %>">
+          <a href="/listings/<%= listing._id %>" class="listing-link d-block">
+            <div class="card card-listing h-100">
+              <div class="listing-img-wrapper">
+                
+                <!-- Guest Favourite Badge -->
+                <% if(listing.price > 2500) { %>
+                  <div class="guest-favorite-badge">Guest favourite</div>
+                <% } %>
+                
+                <!-- Favorite Heart Button (Always red on this page) -->
+                <button class="favorite-btn favorited" data-id="<%= listing._id %>" onclick="toggleFavorite(event, this)" aria-label="Remove from favorites">
+                  <i class="fa-solid fa-heart"></i>
+                </button>
+
+                <img 
+                  src="<%= 
+                    (listing.images && listing.images.length > 0) 
+                      ? listing.images[0].url.replace('/upload', '/upload/w_600,h_600,c_fill')
+                      : (listing.image && listing.image.url) 
+                        ? listing.image.url.replace('/upload', '/upload/w_600,h_600,c_fill')
+                        : 'https://placehold.co/600x600/ffe4e6/fe424d?text=No+Image'
+                  %>" 
+                  alt="listing_image" loading="lazy" />
+              </div>
+              
+              <div class="card-info">
+                <% 
+                  let avgRating = "New";
+                  if(listing.reviews && listing.reviews.length > 0) {
+                     let total = listing.reviews.reduce((sum, r) => sum + r.rating, 0);
+                     avgRating = (total / listing.reviews.length).toFixed(1);
+                  }
+                %>
+                <div class="d-flex justify-content-between align-items-start mt-1">
+                  <b class="text-truncate pe-2"><%= listing.location %>, <%= listing.country %></b>
+                  <span style="font-size: 0.95rem; color: var(--text-color); white-space: nowrap;">
+                    <i class="fa-solid fa-star" style="font-size: 0.85rem; margin-right: 2px;"></i><%= avgRating %>
+                  </span>
+                </div>
+                <span class="text-muted"><%= listing.title %></span>
+                <div class="price">
+                  &#8377;<%= listing.price.toLocaleString("en-IN") %> <span class="fw-normal">night</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      <% } %>
+    </div>
+  <% } else { %>
+    <div class="text-center py-5">
+       <div class="mb-4">
+          <i class="fa-regular fa-heart" style="font-size: 4rem; color: #ddd;"></i>
+       </div>
+       <h4 class="fw-bold">Create your first wishlist</h4>
+       <p class="text-muted">As you search, click the heart icon to save your favorite places.</p>
+       <a href="/listings" class="btn btn-dark px-4 py-2 mt-2 rounded-3">Start exploring</a>
+    </div>
+  <% } %>
+</div>
+
+<script>
+  // Reuse the toggleFavorite function but with removal logic for this page
+  async function toggleFavorite(event, btn) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const listingId = btn.dataset.id;
+    
+    try {
+      const response = await fetch(`/listings/${listingId}/favorite`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success && !data.isFavorited) {
+        // If removed from favorites, remove the card from the UI
+        const card = document.getElementById(`listing-${listingId}`);
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.9)';
+        card.style.transition = '0.3s';
+        setTimeout(() => {
+          card.remove();
+          // Check if no listings left
+          if(document.querySelectorAll('.card-listing').length === 0) {
+             location.reload(); // Refresh to show empty state
+          }
+        }, 300);
+      }
+    } catch (err) {
+      console.error('Error toggling favorite:', err);
+    }
+  }
+</script>
