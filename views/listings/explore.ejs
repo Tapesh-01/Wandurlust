@@ -1,0 +1,211 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+  /* Split Layout Containers */
+  .explore-wrapper {
+    display: flex;
+    height: calc(100vh - 5rem); /* Subtracting navbar height */
+    overflow: hidden;
+    margin: 0 -12px; /* Compensate for boilerplate container padding */
+  }
+  
+  .list-side {
+    flex: 0 0 60%;
+    overflow-y: auto;
+    padding: 24px;
+    background: var(--bg-color);
+  }
+  
+  .map-side {
+    flex: 0 0 40%;
+    position: relative;
+    border-left: 1px solid var(--border-color);
+  }
+  
+  #exploreMap {
+    height: 100%;
+    width: 100%;
+  }
+
+  /* Price Markers for Map */
+  .price-marker {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 24px;
+    padding: 6px 14px;
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: #222;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .price-marker:hover, .price-marker.active {
+    background: #222;
+    color: white;
+    border-color: #000;
+    transform: scale(1.15);
+    z-index: 1000 !important;
+  }
+  
+  [data-theme="dark"] .price-marker {
+    background: #1e293b;
+    color: white;
+    border-color: #334155;
+  }
+  [data-theme="dark"] .price-marker:hover, [data-theme="dark"] .price-marker.active {
+    background: #fe424d;
+    border-color: #fe424d;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 992px) {
+    .list-side { flex: 0 0 100%; }
+    .map-side { display: none; } /* Hide map on mobile/tablet for now, or add toggle */
+  }
+
+  /* List Card Tweaks for Split View */
+  .explore-card {
+    border: none;
+    background: transparent;
+    margin-bottom: 24px;
+    cursor: pointer;
+  }
+  .explore-card .listing-img-wrapper {
+    aspect-ratio: 16 / 10;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+</style>
+
+<div class="explore-wrapper">
+  <!-- Left Side: Scrollable List -->
+  <div class="list-side" id="listingsList">
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+      <h4 class="fw-bold mb-0">Over <%= allListings.length %> homes found</h4>
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-dark rounded-pill px-3">Filters</button>
+      </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      <% for(let listing of allListings) { %>
+        <div class="col">
+          <div class="explore-card" onmouseenter="highlightMarker('<%= listing._id %>')" onmouseleave="unhighlightMarker('<%= listing._id %>')" onclick="window.location.href='/listings/<%= listing._id %>'">
+            <div class="listing-img-wrapper position-relative">
+               <!-- Guest Favourite Badge -->
+               <% if(listing.price > 2500) { %>
+                  <div class="guest-favorite-badge" style="top:10px; left:10px;">Guest favourite</div>
+               <% } %>
+               <img src="<%= (listing.images && listing.images.length > 0) ? listing.images[0].url.replace('/upload', '/upload/w_600,h_400,c_fill') : listing.image.url.replace('/upload', '/upload/w_600,h_400,c_fill') %>" class="w-100 h-100 object-fit-cover" alt="listing_img">
+            </div>
+            <div class="card-info">
+               <div class="d-flex justify-content-between align-items-start">
+                  <b class="text-truncate" style="font-size: 1.05rem;"><%= listing.location %>, <%= listing.country %></b>
+                  <span class="small"><i class="fa-solid fa-star"></i> <%= (listing.reviews && listing.reviews.length > 0) ? (listing.reviews.reduce((s, r) => s + r.rating, 0) / listing.reviews.length).toFixed(1) : "New" %></span>
+               </div>
+               <p class="text-muted small mb-1"><%= listing.title %></p>
+               <div class="price fw-bold">
+                 &#8377;<%= listing.price.toLocaleString("en-IN") %> <span class="fw-normal">night</span>
+               </div>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Right Side: Fixed Map -->
+  <div class="map-side">
+    <div id="exploreMap"></div>
+  </div>
+</div>
+
+<script>
+  // Data for Map
+  const listings = <%- JSON.stringify(allListings) %>;
+  let map;
+  let markers = {};
+
+  function initExploreMap() {
+    // Initial Center (average of all locations or default)
+    const center = [20.5937, 78.9629]; // India Center
+    
+    map = L.map('exploreMap', {
+      zoomControl: false,
+      attributionControl: false
+    }).setView(center, 5);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    
+    // Custom Zoom Control at Bottom Right
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    // Add markers for each listing
+    const bounds = L.latLngBounds();
+
+    listings.forEach(listing => {
+      if (listing.geometry && listing.geometry.coordinates) {
+        const [lng, lat] = listing.geometry.coordinates;
+        
+        // Custom Price Marker Icon
+        const priceIcon = L.divIcon({
+          className: 'price-marker-container',
+          html: `<div class="price-marker" id="marker-${listing._id}">₹${listing.price.toLocaleString("en-IN")}</div>`,
+          iconSize: [60, 30],
+          iconAnchor: [30, 15]
+        });
+
+        const marker = L.marker([lat, lng], { icon: priceIcon }).addTo(map);
+        
+        // Popup on click
+        marker.bindPopup(`
+          <div class="map-popup-card">
+            <img src="${listing.images && listing.images.length > 0 ? listing.images[0].url : (listing.image ? listing.image.url : '')}" class="map-popup-img">
+            <div class="map-popup-info">
+              <div class="map-popup-title">${listing.title}</div>
+              <div class="map-popup-price">₹${listing.price.toLocaleString("en-IN")} per night</div>
+              <a href="/listings/${listing._id}" class="btn btn-sm btn-dark w-100 mt-2 rounded-pill">View Details</a>
+            </div>
+          </div>
+        `);
+
+        markers[listing._id] = marker;
+        bounds.extend([lat, lng]);
+      }
+    });
+
+    if (listings.length > 0) {
+      map.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }
+
+  // Hover Interactions
+  function highlightMarker(id) {
+    const el = document.getElementById(`marker-${id}`);
+    if (el) el.classList.add('active');
+    
+    const marker = markers[id];
+    if (marker) {
+      // Bring to front
+      marker.setZIndexOffset(1000);
+      // Pan map slightly to make sure it's visible if needed, 
+      // but don't jump too much on hover.
+    }
+  }
+
+  function unhighlightMarker(id) {
+    const el = document.getElementById(`marker-${id}`);
+    if (el) el.classList.remove('active');
+    
+    const marker = markers[id];
+    if (marker) marker.setZIndexOffset(0);
+  }
+
+  document.addEventListener('DOMContentLoaded', initExploreMap);
+</script>

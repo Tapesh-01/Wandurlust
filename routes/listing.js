@@ -10,6 +10,9 @@ const upload = multer({ storage});
 // USER LISTINGS ROUTE (UNIQUE ROUTE TO PREVENT CONFLICTS)
 router.get("/mylistings", isLoggedIn, wrapAsync(listingController.userListings));
 
+// EXPLORE SPLIT VIEW (NEW)
+router.get("/explore", wrapAsync(listingController.renderExplorePage));
+
 // INDEX + CREATE
 router.
 route("/")

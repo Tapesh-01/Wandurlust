@@ -201,3 +201,8 @@ module.exports.userListings = async (req, res) => {
   const allListings = await Listing.find({ owner: req.user._id });
   res.render("listings/user_listings.ejs", { allListings });
 };
+
+module.exports.renderExplorePage = async (req, res) => {
+  const allListings = await Listing.find({}).populate("reviews");
+  res.render("listings/explore.ejs", { allListings });
+};
