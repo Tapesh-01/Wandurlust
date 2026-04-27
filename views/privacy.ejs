@@ -132,8 +132,18 @@
     font-size: 1.3rem;
   }
   .contact-card p { color: #bbb; font-size: 15px; margin-bottom: 6px; }
-  .contact-card a { color: #fe424d; text-decoration: none; font-weight: 600; }
-  .contact-card a:hover { text-decoration: underline; }
+  .contact-card a { 
+    color: #fe424d; 
+    text-decoration: none; 
+    font-weight: 600; 
+    position: relative; 
+    z-index: 5;
+    transition: all 0.2s;
+  }
+  .contact-card a:hover { 
+    text-decoration: underline; 
+    opacity: 0.8;
+  }
 
   /* ── Dark Mode Overrides ── */
   [data-theme="dark"] .privacy-hero {
@@ -296,7 +306,7 @@
         <li><strong>Portability</strong> — You can request a copy of your data in a structured format.</li>
         <li><strong>Corrections</strong> — You can update your profile information through your account settings.</li>
       </ul>
-      <p>To exercise any of these rights, contact us at <a href="mailto:sensorman85@gmail.com" style="color:#fe424d; font-weight:600;">support@wanderlust.com</a>.</p>
+      <p>To exercise any of these rights, contact us at <a href="https://mail.google.com/mail/?view=cm&fs=1&to=sensorman85@gmail.com" target="_blank" style="color:#fe424d; font-weight:600; position:relative; z-index:10;">support@wanderlust.com</a>.</p>
     </div>
 
     <!-- 7. Terms of Use -->
@@ -318,7 +328,7 @@
     <div class="contact-card" id="contact">
       <h3><i class="fa-solid fa-headset me-2"></i> Need Help?</h3>
       <p>For any questions regarding these terms, feel free to contact our team:</p>
-      <p>📧 Email: <a href="mailto:sensorman85@gmail.com">support@wanderlust.com</a></p>
+      <p>📧 Email: <a href="https://mail.google.com/mail/?view=cm&fs=1&to=sensorman85@gmail.com" target="_blank">support@wanderlust.com</a></p>
       <p>📍 Address: Harinagar, Durg, Chhattisgarh, India 491001</p>
       <p style="margin-top:16px; font-size:13px; color:rgba(255,255,255,0.5);">© 2026 WanderLust Hospitality. All rights reserved.</p>
     </div>
