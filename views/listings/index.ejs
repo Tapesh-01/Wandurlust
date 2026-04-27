@@ -209,9 +209,11 @@
                    avgRating = (total / listing.reviews.length).toFixed(1);
                 }
               %>
-              <div class="d-flex justify-content-between align-items-center">
-                <b><%= listing.location %>, <%= listing.country %></b>
-                <span style="font-size: 0.9rem;"><i class="fa-solid fa-star"></i> <%= avgRating %></span>
+              <div class="d-flex justify-content-between align-items-start mt-1">
+                <b class="text-truncate pe-2"><%= listing.location %>, <%= listing.country %></b>
+                <span style="font-size: 0.95rem; color: var(--text-color); white-space: nowrap;">
+                  <i class="fa-solid fa-star" style="font-size: 0.85rem; margin-right: 2px;"></i><%= avgRating %>
+                </span>
               </div>
               <span class="text-muted"><%= listing.title %></span>
               <div class="price">
