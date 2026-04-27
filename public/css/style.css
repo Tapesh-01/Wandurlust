@@ -569,14 +569,18 @@ html[data-theme="dark"] body {
 .popular-slider::-webkit-scrollbar { display: none; } /* Hide scrollbar for Chrome/Safari */
 
 .popular-card {
-  min-width: 280px;
-  max-width: 280px;
+  min-width: 320px;
+  max-width: 320px;
   scroll-snap-align: start;
   transition: transform 0.3s ease;
   flex-shrink: 0;
 }
 .popular-card:hover { transform: translateY(-5px); }
-.popular-card .listing-img-wrapper { aspect-ratio: 4 / 5; }
+.popular-card .listing-img-wrapper { aspect-ratio: 1 / 1; }
+
+@media (max-width: 768px) {
+  .popular-card { min-width: 280px; max-width: 280px; }
+}
 
 /* Navigation Buttons for Slider */
 .slider-nav-btn {
