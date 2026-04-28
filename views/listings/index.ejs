@@ -174,15 +174,27 @@
             <div class="popular-card">
               <a href="/listings/<%= listing._id %>" class="listing-link d-block">
                 <div class="card card-listing border-0">
-                  <div class="listing-img-wrapper">
-                    <div class="guest-favorite-badge" style="background: rgba(255,255,255,0.9); font-size: 0.75rem; padding: 2px 8px;">Trending</div>
+                  <div class="listing-img-wrapper position-relative">
+                    <div class="guest-favorite-badge" style="background: rgba(255,255,255,0.9); font-size: 0.75rem; padding: 4px 10px; top:12px; left:12px;">Trending</div>
+                    
+                    <!-- Favorite Heart Button -->
+                    <% 
+                      let isFav = false;
+                      if(currUser && currUser.favorites) {
+                         isFav = currUser.favorites.some(favId => favId.toString() === listing._id.toString());
+                      }
+                    %>
+                    <button class="favorite-btn <%= isFav ? 'favorited' : '' %>" data-id="<%= listing._id %>" onclick="toggleFavorite(event, this)" style="top: 12px; right: 12px; font-size: 1.2rem; z-index: 10;">
+                      <i class="fa-solid fa-heart"></i>
+                    </button>
+
                     <img src="<%= 
                       (listing.images && listing.images.length > 0) 
                         ? listing.images[0].url.replace('/upload', '/upload/w_600,h_800,c_fill') 
                         : (listing.image && listing.image.url) 
                           ? listing.image.url.replace('/upload', '/upload/w_600,h_800,c_fill')
                           : 'https://placehold.co/600x800/ffe4e6/fe424d?text=Popular'
-                    %>" alt="popular_listing" loading="lazy">
+                    %>" alt="popular_listing" class="w-100 h-100 object-fit-cover" loading="lazy">
                   </div>
                   <div class="card-info mt-2">
                     <div class="d-flex justify-content-between align-items-center">
