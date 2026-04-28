@@ -32,7 +32,11 @@
     background: white;
     border: 1px solid rgba(0,0,0,0.1);
     border-radius: 28px;
-    padding: 4px 12px;
+    padding: 0 12px;
+    height: 30px; /* FIXED HEIGHT FOR ACCURATE ANCHORING */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-weight: 800;
     font-size: 0.9rem;
     color: #222;
@@ -40,9 +44,6 @@
     white-space: nowrap;
     cursor: pointer;
     transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-family: 'Plus Jakarta Sans', sans-serif;
   }
   
@@ -259,39 +260,27 @@
       attributionControl: false
     }).setView(center, 5);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    // Use a cleaner Map Style (CartoDB Positron)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; CartoDB'
+    }).addTo(map);
     
-    // Custom Zoom Control at Bottom Right
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Add markers for each listing
     const bounds = L.latLngBounds();
-
     listings.forEach(listing => {
-      if (listing.geometry && listing.geometry.coordinates) {
+      if (listing.geometry && listing.geometry.coordinates && (listing.geometry.coordinates[0] !== 0 || listing.geometry.coordinates[1] !== 0)) {
         const [lng, lat] = listing.geometry.coordinates;
         
-        // Custom Price Marker Icon
         const priceIcon = L.divIcon({
           className: 'price-marker-container',
           html: `<div class="price-marker" id="marker-${listing._id}">₹${listing.price.toLocaleString("en-IN")}</div>`,
-          iconSize: [60, 30],
-          iconAnchor: [30, 15]
+          iconSize: [60, 36],
+          iconAnchor: [30, 36] // Points exactly to the tip of the pointer
         });
 
         const marker = L.marker([lat, lng], { icon: priceIcon }).addTo(map);
-        
-        // Popup on click
-        marker.bindPopup(`
-          <div class="map-popup-card">
-            <img src="${listing.images && listing.images.length > 0 ? listing.images[0].url : (listing.image ? listing.image.url : '')}" class="map-popup-img">
-            <div class="map-popup-info">
-              <div class="map-popup-title">${listing.title}</div>
-              <div class="map-popup-price">₹${listing.price.toLocaleString("en-IN")} per night</div>
-              <a href="/listings/${listing._id}" class="btn btn-sm btn-dark w-100 mt-2 rounded-pill">View Details</a>
-            </div>
-          </div>
-        `);
+        marker.bindPopup(`<b>${listing.title}</b><br>₹${listing.price.toLocaleString("en-IN")} per night`);
 
         markers[listing._id] = marker;
         bounds.extend([lat, lng]);
