@@ -722,24 +722,35 @@ html[data-theme="dark"] body {
   object-fit: cover;
 }
 
-/* Top Destinations Rectangular Card Styling (Dynamic) */
-.dest-card-rect {
-  min-width: 240px;
+/* Standardized Card Sizes for Sliders */
+.popular-card, .dest-card-rect {
+  min-width: 320px;
+  max-width: 320px;
   flex-shrink: 0;
   scroll-snap-align: start;
+  transition: transform 0.3s ease;
 }
+
+.popular-card:hover, .dest-card-rect:hover {
+  transform: translateY(-5px);
+}
+
 .dest-img-rect-wrapper {
   width: 100%;
-  height: 280px;
+  aspect-ratio: 1 / 1; /* Match main grid aspect ratio */
+  height: auto;
   border-radius: 16px;
   overflow: hidden;
   position: relative;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-.dest-card-rect:hover .dest-img-rect-wrapper {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+
+@media (max-width: 768px) {
+  .popular-card, .dest-card-rect { 
+    min-width: 280px; 
+    max-width: 280px; 
+  }
 }
 .dest-img-rect-wrapper img {
   width: 100%;
