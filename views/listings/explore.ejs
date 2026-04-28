@@ -102,9 +102,65 @@
         <h5 class="fw-bold mb-0">Over <%= allListings.length %> homes</h5>
         <p class="text-muted small mb-0">Discover the best stays for your next trip</p>
       </div>
-      <button class="btn border rounded-pill px-3 py-2 d-flex align-items-center gap-2 bg-white shadow-sm hover-shadow" style="font-size: 0.85rem; font-weight: 600;">
+      <button class="btn border rounded-pill px-3 py-2 d-flex align-items-center gap-2 bg-white shadow-sm hover-shadow" data-bs-toggle="modal" data-bs-target="#filtersModal" style="font-size: 0.85rem; font-weight: 600;">
         <i class="fa-solid fa-sliders"></i> Filters
       </button>
+    </div>
+
+    <!-- Filters Modal -->
+    <div class="modal fade" id="filtersModal" tabindex="-1" aria-labelledby="filtersModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+          <div class="modal-header border-bottom px-4">
+            <h5 class="modal-title fw-bold" id="filtersModalLabel">Filters</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form action="/listings/explore" method="GET">
+            <div class="modal-body px-4 py-4">
+              <!-- Price Range Section -->
+              <h6 class="fw-bold mb-3">Price range</h6>
+              <p class="text-muted small">Nightly prices before fees and taxes</p>
+              <div class="d-flex gap-3 align-items-center mb-4">
+                <div class="flex-grow-1">
+                  <label class="small text-muted mb-1">Minimum</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-transparent border-end-0">₹</span>
+                    <input type="number" name="minPrice" class="form-control border-start-0 ps-0" placeholder="500" value="<%= filters ? filters.minPrice : '' %>">
+                  </div>
+                </div>
+                <div class="text-muted mt-3">—</div>
+                <div class="flex-grow-1">
+                  <label class="small text-muted mb-1">Maximum</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-transparent border-end-0">₹</span>
+                    <input type="number" name="maxPrice" class="form-control border-start-0 ps-0" placeholder="50,000" value="<%= filters ? filters.maxPrice : '' %>">
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-4 opacity-10">
+
+              <!-- Category Section -->
+              <h6 class="fw-bold mb-3">Property category</h6>
+              <div class="row row-cols-3 g-2">
+                <% 
+                   const categories = ['All', 'Trending', 'Rooms', 'Mountains', 'Castels', 'Amezing Pool', 'Camping', 'Farms', 'Boats'];
+                   for(let cat of categories) {
+                %>
+                  <div class="col">
+                    <input type="radio" class="btn-check" name="category" id="cat-<%= cat %>" value="<%= cat %>" <%= (filters && filters.category === cat) || (!filters && cat === 'All') ? 'checked' : '' %>>
+                    <label class="btn btn-outline-dark w-100 rounded-pill py-2" style="font-size: 0.75rem;" for="cat-<%= cat %>"><%= cat %></label>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+            <div class="modal-footer border-top px-4 py-3 d-flex justify-content-between">
+              <a href="/listings/explore" class="text-dark fw-bold text-decoration-underline small">Clear all</a>
+              <button type="submit" class="btn btn-dark px-4 py-2 rounded-3 fw-bold">Show listings</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
 
     <div class="row row-cols-1 row-cols-xl-2 g-4 px-2">

@@ -203,6 +203,19 @@ module.exports.userListings = async (req, res) => {
 };
 
 module.exports.renderExplorePage = async (req, res) => {
-  const allListings = await Listing.find({}).populate("reviews");
-  res.render("listings/explore.ejs", { allListings });
+  let { minPrice, maxPrice, category } = req.query;
+  let query = {};
+
+  if (minPrice || maxPrice) {
+    query.price = {};
+    if (minPrice) query.price.$gte = Number(minPrice);
+    if (maxPrice) query.price.$lte = Number(maxPrice);
+  }
+
+  if (category && category !== "All") {
+    query.category = category;
+  }
+
+  const allListings = await Listing.find(query).populate("reviews");
+  res.render("listings/explore.ejs", { allListings, filters: req.query });
 };
