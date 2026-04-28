@@ -168,8 +168,15 @@
         </div>
 
         <div class="popular-slider" id="popularSlider">
-          <% for(let i=0; i<Math.min(6, allListings.length); i++) { 
-             let listing = allListings[i];
+          <% 
+             // Sort by rating (high to low) or just take recent ones
+             let popularListings = [...allListings].sort((a, b) => {
+               let rA = (a.reviews && a.reviews.length > 0) ? (a.reviews.reduce((s, r) => s + r.rating, 0) / a.reviews.length) : 0;
+               let rB = (b.reviews && b.reviews.length > 0) ? (b.reviews.reduce((s, r) => s + r.rating, 0) / b.reviews.length) : 0;
+               return rB - rA;
+             }).slice(0, 8);
+
+             for(let listing of popularListings) { 
           %>
             <div class="popular-card">
               <a href="/listings/<%= listing._id %>" class="listing-link d-block">
