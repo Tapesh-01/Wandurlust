@@ -59,7 +59,13 @@
             <div class="invalid-feedback">Price should be valid</div>
           </div>
 
-          <div class="mb-3 col-8">
+          <div class="mb-3 col-md-4">
+            <label for="taxRate" class="form-label">Tax Rate (%)</label>
+            <input name="listing[taxRate]" type="number" placeholder="e.g., 18" class="form-control" min="0" max="100" />
+            <div class="form-text text-muted">Optional tax percentage.</div>
+          </div>
+
+          <div class="mb-3 col-md-4">
             <label for="country" class="form-label">Country</label>
             <input name="listing[country]" placeholder="India" type="text" class="form-control" required />
             <div class="invalid-feedback">Country name should be valid</div>

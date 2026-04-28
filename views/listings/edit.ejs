@@ -144,6 +144,12 @@
         </div>
 
         <div class="mb-3 col-md-4">
+          <label for="taxRate" class="form-label">Tax Rate (%)</label>
+          <input name="listing[taxRate]" id="taxRate" value="<%= listing.taxRate || 0 %>" type="number" class="form-control" min="0" max="100" />
+          <div class="form-text text-muted">Optional tax percentage.</div>
+        </div>
+
+        <div class="mb-3 col-md-4">
           <label for="country" class="form-label">Country</label>
           <input name="listing[country]" id="country" value="<%= listing.country %>" type="text" class="form-control" required />
           <div class="invalid-feedback">Please provide the country name.</div>
