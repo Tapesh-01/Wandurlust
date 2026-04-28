@@ -1,27 +1,8 @@
-<% layout("/layouts/boilerplate") %>
+   <% layout("/layouts/boilerplate") %>
   <!-- <h3>All Listings</h3> -->
   <!-- <form method="GET" action="/listings/new">
       <button>Create New Listing</button>
     </form> -->
-
-  <script>
-    // Intersection Observer for "See all" card animation
-    document.addEventListener("DOMContentLoaded", function() {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('in-view');
-          } else {
-            // Optional: remove class to re-animate when scrolling back
-            // entry.target.classList.remove('in-view');
-          }
-        });
-      }, { threshold: 0.5 });
-
-      const imageStack = document.querySelector('.image-stack');
-      if (imageStack) observer.observe(imageStack);
-    });
-  </script>
 
   <style>
     /* ── Category Filters ── */
