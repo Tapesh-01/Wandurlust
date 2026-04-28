@@ -42,4 +42,3 @@
 /* ── Popular Homes Card Fixes ── */
 .popular-card .card-info b { color: var(--text-color); }
 .popular-card .card-info .price { color: var(--text-color); }
-.popular-card .card-info .small i { color: #fe424d; }
