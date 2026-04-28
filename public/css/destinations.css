@@ -3,14 +3,14 @@
   background: linear-gradient(135deg, #FF385C 0%, #ff6b87 50%, #e31c5f 100%);
   background-size: 200% 200%;
   animation: gradientFlow 10s ease infinite;
-  padding: 6rem 2rem;
-  border-radius: 2.5rem;
+  padding: 3.5rem 2rem;
+  border-radius: 2rem;
   color: white;
-  margin-bottom: 4rem;
+  margin-bottom: 3.5rem;
   text-align: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(254, 66, 77, 0.25);
+  box-shadow: 0 15px 35px rgba(255, 56, 92, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -27,22 +27,24 @@
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
   pointer-events: none;
 }
 
 .dest-hero h1 {
-  font-size: 3.5rem;
-  letter-spacing: -1.5px;
-  text-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .dest-hero p {
-  font-size: 1.25rem;
-  font-weight: 400;
-  max-width: 600px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  max-width: 500px;
   margin: 0 auto;
-  opacity: 0.9;
+  opacity: 0.85;
 }
 .city-section {
   margin-bottom: 4rem;
