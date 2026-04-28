@@ -1,19 +1,36 @@
 /* WanderBot AI Chatbot Styles */
 #wb-fab {
   position: fixed; bottom: 28px; right: 28px;
-  width: 60px; height: 60px; border-radius: 50%;
-  background: linear-gradient(135deg, #fe424d 0%, #ff6b35 100%);
-  border: none; cursor: pointer;
-  box-shadow: 0 6px 24px rgba(254,66,77,0.5);
+  width: 65px; height: 65px; border-radius: 50%;
+  background: white;
+  border: 1px solid rgba(255, 56, 92, 0.2);
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(255, 56, 92, 0.3);
   display: flex; align-items: center; justify-content: center;
   z-index: 9999;
   transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s;
+  padding: 0;
+  overflow: visible;
 }
-#wb-fab:hover { transform: scale(1.12); box-shadow: 0 10px 32px rgba(254,66,77,0.65); }
-#wb-fab .wb-open-icon { width: 45px; height: 45px; object-fit: cover; border-radius: 50%; transition: opacity 0.2s; }
-#wb-fab .wb-close-icon { width: 28px; height: 28px; fill: #fff; display: none; }
+#wb-fab::after {
+  content: "";
+  position: absolute;
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: rgba(255, 56, 92, 0.4);
+  z-index: -1;
+  animation: wb-pulse 2s infinite;
+}
+@keyframes wb-pulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+#wb-fab:hover { transform: scale(1.1); box-shadow: 0 15px 40px rgba(255, 56, 92, 0.5); }
+#wb-fab .wb-open-icon { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; transition: opacity 0.2s; }
+#wb-fab .wb-close-icon { width: 28px; height: 28px; fill: #ff385c; display: none; }
 #wb-fab.open .wb-open-icon { display: none; }
 #wb-fab.open .wb-close-icon { display: block; }
+#wb-fab.open::after { display: none; }
 #wb-fab.open { transform: rotate(0deg) scale(1.05); }
 
 #wb-window {
