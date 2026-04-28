@@ -1,0 +1,113 @@
+<% layout("/layouts/boilerplate") %>
+<style>
+    .dest-hero {
+        background: linear-gradient(135deg, #fe424d 0%, #ff7e5f 100%);
+        padding: 4rem 2rem;
+        border-radius: 2rem;
+        color: white;
+        margin-bottom: 3rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(254, 66, 77, 0.2);
+    }
+    .city-section {
+        margin-bottom: 4rem;
+        background: #fff;
+        border-radius: 2rem;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    [data-theme="dark"] .city-section {
+        background: #1e293b;
+    }
+    .city-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 1rem;
+    }
+    [data-theme="dark"] .city-header { border-color: #334155; }
+    
+    .city-badge {
+        background: #fe424d;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 2rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .dest-grid {
+        display: flex;
+        gap: 1.5rem;
+        overflow-x: auto;
+        padding: 0.5rem;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+    }
+    .dest-grid::-webkit-scrollbar { display: none; }
+    
+    .dest-item {
+        min-width: 300px;
+        max-width: 300px;
+        scroll-snap-align: start;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="dest-hero">
+        <h1 class="display-4 fw-bold">Explore All Destinations</h1>
+        <p class="lead opacity-75">Find the perfect stay across <%= Object.keys(cityGroups).length %> unique cities</p>
+    </div>
+
+    <% Object.keys(cityGroups).sort().forEach(city => { 
+       let listings = cityGroups[city];
+    %>
+        <div class="city-section">
+            <div class="city-header">
+                <div>
+                    <h2 class="fw-bold mb-0"><%= city %></h2>
+                    <p class="text-muted mb-0 small"><%= listings.length %> homes available in this location</p>
+                </div>
+                <a href="/listings?search=<%= city %>" class="btn btn-outline-danger btn-sm rounded-pill px-3">View all in <%= city %></a>
+            </div>
+
+            <div class="dest-grid">
+                <% listings.forEach(listing => { %>
+                    <div class="dest-item">
+                        <a href="/listings/<%= listing._id %>" class="text-decoration-none">
+                            <div class="card card-listing border-0">
+                                <div class="listing-img-wrapper position-relative overflow-hidden rounded-4" style="aspect-ratio: 1/1;">
+                                    <% if(listing.images && listing.images.length > 1) { %>
+                                        <div id="dest-carousel-<%= listing._id %>" class="carousel slide h-100 w-100" data-bs-ride="false" data-bs-interval="false">
+                                            <div class="carousel-inner h-100 w-100">
+                                                <% listing.images.forEach((img, idx) => { %>
+                                                    <div class="carousel-item h-100 w-100 <%= idx === 0 ? 'active' : '' %>">
+                                                        <img src="<%= img.url.replace('/upload', '/upload/w_400,h_400,c_fill') %>" class="d-block w-100 h-100 object-fit-cover" alt="img">
+                                                    </div>
+                                                <% }) %>
+                                            </div>
+                                            <button class="carousel-control-prev" type="button" data-bs-target="#dest-carousel-<%= listing._id %>" data-bs-slide="prev" onclick="event.preventDefault();">
+                                                <span class="carousel-control-prev-icon-custom"><i class="fa-solid fa-chevron-left"></i></span>
+                                            </button>
+                                            <button class="carousel-control-next" type="button" data-bs-target="#dest-carousel-<%= listing._id %>" data-bs-slide="next" onclick="event.preventDefault();">
+                                                <span class="carousel-control-next-icon-custom"><i class="fa-solid fa-chevron-right"></i></span>
+                                            </button>
+                                        </div>
+                                    <% } else { %>
+                                        <img src="<%= (listing.images && listing.images.length > 0) ? listing.images[0].url.replace('/upload', '/upload/w_400,h_400,c_fill') : (listing.image ? listing.image.url.replace('/upload', '/upload/w_400,h_400,c_fill') : '') %>" class="w-100 h-100 object-fit-cover" alt="img">
+                                    <% } %>
+                                </div>
+                                <div class="card-info mt-2">
+                                    <b class="text-dark d-block text-truncate"><%= listing.title %></b>
+                                    <p class="text-muted small mb-0">&#8377;<%= listing.price.toLocaleString("en-IN") %> / night</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    <% }) %>
+</div>

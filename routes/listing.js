@@ -13,6 +13,9 @@ router.get("/mylistings", isLoggedIn, wrapAsync(listingController.userListings))
 // EXPLORE SPLIT VIEW (NEW)
 router.get("/explore", wrapAsync(listingController.renderExplorePage));
 
+// ALL DESTINATIONS VIEW (NEW)
+router.get("/destinations", wrapAsync(listingController.renderDestinationsPage));
+
 // INDEX + CREATE
 router.
 route("/")

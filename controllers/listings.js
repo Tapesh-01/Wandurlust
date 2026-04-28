@@ -219,3 +219,16 @@ module.exports.renderExplorePage = async (req, res) => {
   const allListings = await Listing.find(query).populate("reviews");
   res.render("listings/explore.ejs", { allListings, filters: req.query });
 };
+
+module.exports.renderDestinationsPage = async (req, res) => {
+  const allListings = await Listing.find({}).populate("reviews");
+  // Group by location
+  const cityGroups = {};
+  allListings.forEach(l => {
+    if(!cityGroups[l.location]) {
+      cityGroups[l.location] = [];
+    }
+    cityGroups[l.location].push(l);
+  });
+  res.render("listings/destinations.ejs", { cityGroups });
+};
