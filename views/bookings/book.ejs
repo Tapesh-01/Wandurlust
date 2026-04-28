@@ -119,16 +119,26 @@
         // Initialize with 1 guest
         renderGuestNameFields(1);
 
+        const taxRate = Number("<%= listing.taxRate || 0 %>");
+
         function calculateTotal() {
             const checkIn = new Date(checkInInput.value);
             const checkOut = new Date(checkOutInput.value);
 
             if (checkInInput.value && checkOutInput.value && checkOut > checkIn) {
                 const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-                const total = pricePerNight * nights;
+                const baseTotal = pricePerNight * nights;
+                const taxAmount = (baseTotal * taxRate) / 100;
+                const grandTotal = baseTotal + taxAmount;
 
-                totalPriceElement.textContent = '₹' + total.toLocaleString('en-IN');
-                priceBreakdownElement.textContent = `₹${pricePerNight.toLocaleString('en-IN')} × ${nights} night${nights > 1 ? 's' : ''}`;
+                totalPriceElement.textContent = '₹' + grandTotal.toLocaleString('en-IN');
+                
+                let breakdownHtml = `₹${pricePerNight.toLocaleString('en-IN')} × ${nights} night${nights > 1 ? 's' : ''}`;
+                if (taxRate > 0) {
+                    breakdownHtml += ` <br>+ ${taxRate}% Tax (₹${taxAmount.toLocaleString('en-IN')})`;
+                }
+                priceBreakdownElement.innerHTML = breakdownHtml;
+                
                 totalPriceDisplay.style.display = 'block';
             } else {
                 totalPriceDisplay.style.display = 'none';

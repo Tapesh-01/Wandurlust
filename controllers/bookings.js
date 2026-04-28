@@ -79,7 +79,10 @@ module.exports.createBooking = async (req, res) => {
     }
 
     const nights = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
-    const totalPrice = listing.price * nights;
+    const baseTotal = listing.price * nights;
+    const taxRate = listing.taxRate || 0;
+    const taxAmount = (baseTotal * taxRate) / 100;
+    const totalPrice = baseTotal + taxAmount;
 
     // Use helper to normalize guest names
     const names = normalizeGuestNames(guestNames, guests, req.user.username);
