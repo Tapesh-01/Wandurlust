@@ -181,7 +181,33 @@
             <div class="popular-card">
               <a href="/listings/<%= listing._id %>" class="listing-link d-block">
                 <div class="card card-listing border-0">
-                  <div class="listing-img-wrapper position-relative">
+                  <div class="listing-img-wrapper position-relative overflow-hidden">
+                    <!-- Carousel for Popular Home -->
+                    <% if(listing.images && listing.images.length > 1) { %>
+                      <div id="popular-carousel-<%= listing._id %>" class="carousel slide h-100 w-100" data-bs-ride="false" data-bs-interval="false">
+                        <div class="carousel-indicators mb-2">
+                          <% for(let i=0; i<Math.min(5, listing.images.length); i++) { %>
+                            <button type="button" data-bs-target="#popular-carousel-<%= listing._id %>" data-bs-slide-to="<%= i %>" class="<%= i === 0 ? 'active' : '' %>"></button>
+                          <% } %>
+                        </div>
+                        <div class="carousel-inner h-100 w-100">
+                          <% listing.images.forEach((img, index) => { %>
+                            <div class="carousel-item h-100 w-100 <%= index === 0 ? 'active' : '' %>">
+                              <img src="<%= img.url.replace('/upload', '/upload/w_600,h_800,c_fill') %>" class="d-block w-100 h-100 object-fit-cover" alt="popular_listing">
+                            </div>
+                          <% }) %>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#popular-carousel-<%= listing._id %>" data-bs-slide="prev" onclick="event.preventDefault(); event.stopPropagation();">
+                          <span class="carousel-control-prev-icon-custom"><i class="fa-solid fa-chevron-left"></i></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#popular-carousel-<%= listing._id %>" data-bs-slide="next" onclick="event.preventDefault(); event.stopPropagation();">
+                          <span class="carousel-control-next-icon-custom"><i class="fa-solid fa-chevron-right"></i></span>
+                        </button>
+                      </div>
+                    <% } else { %>
+                      <img src="<%= (listing.images && listing.images.length > 0) ? listing.images[0].url.replace('/upload', '/upload/w_600,h_800,c_fill') : (listing.image ? listing.image.url.replace('/upload', '/upload/w_600,h_800,c_fill') : '') %>" alt="popular_listing" class="w-100 h-100 object-fit-cover" loading="lazy">
+                    <% } %>
+
                     <div class="guest-favorite-badge" style="background: rgba(255,255,255,0.9); font-size: 0.75rem; padding: 4px 10px; top:12px; left:12px;">Trending</div>
                     
                     <!-- Favorite Heart Button -->
@@ -194,14 +220,6 @@
                     <button class="favorite-btn <%= isFav ? 'favorited' : '' %>" data-id="<%= listing._id %>" onclick="toggleFavorite(event, this)" style="top: 12px; right: 12px; font-size: 1.2rem; z-index: 10;">
                       <i class="fa-solid fa-heart"></i>
                     </button>
-
-                    <img src="<%= 
-                      (listing.images && listing.images.length > 0) 
-                        ? listing.images[0].url.replace('/upload', '/upload/w_600,h_800,c_fill') 
-                        : (listing.image && listing.image.url) 
-                          ? listing.image.url.replace('/upload', '/upload/w_600,h_800,c_fill')
-                          : 'https://placehold.co/600x800/ffe4e6/fe424d?text=Popular'
-                    %>" alt="popular_listing" class="w-100 h-100 object-fit-cover" loading="lazy">
                   </div>
                   <div class="card-info mt-2">
                     <div class="d-flex justify-content-between align-items-center">
@@ -260,24 +278,43 @@
         </div>
         <div class="slider-controls d-flex gap-2">
           <button class="slider-nav-btn" onclick="scrollSlider('destSlider', -1)"><i class="fa-solid fa-chevron-left"></i></button>
-          <button class="slider-nav-btn" onclick="slider-nav-btn" onclick="scrollSlider('destSlider', 1)"><i class="fa-solid fa-chevron-right"></i></button>
+          <button class="slider-nav-btn" onclick="scrollSlider('destSlider', 1)"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
       </div>
 
       <div class="popular-slider" id="destSlider">
         <% for(let cityName of cities) { 
-           let cityData = cityStats[cityName];
+           // Get all images for this city to create a city carousel
+           let cityListings = allListings.filter(l => l.location === cityName).slice(0, 5);
+           let cityCount = cityStats[cityName].count;
         %>
           <div class="dest-card-rect">
-            <a href="/listings?search=<%= cityName %>" class="text-decoration-none">
-              <div class="dest-img-rect-wrapper mb-2">
-                <img src="<%= cityData.img.replace('/upload', '/upload/w_400,h_500,c_fill') %>" alt="<%= cityName %>">
-                <div class="dest-card-info-overlay">
-                   <h6 class="fw-bold mb-0 text-white text-shadow"><%= cityName %></h6>
-                   <p class="text-white small mb-0 opacity-75"><%= cityData.count %> <%= cityData.count > 1 ? 'Listings' : 'Listing' %></p>
+            <div class="dest-img-rect-wrapper mb-2">
+              <div id="city-carousel-<%= cityName.replace(/\s+/g, '-') %>" class="carousel slide h-100 w-100" data-bs-ride="false" data-bs-interval="false">
+                <div class="carousel-inner h-100 w-100">
+                  <% cityListings.forEach((l, index) => { 
+                     let imgUrl = (l.images && l.images.length > 0) ? l.images[0].url : (l.image ? l.image.url : '');
+                  %>
+                    <div class="carousel-item h-100 w-100 <%= index === 0 ? 'active' : '' %>">
+                      <img src="<%= imgUrl.replace('/upload', '/upload/w_400,h_500,c_fill') %>" class="d-block w-100 h-100 object-fit-cover" alt="<%= cityName %>">
+                    </div>
+                  <% }) %>
                 </div>
+                <% if(cityListings.length > 1) { %>
+                  <button class="carousel-control-prev" type="button" data-bs-target="#city-carousel-<%= cityName.replace(/\s+/g, '-') %>" data-bs-slide="prev" onclick="event.preventDefault(); event.stopPropagation();">
+                    <span class="carousel-control-prev-icon-custom"><i class="fa-solid fa-chevron-left"></i></span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#city-carousel-<%= cityName.replace(/\s+/g, '-') %>" data-bs-slide="next" onclick="event.preventDefault(); event.stopPropagation();">
+                    <span class="carousel-control-next-icon-custom"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                <% } %>
               </div>
-            </a>
+              
+              <a href="/listings?search=<%= cityName %>" class="dest-card-info-overlay text-decoration-none">
+                 <h6 class="fw-bold mb-0 text-white text-shadow"><%= cityName %></h6>
+                 <p class="text-white small mb-0 opacity-75"><%= cityCount %> <%= cityCount > 1 ? 'Listings' : 'Listing' %></p>
+              </a>
+            </div>
           </div>
         <% } %>
       </div>
