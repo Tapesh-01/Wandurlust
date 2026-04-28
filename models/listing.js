@@ -55,6 +55,12 @@ const listingSchema = new Schema({
       type: [Number],
       required: true
     }
+  },
+  taxRate: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 100
   }
 });
 
