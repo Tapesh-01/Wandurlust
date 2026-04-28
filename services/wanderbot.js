@@ -7,13 +7,12 @@ const Listing = require("../models/listing.js");
 const Booking = require("../models/booking.js");
 
 const GEMINI_MODELS = [
-  "gemini-1.5-flash",
-  "gemini-1.5-flash-latest",
-  "gemini-pro"
+  "gemini-3-flash-preview",
+  "gemini-2.5-flash-lite",
+  "gemini-1.5-flash"
 ];
 
 async function callGemini(apiKey, model, contents) {
-  // Free tier keys strongly prefer v1beta for these models
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
   try {
     const res = await fetch(url, {
