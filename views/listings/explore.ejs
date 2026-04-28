@@ -334,7 +334,26 @@
         });
 
         const marker = L.marker([lat, lng], { icon: priceIcon }).addTo(map);
-        marker.bindPopup(`<b>${listing.title}</b><br>₹${listing.price.toLocaleString("en-IN")} per night`);
+        
+        // Premium Popup Design
+        const popupContent = `
+          <div class="map-popup-card" style="width: 200px; overflow: hidden; border-radius: 12px;">
+            <div style="height: 120px; overflow: hidden; position: relative;">
+               <img src="${(listing.images && listing.images.length > 0) ? listing.images[0].url.replace('/upload', '/upload/w_400,h_300,c_fill') : (listing.image ? listing.image.url : '')}" 
+                    style="width: 100%; height: 100%; object-fit: cover;" alt="img">
+            </div>
+            <div style="padding: 12px; font-family: 'Plus Jakarta Sans', sans-serif;">
+               <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${listing.title}</div>
+               <div style="color: #222; font-weight: 800; font-size: 0.9rem;">₹${listing.price.toLocaleString("en-IN")} <span style="font-weight: 400; color: #717171;">night</span></div>
+               <a href="/listings/${listing._id}" class="btn btn-dark w-100 mt-2 py-2" style="font-size: 0.75rem; border-radius: 8px; font-weight: 600;">View Listing</a>
+            </div>
+          </div>
+        `;
+        
+        marker.bindPopup(popupContent, {
+           closeButton: false,
+           offset: L.point(0, -30)
+        });
 
         markers[listing._id] = marker;
         bounds.extend([lat, lng]);
@@ -370,3 +389,20 @@
 
   document.addEventListener('DOMContentLoaded', initExploreMap);
 </script>
+
+<style>
+  /* Clean Leaflet Popup Overrides */
+  .leaflet-popup-content-wrapper {
+    padding: 0 !important;
+    overflow: hidden !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2) !important;
+  }
+  .leaflet-popup-content {
+    margin: 0 !important;
+    width: 200px !important;
+  }
+  .leaflet-popup-tip-container {
+    display: none !important;
+  }
+</style>
