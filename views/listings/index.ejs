@@ -474,7 +474,7 @@
       const real = document.getElementById('realListings');
       setTimeout(function() { skeleton.style.display = 'none'; real.classList.add('loaded'); }, 700);
 
-      // Intersection Observer for "See all" card animation
+      // Intersection Observer for all "See all" card animations
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -483,8 +483,8 @@
         });
       }, { threshold: 0.5 });
 
-      const imageStack = document.querySelector('.image-stack');
-      if (imageStack) observer.observe(imageStack);
+      const imageStacks = document.querySelectorAll('.image-stack');
+      imageStacks.forEach(stack => observer.observe(stack));
     });
     // Tax toggle
     let taxSwitch = document.getElementById("switchCheckDefault");
