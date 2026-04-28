@@ -4,6 +4,25 @@
       <button>Create New Listing</button>
     </form> -->
 
+  <script>
+    // Intersection Observer for "See all" card animation
+    document.addEventListener("DOMContentLoaded", function() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+          } else {
+            // Optional: remove class to re-animate when scrolling back
+            // entry.target.classList.remove('in-view');
+          }
+        });
+      }, { threshold: 0.5 });
+
+      const imageStack = document.querySelector('.image-stack');
+      if (imageStack) observer.observe(imageStack);
+    });
+  </script>
+
   <style>
     /* ── Category Filters ── */
     #filters { display: flex; flex-wrap: wrap; align-items: center; }
@@ -333,6 +352,18 @@
       const skeleton = document.getElementById('skeletonGrid');
       const real = document.getElementById('realListings');
       setTimeout(function() { skeleton.style.display = 'none'; real.classList.add('loaded'); }, 700);
+
+      // Intersection Observer for "See all" card animation
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+          }
+        });
+      }, { threshold: 0.5 });
+
+      const imageStack = document.querySelector('.image-stack');
+      if (imageStack) observer.observe(imageStack);
     });
     // Tax toggle
     let taxSwitch = document.getElementById("switchCheckDefault");

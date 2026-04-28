@@ -608,6 +608,7 @@ html[data-theme="dark"] body {
   background: white !important;
   border: 1px solid #eee !important;
   box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
+  overflow: hidden;
 }
 [data-theme="dark"] .show-more-card {
   background: #1e293b !important;
@@ -632,26 +633,33 @@ html[data-theme="dark"] body {
   border: 3px solid white;
   box-shadow: 0 10px 25px rgba(0,0,0,0.2);
   object-fit: cover;
-  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  animation: stackEntrance 1s ease-out forwards;
+  transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: scale(0.5) rotate(0); /* Hidden/Collapsed by default */
+  opacity: 0;
 }
 
 [data-theme="dark"] .stack-img {
   border-color: #334155;
 }
 
-/* Base positions (Cascaded) */
-.stack-img:nth-child(1) { transform: rotate(-15deg) translate(-25px, -8px); z-index: 1; opacity: 0.8; animation-delay: 0.2s; }
-.stack-img:nth-child(2) { transform: rotate(0deg); z-index: 3; animation-delay: 0.4s; }
-.stack-img:nth-child(3) { transform: rotate(15deg) translate(25px, 8px); z-index: 2; opacity: 0.9; animation-delay: 0.6s; }
-
-/* Entrance Animation */
-@keyframes stackEntrance {
-  0% { transform: scale(0.5) rotate(0); opacity: 0; }
-  100% { /* Final positions handled by nth-child rules */ }
+/* Fan-out Animation Triggered by .in-view class */
+.image-stack.in-view .stack-img:nth-child(1) { 
+  transform: rotate(-15deg) translate(-28px, -8px) scale(1); 
+  z-index: 1; 
+  opacity: 0.8; 
+}
+.image-stack.in-view .stack-img:nth-child(2) { 
+  transform: rotate(0deg) scale(1.1); 
+  z-index: 3; 
+  opacity: 1; 
+}
+.image-stack.in-view .stack-img:nth-child(3) { 
+  transform: rotate(15deg) translate(28px, 8px) scale(1); 
+  z-index: 2; 
+  opacity: 0.9; 
 }
 
-/* Hover "Fan-out" Effect */
+/* Hover "Pop" Effect */
 .show-more-card:hover .stack-img:nth-child(1) { 
   transform: rotate(-25deg) translate(-45px, -15px) scale(1.05); 
   opacity: 1;
@@ -661,7 +669,7 @@ html[data-theme="dark"] body {
   opacity: 1;
 }
 .show-more-card:hover .stack-img:nth-child(2) { 
-  transform: scale(1.15) translateY(-5px); 
+  transform: scale(1.2) translateY(-8px); 
   z-index: 10;
 }
 
