@@ -7,10 +7,9 @@ const Listing = require("../models/listing.js");
 const Booking = require("../models/booking.js");
 
 const GEMINI_MODELS = [
-  "gemini-flash-latest",     // Verified Working (Gemini 3 Flash Preview)
-  "gemini-2.5-flash",        // High Performance Fallback
-  "gemini-2.0-flash",        // Reliable Fallback
-  "gemini-1.5-flash-8b-exp", // Experimental fast tier
+  "gemini-1.5-flash",
+  "gemini-1.5-flash-latest",
+  "gemini-pro"
 ];
 
 async function callGemini(apiKey, model, contents) {
@@ -51,15 +50,15 @@ async function buildSystemPrompt(userQuery = "") {
         { country: searchRegex },
         { category: searchRegex }
       ]
-    }).select("title location price category").limit(15).lean();
+    }).select("title location price category").limit(8).lean();
   }
 
   // Fallback to top/recent listings if no keyword matches
-  if (listings.length < 5) {
-    const general = await Listing.find({}).sort({createdAt: -1}).select("title location price category").limit(10).lean();
+  if (listings.length < 3) {
+    const general = await Listing.find({}).sort({createdAt: -1}).select("title location price category").limit(5).lean();
     const seen = new Set(listings.map(l => l._id.toString()));
     for (const item of general) {
-      if (!seen.has(item._id.toString()) && listings.length < 20) {
+      if (!seen.has(item._id.toString()) && listings.length < 10) {
         listings.push(item);
       }
     }
