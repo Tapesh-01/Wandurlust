@@ -247,9 +247,39 @@
       <div class="col">
         <a href="/listings/<%= listing._id %>" class="listing-link d-block">
           <div class="card card-listing h-100">
-            <div class="listing-img-wrapper">
+            <div class="listing-img-wrapper position-relative overflow-hidden rounded-4">
+              <!-- Carousel for Multiple Images -->
+              <% if(listing.images && listing.images.length > 1) { %>
+                <div id="carousel-<%= listing._id %>" class="carousel slide h-100 w-100" data-bs-ride="false" data-bs-interval="false">
+                  <!-- Indicators (Dots) -->
+                  <div class="carousel-indicators mb-2">
+                    <% for(let i=0; i<Math.min(5, listing.images.length); i++) { %>
+                      <button type="button" data-bs-target="#carousel-<%= listing._id %>" data-bs-slide-to="<%= i %>" class="<%= i === 0 ? 'active' : '' %>" aria-label="Slide <%= i + 1 %>"></button>
+                    <% } %>
+                  </div>
+
+                  <div class="carousel-inner h-100 w-100">
+                    <% listing.images.forEach((img, index) => { %>
+                      <div class="carousel-item h-100 w-100 <%= index === 0 ? 'active' : '' %>">
+                        <img src="<%= img.url.replace('/upload', '/upload/w_600,h_600,c_fill') %>" class="d-block w-100 h-100 object-fit-cover" alt="listing_img">
+                      </div>
+                    <% }) %>
+                  </div>
+
+                  <!-- Navigation Arrows -->
+                  <button class="carousel-control-prev" type="button" data-bs-target="#carousel-<%= listing._id %>" data-bs-slide="prev" onclick="event.preventDefault(); event.stopPropagation();">
+                    <span class="carousel-control-prev-icon-custom" aria-hidden="true"><i class="fa-solid fa-chevron-left"></i></span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#carousel-<%= listing._id %>" data-bs-slide="next" onclick="event.preventDefault(); event.stopPropagation();">
+                    <span class="carousel-control-next-icon-custom" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+              <% } else { %>
+                <!-- Single Image fallback -->
+                <img src="<%= (listing.images && listing.images.length > 0) ? listing.images[0].url.replace('/upload', '/upload/w_600,h_600,c_fill') : (listing.image ? listing.image.url.replace('/upload', '/upload/w_600,h_600,c_fill') : 'https://placehold.co/600x600/ffe4e6/fe424d?text=No+Image') %>" class="w-100 h-100 object-fit-cover" alt="listing_img">
+              <% } %>
               
-              <!-- Guest Favourite Badge (Logic: showing for highly priced or specific listings as demo) -->
+              <!-- Guest Favourite Badge -->
               <% if(listing.price > 2500) { %>
                 <div class="guest-favorite-badge">Guest favourite</div>
               <% } %>
@@ -264,16 +294,6 @@
               <button class="favorite-btn <%= isFav ? 'favorited' : '' %>" data-id="<%= listing._id %>" onclick="toggleFavorite(event, this)" aria-label="Save to favorites">
                 <i class="fa-solid fa-heart"></i>
               </button>
-
-              <img 
-                src="<%= 
-                  (listing.images && listing.images.length > 0) 
-                    ? listing.images[0].url.replace('/upload', '/upload/w_600,h_600,c_fill')
-                    : (listing.image && listing.image.url) 
-                      ? listing.image.url.replace('/upload', '/upload/w_600,h_600,c_fill')
-                      : 'https://placehold.co/600x600/ffe4e6/fe424d?text=No+Image'
-                %>" 
-                alt="listing_image" loading="lazy" />
             </div>
             
             <div class="card-info">

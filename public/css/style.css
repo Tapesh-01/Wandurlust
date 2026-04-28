@@ -665,3 +665,59 @@ html[data-theme="dark"] body {
   border-color: #222 !important;
 }
 .show-more-card:active { transform: scale(0.96); }
+
+/* Listing Image Carousel (Airbnb Style) */
+.carousel-indicators [data-bs-target] {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.6);
+  border: none;
+  margin: 0 3px;
+}
+.carousel-indicators .active {
+  background-color: #fff;
+  transform: scale(1.2);
+}
+
+.carousel-control-prev, .carousel-control-next {
+  width: 12%;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 5;
+}
+.card-listing:hover .carousel-control-prev, 
+.card-listing:hover .carousel-control-next {
+  opacity: 1;
+}
+
+.carousel-control-prev-icon-custom, .carousel-control-next-icon-custom {
+  background-color: rgba(255, 255, 255, 0.9);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #222;
+  font-size: 0.8rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  border: 1px solid rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+.carousel-control-prev-icon-custom:hover, 
+.carousel-control-next-icon-custom:hover {
+  transform: scale(1.1);
+  background-color: #fff;
+}
+
+/* Fix for skeleton and image aspect ratios */
+.listing-img-wrapper {
+  aspect-ratio: 1 / 1;
+  position: relative;
+}
+.listing-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
