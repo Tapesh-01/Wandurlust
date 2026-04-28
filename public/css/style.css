@@ -601,13 +601,13 @@ html[data-theme="dark"] body {
 .slider-nav-btn:hover { background: #f7f7f7; box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
 [data-theme="dark"] .slider-nav-btn:hover { background: #1e293b; }
 
-/* Show More Card - Stacked Images Design */
+/* Show More Card - Premium Stacked Images Design */
 .show-more-card {
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
   cursor: pointer;
   background: white !important;
-  border: 1px solid #ddd !important;
-  border-style: solid !important;
+  border: 1px solid #eee !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
 }
 [data-theme="dark"] .show-more-card {
   background: #1e293b !important;
@@ -616,9 +616,9 @@ html[data-theme="dark"] body {
 
 .image-stack {
   position: relative;
-  width: 120px;
-  height: 100px;
-  margin-bottom: 25px;
+  width: 140px;
+  height: 120px;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -626,29 +626,47 @@ html[data-theme="dark"] body {
 
 .stack-img {
   position: absolute;
-  width: 80px;
-  height: 80px;
-  border-radius: 12px;
+  width: 90px;
+  height: 90px;
+  border-radius: 14px;
   border: 3px solid white;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
   object-fit: cover;
-  transition: all 0.4s ease;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: stackEntrance 1s ease-out forwards;
 }
 
 [data-theme="dark"] .stack-img {
   border-color: #334155;
 }
 
-.stack-img:nth-child(1) { transform: rotate(-15deg) translate(-15px, -5px); z-index: 1; opacity: 0.7; }
-.stack-img:nth-child(2) { transform: rotate(0deg); z-index: 3; }
-.stack-img:nth-child(3) { transform: rotate(15deg) translate(15px, 5px); z-index: 2; opacity: 0.8; }
+/* Base positions (Cascaded) */
+.stack-img:nth-child(1) { transform: rotate(-15deg) translate(-25px, -8px); z-index: 1; opacity: 0.8; animation-delay: 0.2s; }
+.stack-img:nth-child(2) { transform: rotate(0deg); z-index: 3; animation-delay: 0.4s; }
+.stack-img:nth-child(3) { transform: rotate(15deg) translate(25px, 8px); z-index: 2; opacity: 0.9; animation-delay: 0.6s; }
 
-.show-more-card:hover .stack-img:nth-child(1) { transform: rotate(-25deg) translate(-25px, -10px); }
-.show-more-card:hover .stack-img:nth-child(3) { transform: rotate(25deg) translate(25px, 10px); }
-.show-more-card:hover .stack-img:nth-child(2) { transform: scale(1.1); }
+/* Entrance Animation */
+@keyframes stackEntrance {
+  0% { transform: scale(0.5) rotate(0); opacity: 0; }
+  100% { /* Final positions handled by nth-child rules */ }
+}
+
+/* Hover "Fan-out" Effect */
+.show-more-card:hover .stack-img:nth-child(1) { 
+  transform: rotate(-25deg) translate(-45px, -15px) scale(1.05); 
+  opacity: 1;
+}
+.show-more-card:hover .stack-img:nth-child(3) { 
+  transform: rotate(25deg) translate(45px, 15px) scale(1.05); 
+  opacity: 1;
+}
+.show-more-card:hover .stack-img:nth-child(2) { 
+  transform: scale(1.15) translateY(-5px); 
+  z-index: 10;
+}
 
 .show-more-card:hover {
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.12) !important;
   border-color: #222 !important;
 }
-.show-more-card:active { transform: scale(0.95); }
+.show-more-card:active { transform: scale(0.96); }
