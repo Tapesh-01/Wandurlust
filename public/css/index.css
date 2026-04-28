@@ -16,3 +16,30 @@
 [data-theme="dark"] .skeleton-img, [data-theme="dark"] .skeleton-line { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 700px 100%; }
 #realListings { opacity: 0; transition: opacity 0.5s ease; }
 #realListings.loaded { opacity: 1; }
+
+/* ── Listing Card Badges ── */
+.guest-favorite-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #222;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 5px 12px;
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  z-index: 5;
+  transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .guest-favorite-badge {
+  background: rgba(30, 41, 59, 0.9);
+  color: #f8fafc;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* ── Popular Homes Card Fixes ── */
+.popular-card .card-info b { color: var(--text-color); }
+.popular-card .card-info .price { color: var(--text-color); }
+.popular-card .card-info .small i { color: #fe424d; }
