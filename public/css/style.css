@@ -659,22 +659,22 @@ html[data-theme="dark"] body {
   opacity: 0.9; 
 }
 
-/* Hover "Pop" Effect */
+/* Hover "Fan-out" Effect (Subtle & Smooth) */
 .show-more-card:hover .stack-img:nth-child(1) { 
-  transform: rotate(-25deg) translate(-45px, -15px) scale(1.05); 
+  transform: rotate(-20deg) translate(-35px, -10px) scale(1.02); 
   opacity: 1;
 }
 .show-more-card:hover .stack-img:nth-child(3) { 
-  transform: rotate(25deg) translate(45px, 15px) scale(1.05); 
+  transform: rotate(20deg) translate(35px, 10px) scale(1.02); 
   opacity: 1;
 }
 .show-more-card:hover .stack-img:nth-child(2) { 
-  transform: scale(1.2) translateY(-8px); 
+  transform: scale(1.1) translateY(-5px); 
   z-index: 10;
 }
 
 .show-more-card:hover {
-  box-shadow: 0 15px 40px rgba(0,0,0,0.12) !important;
-  border-color: #222 !important;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.1) !important;
+  border-color: #444 !important;
 }
-.show-more-card:active { transform: scale(0.96); }
+.show-more-card:active { transform: scale(0.97); }
