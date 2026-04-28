@@ -55,14 +55,6 @@
       <p>Boats</p>
     </a>
 
-    <div class="tax-toggle">
-      <div class="form-check-reverse form-switch">
-        <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
-        <label class="form-check-label" for="switchCheckDefault">
-          Display total after taxes
-        </label>
-      </div>
-    </div>
   </div>
 
   <!-- Clear filter option if a category is selected -->
@@ -388,7 +380,9 @@
               <span class="text-muted"><%= listing.title %></span>
               <div class="price">
                 &#8377;<%= listing.price.toLocaleString("en-IN") %> <span class="fw-normal">night</span>
-                <span class="tax-info" style="display:none; font-size:0.85rem; color:#717171; font-weight:normal;">&nbsp;+18% GST</span>
+                <% if(listing.taxRate && listing.taxRate > 0) { %>
+                  <span class="tax-info" style="font-size:0.85rem; color:#717171; font-weight:normal;">&nbsp;+<%= listing.taxRate %>% Tax</span>
+                <% } %>
               </div>
             </div>
           </div>
@@ -453,14 +447,7 @@
       const imageStacks = document.querySelectorAll('.image-stack');
       imageStacks.forEach(stack => observer.observe(stack));
     });
-    // Tax toggle
-    let taxSwitch = document.getElementById("switchCheckDefault");
-    if(taxSwitch) {
-      taxSwitch.addEventListener("click", () => {
-        let taxInfo = document.getElementsByClassName("tax-info");
-        for (let info of taxInfo) { info.style.display = (info.style.display != "inline") ? "inline" : "none"; }
-      });
-    }
+
   </script>
 
   <!-- Pass MongoDB Listings cleanly to Frontend JS -->

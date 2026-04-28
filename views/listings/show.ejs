@@ -217,9 +217,14 @@
     <p class="text-muted mb-2">Hosted by <b><%= listing.owner ? listing.owner.username : 'Unknown Host' %></b></p>
     <hr>
     <p style="font-size:1.05rem;"><%= listing.description %></p>
-    <h5 class="fw-bold mb-3" style="color: var(--accent-color);">
+    <h5 class="fw-bold mb-1" style="color: var(--accent-color);">
       &#8377;<%= listing.price.toLocaleString("en-IN") %> <small class="text-muted fw-normal fs-6">/ night</small>
     </h5>
+    <% if(listing.taxRate && listing.taxRate > 0) { %>
+      <p class="text-muted small mb-3">+<%= listing.taxRate %>% Tax</p>
+    <% } else { %>
+      <div class="mb-3"></div>
+    <% } %>
     <hr>
 
     <!-- Action Buttons (Reserve & Chat) -->
