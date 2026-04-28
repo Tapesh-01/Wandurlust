@@ -1,6 +1,6 @@
 /* Destinations Page Styling */
 .dest-hero {
-  background: linear-gradient(135deg, #FF385C 0%, #ff6b87 50%, #e31c5f 100%);
+  background: linear-gradient(135deg, #e31c5f 0%, #FF385C 50%, #8b1341 100%);
   background-size: 200% 200%;
   animation: gradientFlow 10s ease infinite;
   padding: 3.5rem 2rem;
