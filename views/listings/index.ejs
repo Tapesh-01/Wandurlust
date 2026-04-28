@@ -1,19 +1,11 @@
    <% layout("/layouts/boilerplate") %>
+<link rel="stylesheet" href="/css/index.css">
   <!-- <h3>All Listings</h3> -->
   <!-- <form method="GET" action="/listings/new">
       <button>Create New Listing</button>
     </form> -->
 
-  <style>
-    /* ── Category Filters ── */
-    #filters { display: flex; flex-wrap: wrap; align-items: center; }
-    .filter { text-align: center; margin-right: 2rem; margin-top: 2rem; opacity: 0.7; text-decoration: none; color: var(--text-color); }
-    .filter:hover, .filter.active { opacity: 1; cursor: pointer; color: #fe424d; }
-    .filter.active { border-bottom: 2px solid #fe424d; padding-bottom: 5px; }
-    .filter p { font-size: 0.8rem; }
-    .tax-info { display: none; }
-    .tax-toggle { border: 1px solid var(--border-color); border-radius: 1rem; height: 3.25rem; padding: 1rem; display: flex; align-items: center; margin-left: 2rem; color: var(--text-color); }
-  </style>
+
 
   <div id="filters">
     <% const currentCat = typeof category !== 'undefined' ? category : ''; %>
@@ -141,16 +133,7 @@
   <div id="listViews">
 
   <!-- ═══ SKELETON LOADER (ghost cards) ═══ -->
-  <style>
-    @keyframes shimmer { 0% { background-position: -700px 0; } 100% { background-position: 700px 0; } }
-    .skeleton-card { width: 20rem; border-radius: 1rem; overflow: hidden; margin-bottom: 2rem; }
-    .skeleton-img { height: 20rem; border-radius: 1rem; background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%); background-size: 700px 100%; animation: shimmer 1.4s infinite linear; }
-    .skeleton-line { height: 14px; border-radius: 6px; margin-top: 10px; background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%); background-size: 700px 100%; animation: shimmer 1.4s infinite linear; }
-    .skeleton-line.short { width: 55%; }
-    [data-theme="dark"] .skeleton-img, [data-theme="dark"] .skeleton-line { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 700px 100%; }
-    #realListings { opacity: 0; transition: opacity 0.5s ease; }
-    #realListings.loaded { opacity: 1; }
-  </style>
+
 
     <!-- ═══ Popular Homes Horizontal Slider ═══ -->
     <% if(allListings && allListings.length > 5 && !category) { %>
