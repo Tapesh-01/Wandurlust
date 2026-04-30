@@ -169,9 +169,66 @@
 
       <div class="mb-3">
         <label for="location" class="form-label">Location</label>
-        <input name="listing[location]" id="location" value="<%= listing.location %>" type="text" class="form-control" required />
+        <input name="listing[location]" id="locationInput" value="<%= listing.location %>" type="text" class="form-control" required />
+        <input type="hidden" name="listing[lat]" id="latInput" value="<%= listing.geometry.coordinates[1] %>">
+        <input type="hidden" name="listing[lng]" id="lngInput" value="<%= listing.geometry.coordinates[0] %>">
         <div class="invalid-feedback">Please enter the specific city or area.</div>
       </div>
+
+      <!-- 🗺️ Interactive Map Picker (Edit Mode) -->
+      <div class="mb-4">
+        <label class="form-label text-muted small"><i class="fa-solid fa-map-location-dot me-1"></i> Adjust Exact Location (Search or drag pin)</label>
+        <div id="pickerMap" style="height: 300px; width: 100%; border-radius: 1rem; border: 2px solid #eee;"></div>
+        <div class="form-text text-muted">You can search for a new address or drag the existing pin.</div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const currLat = <%= listing.geometry.coordinates[1] %>;
+          const currLng = <%= listing.geometry.coordinates[0] %>;
+          
+          const map = L.map('pickerMap').setView([currLat, currLng], 15);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+          let marker = L.marker([currLat, currLng], { draggable: true }).addTo(map);
+
+          function updateFields(lat, lng, address) {
+            document.getElementById('latInput').value = lat;
+            document.getElementById('lngInput').value = lng;
+            if (address) {
+              document.getElementById('locationInput').value = address;
+            }
+          }
+
+          const geocoder = L.Control.geocoder({
+            defaultMarkGeocode: false,
+            placeholder: "Search for new location...",
+          }).on('markgeocode', function(e) {
+            const latlng = e.geocode.center;
+            map.setView(latlng, 16);
+            marker.setLatLng(latlng);
+            updateFields(latlng.lat, latlng.lng, e.geocode.name);
+          }).addTo(map);
+
+          marker.on('dragend', function(e) {
+            const latlng = marker.getLatLng();
+            updateFields(latlng.lat, latlng.lng);
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`)
+              .then(res => res.json())
+              .then(data => {
+                if (data.display_name) {
+                  document.getElementById('locationInput').value = data.display_name;
+                }
+              });
+          });
+
+          map.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            updateFields(e.latlng.lat, e.latlng.lng);
+          });
+        });
+      </script>
+
 
       <div class="mb-4">
         <label for="maxGuests" class="form-label">Max Guests Allowed</label>

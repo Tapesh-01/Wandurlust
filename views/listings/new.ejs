@@ -117,16 +117,75 @@
 
           <div class="mb-md-3">
             <label for="location" class="form-label">Location</label>
-            <input name="listing[location]" placeholder="Raipur, chhattisgarh" type="text" class="form-control"
+            <input name="listing[location]" id="locationInput" placeholder="Raipur, chhattisgarh" type="text" class="form-control"
               required />
+            <input type="hidden" name="listing[lat]" id="latInput">
+            <input type="hidden" name="listing[lng]" id="lngInput">
           </div>
           <div class="invalid-feedback">Location should be valid</div>
+
+          <!-- 🗺️ Interactive Map Picker -->
+          <div class="mb-4">
+            <label class="form-label text-muted small"><i class="fa-solid fa-map-location-dot me-1"></i> Exact Location Picker (Search or drag pin)</label>
+            <div id="pickerMap" style="height: 300px; width: 100%; border-radius: 1rem; border: 2px solid #eee;"></div>
+            <div class="form-text text-muted">Use the search icon on the map or drag the pin to your exact spot.</div>
+          </div>
+
+          <script>
+            document.addEventListener('DOMContentLoaded', () => {
+              const map = L.map('pickerMap').setView([20.5937, 78.9629], 5);
+              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+              let marker = L.marker([20.5937, 78.9629], { draggable: true }).addTo(map);
+
+              function updateFields(lat, lng, address) {
+                document.getElementById('latInput').value = lat;
+                document.getElementById('lngInput').value = lng;
+                if (address) {
+                  document.getElementById('locationInput').value = address;
+                }
+              }
+
+              // Geocoder (Search Bar on Map)
+              const geocoder = L.Control.geocoder({
+                defaultMarkGeocode: false,
+                placeholder: "Search for your property location...",
+              }).on('markgeocode', function(e) {
+                const latlng = e.geocode.center;
+                map.setView(latlng, 16);
+                marker.setLatLng(latlng);
+                updateFields(latlng.lat, latlng.lng, e.geocode.name);
+              }).addTo(map);
+
+              // Update fields on drag end
+              marker.on('dragend', function(e) {
+                const latlng = marker.getLatLng();
+                updateFields(latlng.lat, latlng.lng);
+                
+                // Optional: Reverse Geocode to update text address
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`)
+                  .then(res => res.json())
+                  .then(data => {
+                    if (data.display_name) {
+                      document.getElementById('locationInput').value = data.display_name;
+                    }
+                  });
+              });
+
+              // Click on map to move marker
+              map.on('click', function(e) {
+                marker.setLatLng(e.latlng);
+                updateFields(e.latlng.lat, e.latlng.lng);
+              });
+            });
+          </script>
 
           <div class="mb-3">
             <label for="maxGuests" class="form-label">Max Guests Allowed</label>
             <input name="listing[maxGuests]" placeholder="e.g. 4" type="number" class="form-control" min="1" required />
             <div class="form-text text-muted">How many guests can stay at your property?</div>
           </div>
+
         </div>
 
         <br /><br />

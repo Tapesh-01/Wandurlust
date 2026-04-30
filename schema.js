@@ -10,8 +10,11 @@ module.exports.listingSchema = Joi.object({
         image: Joi.any().optional(),
         category: Joi.string().valid('Trending', 'Rooms', 'Iconic Cities', 'Mountains', 'Castels', 'Amezing Pool', 'Camping', 'Farms', 'Arctic', 'Domes', 'Boats', 'Resort').default('Trending'),
         maxGuests: Joi.number().min(1).default(10),
-        taxRate: Joi.number().min(0).max(100).default(0)
+        taxRate: Joi.number().min(0).max(100).default(0),
+        lat: Joi.number().optional(),
+        lng: Joi.number().optional(),
     }).required(),
+
 }).unknown(true);  // allow deleteImages, coverImage etc.
 
 module.exports.reviewSchema = Joi.object({
