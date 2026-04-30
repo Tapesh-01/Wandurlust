@@ -26,6 +26,13 @@ router
 
 router.get("/logout", userController.logout);
 
+// Forgot Password
+router.get("/forgot", userController.renderForgotForm);
+router.post("/forgot", wrapAsync(userController.sendResetEmail));
+router.get("/reset/:token", wrapAsync(userController.renderResetForm));
+router.post("/reset/:token", wrapAsync(userController.resetPassword));
+
+
 // Favorite Route
 router.post("/listings/:id/favorite", userController.toggleFavorite);
 

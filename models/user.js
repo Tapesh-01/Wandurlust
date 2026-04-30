@@ -10,7 +10,9 @@ const userSchema = new Schema({
     favorites: [{
         type: Schema.Types.ObjectId,
         ref: 'Listing'
-    }]
+    }],
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
 });
 
 userSchema.plugin(passportLocalMongoose);
