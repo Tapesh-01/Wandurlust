@@ -160,12 +160,36 @@
               L.control.layers(baseMaps).addTo(map);
 
               let marker = L.marker([20.5937, 78.9629], { draggable: true }).addTo(map);
+              const poiLayer = L.layerGroup().addTo(map);
 
               function updateFields(lat, lng, address) {
                 document.getElementById('latInput').value = lat;
                 document.getElementById('lngInput').value = lng;
                 if (address) {
                   document.getElementById('locationInput').value = address;
+                }
+                fetchNearbyPOIs(lat, lng);
+              }
+
+              async function fetchNearbyPOIs(lat, lng) {
+                try {
+                  const resp = await fetch(`/api/map/discover?lat=${lat}&lng=${lng}&radius=1500`);
+                  const pois = await resp.json();
+                  poiLayer.clearLayers();
+                  
+                  pois.forEach(poi => {
+                    const icon = L.divIcon({
+                      className: 'poi-marker',
+                      html: `<div style="background:#4285F4; width:10px; height:10px; border-radius:50%; border:2px solid white; box-shadow:0 0 5px rgba(0,0,0,0.3);"></div>`,
+                      iconSize: [10, 10]
+                    });
+                    
+                    const pMarker = L.marker([poi.lat, poi.lon], { icon })
+                      .bindTooltip(poi.name, { permanent: false, direction: 'top' });
+                    poiLayer.addLayer(pMarker);
+                  });
+                } catch (e) {
+                  console.error("Discovery failed", e);
                 }
               }
 
@@ -204,8 +228,14 @@
                 marker.setLatLng(e.latlng);
                 updateFields(e.latlng.lat, e.latlng.lng);
               });
+
+              // Initial POI fetch if map is at a specific location
+              if(latInput.value && lngInput.value) {
+                fetchNearbyPOIs(latInput.value, lngInput.value);
+              }
             });
           </script>
+
 
 
           <div class="mb-3">
