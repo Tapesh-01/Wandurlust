@@ -117,132 +117,17 @@
 
           <div class="mb-md-3">
             <label for="location" class="form-label">Location</label>
-            <input name="listing[location]" id="locationInput" placeholder="Raipur, chhattisgarh" type="text" class="form-control"
+            <input name="listing[location]" placeholder="Raipur, chhattisgarh" type="text" class="form-control"
               required />
-            <input type="hidden" name="listing[lat]" id="latInput">
-            <input type="hidden" name="listing[lng]" id="lngInput">
           </div>
           <div class="invalid-feedback">Location should be valid</div>
-
-          <!-- 🗺️ Interactive Map Picker -->
-          <div class="mb-4">
-            <label class="form-label text-muted small"><i class="fa-solid fa-map-location-dot me-1"></i> Exact Location Picker (Search or drag pin)</label>
-            <div id="pickerMap" style="height: 300px; width: 100%; border-radius: 1rem; border: 2px solid #eee;"></div>
-            <div class="form-text text-muted">Use the search icon on the map or drag the pin to your exact spot.</div>
-          </div>
-
-          <script>
-            document.addEventListener('DOMContentLoaded', () => {
-              // --- Define Base Layers ---
-              const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-              });
-
-              const esriWorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-              });
-
-              const esriWorldStreet = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
-              });
-
-              // Initial Map setup
-              const map = L.map('pickerMap', {
-                layers: [esriWorldStreet] // Default layer
-              }).setView([20.5937, 78.9629], 5);
-
-              const baseMaps = {
-                "Detailed Street": esriWorldStreet,
-                "Satellite View": esriWorldImagery,
-                "Standard (OSM)": osm
-              };
-
-              L.control.layers(baseMaps).addTo(map);
-
-              let marker = L.marker([20.5937, 78.9629], { draggable: true }).addTo(map);
-              const poiLayer = L.layerGroup().addTo(map);
-
-              function updateFields(lat, lng, address) {
-                document.getElementById('latInput').value = lat;
-                document.getElementById('lngInput').value = lng;
-                if (address) {
-                  document.getElementById('locationInput').value = address;
-                }
-                fetchNearbyPOIs(lat, lng);
-              }
-
-              async function fetchNearbyPOIs(lat, lng) {
-                try {
-                  const resp = await fetch(`/api/map/discover?lat=${lat}&lng=${lng}&radius=1500`);
-                  const pois = await resp.json();
-                  poiLayer.clearLayers();
-                  
-                  pois.forEach(poi => {
-                    const icon = L.divIcon({
-                      className: 'poi-marker',
-                      html: `<div style="background:#4285F4; width:10px; height:10px; border-radius:50%; border:2px solid white; box-shadow:0 0 5px rgba(0,0,0,0.3);"></div>`,
-                      iconSize: [10, 10]
-                    });
-                    
-                    const pMarker = L.marker([poi.lat, poi.lon], { icon })
-                      .bindTooltip(poi.name, { permanent: false, direction: 'top' });
-                    poiLayer.addLayer(pMarker);
-                  });
-                } catch (e) {
-                  console.error("Discovery failed", e);
-                }
-              }
-
-              // Geocoder with India/Chhattisgarh focus
-              const geocoder = L.Control.geocoder({
-                defaultMarkGeocode: false,
-                placeholder: "Search (e.g. Raipur, Bhilai, Durg)...",
-                geocoder: L.Control.geocoder.nominatim({
-                  geocodingQueryParams: {
-                    countrycodes: 'in',
-                    viewbox: '81.0,21.0,82.0,22.0' // Focus near CG
-                  }
-                })
-              }).on('markgeocode', function(e) {
-                const latlng = e.geocode.center;
-                map.setView(latlng, 17);
-                marker.setLatLng(latlng);
-                updateFields(latlng.lat, latlng.lng, e.geocode.name);
-              }).addTo(map);
-
-              // Update fields on drag end
-              marker.on('dragend', function(e) {
-                const latlng = marker.getLatLng();
-                updateFields(latlng.lat, latlng.lng);
-                
-                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`)
-                  .then(res => res.json())
-                  .then(data => {
-                    if (data.display_name) {
-                      document.getElementById('locationInput').value = data.display_name;
-                    }
-                  });
-              });
-
-              map.on('click', function(e) {
-                marker.setLatLng(e.latlng);
-                updateFields(e.latlng.lat, e.latlng.lng);
-              });
-
-              // Initial POI fetch if map is at a specific location
-              if(latInput.value && lngInput.value) {
-                fetchNearbyPOIs(latInput.value, lngInput.value);
-              }
-            });
-          </script>
-
-
 
           <div class="mb-3">
             <label for="maxGuests" class="form-label">Max Guests Allowed</label>
             <input name="listing[maxGuests]" placeholder="e.g. 4" type="number" class="form-control" min="1" required />
             <div class="form-text text-muted">How many guests can stay at your property?</div>
           </div>
+iv>
 
         </div>
 

@@ -47,8 +47,9 @@ document.addEventListener("DOMContentLoaded", () => {
       
       const listings = window.WANDERLUST_LISTINGS || [];
   
-      // Focus initially on Chhattisgarh (Raipur/Bhilai region) as requested by user
-      globalLeafletMap = L.map('indexMap').setView([21.2514, 81.6296], 6);
+      // Base center - rough center of India if empty, or will be fit to bounds anyway
+      globalLeafletMap = L.map('indexMap').setView([20.5937, 78.9629], 5);
+
 
   
       // Beautiful Standard Map Layer

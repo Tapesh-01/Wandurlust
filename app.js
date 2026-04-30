@@ -270,10 +270,7 @@ app.use("/", bookingRouter);
 
 // -------------------- AI CHATBOT --------------------
 const aiRouter = require("./routes/ai.js");
-const mapRouter = require("./routes/map.js");
-
 app.use("/", aiRouter);
-app.use("/api/map", mapRouter);
 
 
 // -------------------- 404 HANDLER --------------------

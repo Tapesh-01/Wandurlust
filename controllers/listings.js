@@ -106,20 +106,13 @@ module.exports.createListing = async (req, res, next) => {
   const newListing = new Listing(req.body.listing);
   newListing.owner = req.user._id;
 
-  // Set geometry: Use coordinates from frontend if available, else geocode
-  if (req.body.listing.lat && req.body.listing.lng) {
-    newListing.geometry = {
-      type: "Point",
-      coordinates: [parseFloat(req.body.listing.lng), parseFloat(req.body.listing.lat)]
-    };
+  // Set geometry using free Nominatim API
+  const geometry = await getCoordinates(req.body.listing.location, req.body.listing.country);
+  if (geometry) {
+    newListing.geometry = geometry;
   } else {
-    const geometry = await getCoordinates(req.body.listing.location, req.body.listing.country);
-    if (geometry) {
-      newListing.geometry = geometry;
-    } else {
-      req.flash("error", "Location not found, please try a clearer city/country name.");
-      return res.redirect("/listings/new");
-    }
+    req.flash("error", "Location not found, please try a clearer city/country name.");
+    return res.redirect("/listings/new");
   }
 
   // Map all uploaded files to {url, filename} objects
@@ -164,19 +157,14 @@ module.exports.renderEditForm = async (req, res) => {
 module.exports.updateListing = async (req, res) => {
   let { id } = req.params;
   
+  // Geocode the new location using Nominatim
+  const geometry = await getCoordinates(req.body.listing.location, req.body.listing.country);
+
   let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing }, { new: true });
 
-  // Update geometry: Use coordinates from frontend if available, else geocode
-  if (req.body.listing.lat && req.body.listing.lng) {
-    listing.geometry = {
-      type: "Point",
-      coordinates: [parseFloat(req.body.listing.lng), parseFloat(req.body.listing.lat)]
-    };
-  } else {
-    const geometry = await getCoordinates(req.body.listing.location, req.body.listing.country);
-    if (geometry) {
-      listing.geometry = geometry;
-    }
+  // Update geometry if found
+  if (geometry) {
+    listing.geometry = geometry;
   }
 
 
