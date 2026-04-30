@@ -211,7 +211,57 @@
       <hr class="my-5 opacity-25">
     <% } %>
 
+    <!-- 🧡 SPECIAL SECTION: Heart of Chhattisgarh 🧡 -->
+    <% 
+       const cgCities = ["Raipur", "Bhilai", "Durg", "Bilaspur"];
+       const cgListings = allListings.filter(l => cgCities.some(city => l.location.toLowerCase().includes(city.toLowerCase())));
+    %>
+
+    <% if(cgListings.length > 0) { %>
+    <div class="destinations-section mb-5 px-3">
+      <div class="popular-header d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h4 class="fw-bold mb-1" style="background: linear-gradient(45deg, #ff9966, #ff5e62); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Heart of Chhattisgarh</h4>
+          <p class="text-muted small mb-0">Discover the finest stays in Raipur, Bhilai, Durg, and Bilaspur</p>
+        </div>
+      </div>
+
+      <div class="popular-slider" id="cgSlider">
+        <% 
+           // Group by city
+           const cgStats = {};
+           cgListings.forEach(l => {
+             const matchedCity = cgCities.find(c => l.location.toLowerCase().includes(c.toLowerCase()));
+             if(matchedCity) {
+               if(!cgStats[matchedCity]) cgStats[matchedCity] = { count: 0, listings: [] };
+               cgStats[matchedCity].count++;
+               cgStats[matchedCity].listings.push(l);
+             }
+           });
+
+           for(let cityName in cgStats) { 
+             let cityData = cgStats[cityName];
+             let displayImg = (cityData.listings[0].images && cityData.listings[0].images.length > 0) ? cityData.listings[0].images[0].url : (cityData.listings[0].image ? cityData.listings[0].image.url : '');
+        %>
+          <div class="dest-card-rect">
+            <div class="dest-img-rect-wrapper mb-2" style="border: 2px solid #ff9966; border-radius: 1rem; overflow: hidden;">
+              <a href="/listings?search=<%= cityName %>" class="d-block h-100 w-100 position-relative">
+                <img src="<%= displayImg.replace('/upload', '/upload/w_400,h_500,c_fill') %>" class="w-100 h-100 object-fit-cover" alt="<%= cityName %>">
+                <div class="dest-card-info-overlay" style="background: linear-gradient(to top, rgba(255, 94, 98, 0.8), transparent); padding: 15px; border-radius: 0 0 1rem 1rem;">
+                   <h6 class="fw-bold mb-0 text-white text-shadow"><%= cityName %></h6>
+                   <p class="text-white small mb-0 opacity-75"><%= cityData.count %> Properties</p>
+                </div>
+              </a>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    </div>
+    <hr class="my-5 opacity-25">
+    <% } %>
+
     <!-- Top Destinations Section (Dynamic from DB) -->
+
     <% 
        // Group listings by location to get unique cities and their counts
        const cityStats = {};
