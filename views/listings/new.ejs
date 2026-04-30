@@ -21,35 +21,59 @@
           <label for="images" class="form-label">Upload Listing Photos <span class="text-muted fw-normal">(Up to 5 images)</span></label>
           <input name="listing[images]" id="imageInput" type="file" class="form-control" accept="image/*" multiple required />
           <div class="form-text text-muted">Select up to 5 photos. First image will be the cover photo.</div>
-          <!-- Preview Strip -->
+          <input type="hidden" name="coverIndex" id="coverIndexInput" value="0">
           <div id="imagePreview" class="d-flex gap-2 mt-2 flex-wrap"></div>
           <script>
             document.getElementById('imageInput').addEventListener('change', function() {
               const preview = document.getElementById('imagePreview');
+              const coverInput = document.getElementById('coverIndexInput');
               preview.innerHTML = '';
+              coverInput.value = '0'; // reset to first image
+              
               const files = Array.from(this.files).slice(0, 5);
               files.forEach((file, i) => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                   const wrapper = document.createElement('div');
-                  wrapper.style.cssText = 'position:relative;display:inline-block;';
+                  wrapper.className = 'preview-wrapper';
+                  wrapper.style.cssText = 'position:relative;display:inline-block;cursor:pointer;';
+                  wrapper.dataset.index = i;
+                  
                   const img = document.createElement('img');
                   img.src = e.target.result;
-                  img.style.cssText = 'width:80px;height:60px;object-fit:cover;border-radius:8px;border:2px solid ' + (i === 0 ? '#fe424d' : '#ddd');
-                  img.title = i === 0 ? 'Cover photo' : 'Photo ' + (i+1);
-                  if (i === 0) {
-                    const badge = document.createElement('span');
-                    badge.textContent = 'Cover';
-                    badge.style.cssText = 'position:absolute;bottom:2px;left:2px;background:#fe424d;color:#fff;font-size:9px;padding:1px 4px;border-radius:4px;';
-                    wrapper.appendChild(badge);
-                  }
+                  img.className = 'preview-img';
+                  img.style.cssText = 'width:80px;height:60px;object-fit:cover;border-radius:8px;border:3px solid ' + (i === 0 ? '#fe424d' : '#ddd');
+                  
+                  const badge = document.createElement('span');
+                  badge.className = 'cover-badge-ui';
+                  badge.textContent = 'Cover';
+                  badge.style.cssText = 'position:absolute;bottom:2px;left:2px;background:#fe424d;color:#fff;font-size:9px;padding:1px 4px;border-radius:4px;display:' + (i === 0 ? 'block' : 'none');
+                  
                   wrapper.appendChild(img);
+                  wrapper.appendChild(badge);
+                  
+                  wrapper.addEventListener('click', function() {
+                    // Update hidden input
+                    coverInput.value = this.dataset.index;
+                    
+                    // Reset all previews
+                    document.querySelectorAll('.preview-wrapper').forEach(w => {
+                      w.querySelector('img').style.borderColor = '#ddd';
+                      w.querySelector('span').style.display = 'none';
+                    });
+                    
+                    // Highlight selected
+                    this.querySelector('img').style.borderColor = '#fe424d';
+                    this.querySelector('span').style.display = 'block';
+                  });
+                  
                   preview.appendChild(wrapper);
                 };
                 reader.readAsDataURL(file);
               });
             });
           </script>
+
         </div>
 
         <div class="row">

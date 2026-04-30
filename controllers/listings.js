@@ -117,7 +117,16 @@ module.exports.createListing = async (req, res, next) => {
 
   // Map all uploaded files to {url, filename} objects
   if (req.files && req.files.length > 0) {
-    newListing.images = req.files.map(f => ({ url: f.path, filename: f.filename }));
+    const images = req.files.map(f => ({ url: f.path, filename: f.filename }));
+    const coverIndex = parseInt(req.body.coverIndex) || 0;
+    
+    // If user picked a specific cover, move it to the front
+    if (coverIndex > 0 && coverIndex < images.length) {
+      const [coverImg] = images.splice(coverIndex, 1);
+      images.unshift(coverImg);
+    }
+    
+    newListing.images = images;
   }
   await newListing.save();
   
