@@ -24,10 +24,6 @@
         border: 1px solid rgba(255, 255, 255, 0.1);
         box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.4);
     }
-    .auth-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 15px 50px 0 rgba(0, 0, 0, 0.15);
-    }
     .auth-title {
         font-weight: 800;
         margin-bottom: 0.5rem;
@@ -64,10 +60,6 @@
     .form-control:focus {
         border-color: #fe424d;
         box-shadow: 0 0 0 0.25rem rgba(254, 66, 77, 0.1);
-        background: white;
-    }
-    [data-theme="dark"] .form-control:focus {
-        background: rgba(255,255,255,0.1);
     }
     .btn-auth {
         background: linear-gradient(45deg, #fe424d, #ff7e5f);
@@ -84,46 +76,75 @@
         box-shadow: 0 4px 15px rgba(254, 66, 77, 0.3);
     }
     .btn-auth:hover {
-        opacity: 1;
         transform: scale(1.02);
         box-shadow: 0 6px 20px rgba(254, 66, 77, 0.4);
     }
-    .back-link {
-        color: #fe424d;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s ease;
+    .otp-input-group {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 1.5rem;
     }
-    .back-link:hover {
-        text-decoration: underline;
-        opacity: 0.8;
+    .otp-field {
+        width: 45px;
+        height: 55px;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 800;
     }
 </style>
 
 <div class="auth-container">
     <div class="auth-card">
-        <h2 class="auth-title">Forgot Password?</h2>
-        <p class="auth-subtitle">Lost your key to adventure? Enter your email and we'll help you get back in.</p>
+        <h2 class="auth-title">Verify OTP</h2>
+        <p class="auth-subtitle">We've sent a 6-digit code to <b><%= email %></b>. Enter it below to reset your password.</p>
         
-        <form action="/forgot" method="POST" class="needs-validation" novalidate>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email Address</label>
+        <form action="/verify-otp" method="POST" class="needs-validation" novalidate>
+            <input type="hidden" name="email" value="<%= email %>">
+            
+            <div class="mb-4">
+                <label class="form-label">Enter 6-Digit OTP</label>
                 <input
-                    name="email"
-                    id="email"
-                    type="email"
-                    class="form-control"
-                    placeholder="Enter your registered email"
+                    name="otp"
+                    type="text"
+                    class="form-control text-center fw-bold fs-4"
+                    placeholder="· · · · · ·"
+                    maxlength="6"
+                    pattern="\d{6}"
                     required
                 />
-                <div class="invalid-feedback">Please enter a valid email.</div>
+                <div class="invalid-feedback">Please enter the 6-digit code.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">New Password</label>
+                <input
+                    name="password"
+                    id="password"
+                    type="password"
+                    class="form-control"
+                    placeholder="Enter new password"
+                    required
+                />
+            </div>
+
+            <div class="mb-3">
+                <label for="confirm" class="form-label">Confirm New Password</label>
+                <input
+                    name="confirm"
+                    id="confirm"
+                    type="password"
+                    class="form-control"
+                    placeholder="Confirm new password"
+                    required
+                />
             </div>
             
-            <button class="btn-auth">Send OTP</button>
+            <button class="btn-auth">Reset Password</button>
         </form>
         
         <div class="mt-4 text-center">
-            <a href="/login" class="back-link"><i class="fa-solid fa-arrow-left me-2"></i>Back to Login</a>
+            <p class="text-muted small">Didn't get the code? <a href="/forgot" style="color: #fe424d; font-weight: 600; text-decoration: none;">Try again</a></p>
         </div>
     </div>
 </div>

@@ -26,11 +26,12 @@ router
 
 router.get("/logout", userController.logout);
 
-// Forgot Password
+// Password Reset
 router.get("/forgot", userController.renderForgotForm);
 router.post("/forgot", wrapAsync(userController.sendResetEmail));
-router.get("/reset/:token", wrapAsync(userController.renderResetForm));
-router.post("/reset/:token", wrapAsync(userController.resetPassword));
+router.get("/verify-otp", userController.renderVerifyOtpForm);
+router.post("/verify-otp", wrapAsync(userController.verifyOtpAndReset));
+
 
 
 // Favorite Route

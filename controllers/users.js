@@ -14,9 +14,9 @@ module.exports.sendResetEmail = async (req, res) => {
         return res.redirect("/forgot");
     }
 
-    const token = crypto.randomBytes(20).toString("hex");
-    user.resetPasswordToken = token;
-    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.resetPasswordToken = otp;
+    user.resetPasswordExpires = Date.now() + 600000; // 10 mins valid
     await user.save();
 
     const transporter = nodemailer.createTransport({
@@ -30,68 +30,63 @@ module.exports.sendResetEmail = async (req, res) => {
     const mailOptions = {
         to: user.email,
         from: "Wanderlust Support <no-reply@wanderlust.com>",
-        subject: "Wanderlust Password Reset",
-        text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
-              `Please click on the following link, or paste this into your browser to complete the process:\n\n` +
-              `http://${req.headers.host}/reset/${token}\n\n` +
-              `If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+        subject: "Wanderlust Password Reset OTP",
+        text: `Your OTP for password reset is: ${otp}\n\n` +
+              `This code is valid for 10 minutes.\n\n` +
+              `If you did not request this, please ignore this email.\n`,
     };
 
     try {
         await transporter.sendMail(mailOptions);
-        req.flash("success", `An e-mail has been sent to ${user.email} with further instructions.`);
-        res.redirect("/forgot");
+        req.flash("success", `An OTP has been sent to ${user.email}.`);
+        res.redirect(`/verify-otp?email=${user.email}`);
     } catch (err) {
         console.error("Email Error:", err);
-        // Fallback for development if email credentials aren't set
         if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-            console.log("\x1b[33m%s\x1b[0m", "DEBUG: Forgot Password Link -> " + `http://${req.headers.host}/reset/${token}`);
-            req.flash("success", "(DEV MODE) Token generated! Check terminal console for reset link since EMAIL_USER/PASS is not set.");
+            console.log("\x1b[33m%s\x1b[0m", "DEBUG: Forgot Password OTP -> " + otp);
+            req.flash("success", "(DEV MODE) OTP generated! Check terminal console for code.");
+            res.redirect(`/verify-otp?email=${user.email}`);
         } else {
             req.flash("error", "Failed to send email. Please try again later.");
+            res.redirect("/forgot");
         }
-        res.redirect("/forgot");
     }
 };
 
-module.exports.renderResetForm = async (req, res) => {
-    const user = await User.findOne({
-        resetPasswordToken: req.params.token,
-        resetPasswordExpires: { $gt: Date.now() },
-    });
-    if (!user) {
-        req.flash("error", "Password reset token is invalid or has expired.");
-        return res.redirect("/forgot");
-    }
-    res.render("users/reset.ejs", { token: req.params.token });
+module.exports.renderVerifyOtpForm = (req, res) => {
+    const { email } = req.query;
+    res.render("users/verify-otp.ejs", { email });
 };
 
-module.exports.resetPassword = async (req, res) => {
+module.exports.verifyOtpAndReset = async (req, res) => {
     try {
+        const { email, otp, password, confirm } = req.body;
         const user = await User.findOne({
-            resetPasswordToken: req.params.token,
+            email,
+            resetPasswordToken: otp,
             resetPasswordExpires: { $gt: Date.now() },
         });
 
         if (!user) {
-            req.flash("error", "Password reset token is invalid or has expired.");
+            req.flash("error", "Invalid or expired OTP.");
             return res.redirect("back");
         }
 
-        if (req.body.password === req.body.confirm) {
-            await user.setPassword(req.body.password);
-            user.resetPasswordToken = undefined;
-            user.resetPasswordExpires = undefined;
-            await user.save();
-            req.login(user, (err) => {
-                if (err) return next(err);
-                req.flash("success", "Success! Your password has been changed.");
-                res.redirect("/listings");
-            });
-        } else {
+        if (password !== confirm) {
             req.flash("error", "Passwords do not match.");
-            res.redirect("back");
+            return res.redirect("back");
         }
+
+        await user.setPassword(password);
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+        await user.save();
+
+        req.login(user, (err) => {
+            if (err) return next(err);
+            req.flash("success", "Password reset successful! Welcome back.");
+            res.redirect("/listings");
+        });
     } catch (err) {
         req.flash("error", err.message);
         res.redirect("back");
