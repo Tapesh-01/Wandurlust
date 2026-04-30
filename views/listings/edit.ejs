@@ -158,7 +158,7 @@
         <div class="mb-3 col-md-4">
           <label for="category" class="form-label">Category</label>
           <select name="listing[category]" id="category" class="form-select" required>
-            <% const cats = ['Trending', 'Rooms', 'Iconic Cities', 'Mountains', 'Castles', 'Amazing Pool', 'Camping', 'Farms', 'Arctic', 'Domes', 'Boats']; %>
+            <% const cats = ['Trending', 'Rooms', 'Iconic Cities', 'Mountains', 'Castles', 'Amazing Pool', 'Camping', 'Farms', 'Arctic', 'Domes', 'Boats', 'Resort']; %>
             <% cats.forEach(cat => { %>
               <option value="<%= cat %>" <%= listing.category === cat ? 'selected' : '' %>><%= cat %></option>
             <% }) %>
