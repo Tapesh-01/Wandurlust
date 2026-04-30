@@ -133,8 +133,31 @@
 
           <script>
             document.addEventListener('DOMContentLoaded', () => {
-              const map = L.map('pickerMap').setView([20.5937, 78.9629], 5);
-              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+              // --- Define Base Layers ---
+              const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+              });
+
+              const esriWorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+              });
+
+              const esriWorldStreet = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+              });
+
+              // Initial Map setup
+              const map = L.map('pickerMap', {
+                layers: [esriWorldStreet] // Default layer
+              }).setView([20.5937, 78.9629], 5);
+
+              const baseMaps = {
+                "Detailed Street": esriWorldStreet,
+                "Satellite View": esriWorldImagery,
+                "Standard (OSM)": osm
+              };
+
+              L.control.layers(baseMaps).addTo(map);
 
               let marker = L.marker([20.5937, 78.9629], { draggable: true }).addTo(map);
 
@@ -146,13 +169,19 @@
                 }
               }
 
-              // Geocoder (Search Bar on Map)
+              // Geocoder with India/Chhattisgarh focus
               const geocoder = L.Control.geocoder({
                 defaultMarkGeocode: false,
-                placeholder: "Search for your property location...",
+                placeholder: "Search (e.g. Raipur, Bhilai, Durg)...",
+                geocoder: L.Control.geocoder.nominatim({
+                  geocodingQueryParams: {
+                    countrycodes: 'in',
+                    viewbox: '81.0,21.0,82.0,22.0' // Focus near CG
+                  }
+                })
               }).on('markgeocode', function(e) {
                 const latlng = e.geocode.center;
-                map.setView(latlng, 16);
+                map.setView(latlng, 17);
                 marker.setLatLng(latlng);
                 updateFields(latlng.lat, latlng.lng, e.geocode.name);
               }).addTo(map);
@@ -162,7 +191,6 @@
                 const latlng = marker.getLatLng();
                 updateFields(latlng.lat, latlng.lng);
                 
-                // Optional: Reverse Geocode to update text address
                 fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`)
                   .then(res => res.json())
                   .then(data => {
@@ -172,13 +200,13 @@
                   });
               });
 
-              // Click on map to move marker
               map.on('click', function(e) {
                 marker.setLatLng(e.latlng);
                 updateFields(e.latlng.lat, e.latlng.lng);
               });
             });
           </script>
+
 
           <div class="mb-3">
             <label for="maxGuests" class="form-label">Max Guests Allowed</label>

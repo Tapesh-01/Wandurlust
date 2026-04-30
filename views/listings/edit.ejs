@@ -187,8 +187,30 @@
           const currLat = <%= listing.geometry.coordinates[1] %>;
           const currLng = <%= listing.geometry.coordinates[0] %>;
           
-          const map = L.map('pickerMap').setView([currLat, currLng], 15);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+          // --- Define Base Layers ---
+          const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+          });
+
+          const esriWorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+          });
+
+          const esriWorldStreet = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+          });
+
+          const map = L.map('pickerMap', {
+            layers: [esriWorldStreet]
+          }).setView([currLat, currLng], 15);
+
+          const baseMaps = {
+            "Detailed Street": esriWorldStreet,
+            "Satellite View": esriWorldImagery,
+            "Standard (OSM)": osm
+          };
+
+          L.control.layers(baseMaps).addTo(map);
 
           let marker = L.marker([currLat, currLng], { draggable: true }).addTo(map);
 
@@ -202,10 +224,16 @@
 
           const geocoder = L.Control.geocoder({
             defaultMarkGeocode: false,
-            placeholder: "Search for new location...",
+            placeholder: "Search new location...",
+            geocoder: L.Control.geocoder.nominatim({
+              geocodingQueryParams: {
+                countrycodes: 'in',
+                viewbox: '81.0,21.0,82.0,22.0'
+              }
+            })
           }).on('markgeocode', function(e) {
             const latlng = e.geocode.center;
-            map.setView(latlng, 16);
+            map.setView(latlng, 17);
             marker.setLatLng(latlng);
             updateFields(latlng.lat, latlng.lng, e.geocode.name);
           }).addTo(map);
@@ -228,6 +256,7 @@
           });
         });
       </script>
+
 
 
       <div class="mb-4">
