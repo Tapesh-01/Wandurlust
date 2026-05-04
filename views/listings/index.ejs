@@ -301,6 +301,63 @@
     </div>
     <hr class="my-5 opacity-25">
     <% } %>
+
+    <!-- ═══ Dynamic Explore by City Section ═══ -->
+    <% 
+      if(typeof cityGroups !== 'undefined' && Object.keys(cityGroups).length > 0 && !category && !search) { 
+        const displayCities = Object.keys(cityGroups).sort((a,b) => cityGroups[b].length - cityGroups[a].length).slice(0, 3);
+    %>
+      <div class="city-wise-section mb-5 px-3">
+        <h4 class="fw-bold mb-4">Explore by City</h4>
+        
+        <% for(let cityName of displayCities) { 
+           let listings = cityGroups[cityName];
+           let sliderId = `slider-${cityName.replace(/\s+/g, '-')}`;
+        %>
+          <div class="city-row mb-5">
+            <div class="popular-header d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold mb-0"><i class="fa-solid fa-location-dot me-2 text-danger"></i><%= cityName %></h5>
+              <div class="d-flex gap-2">
+                <button class="slider-nav-btn" onclick="document.getElementById('<%= sliderId %>').scrollBy({left: -320, behavior: 'smooth'})">
+                  <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button class="slider-nav-btn" onclick="document.getElementById('<%= sliderId %>').scrollBy({left: 320, behavior: 'smooth'})">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <a href="/listings?search=<%= cityName %>" class="btn btn-sm btn-link text-decoration-none text-dark fw-bold">View all</a>
+              </div>
+            </div>
+
+            <div class="popular-slider" id="<%= sliderId %>">
+              <% for(let listing of listings.slice(0, 10)) { %>
+                <div class="popular-card" style="width: 280px; min-width: 280px;">
+                  <a href="/listings/<%= listing._id %>" class="listing-link d-block">
+                    <div class="card card-listing border-0">
+                      <div class="listing-img-wrapper position-relative overflow-hidden rounded-4" style="aspect-ratio: 4/3;">
+                        <img src="<%= (listing.images && listing.images.length > 0) ? listing.images[0].url.replace('/upload', '/upload/w_400,h_300,c_fill') : (listing.image ? listing.image.url : '') %>" class="w-100 h-100 object-fit-cover" alt="img">
+                        <div class="guest-favorite-badge" style="background: rgba(0,0,0,0.5); font-size: 0.7rem;">Verified</div>
+                      </div>
+                      <div class="card-info mt-2">
+                        <b class="text-truncate d-block" style="font-size: 0.9rem;"><%= listing.title %></b>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                          <span class="price small">&#8377;<%= listing.price.toLocaleString("en-IN") %> / night</span>
+                          <span class="small"><i class="fa-solid fa-star" style="font-size: 0.8rem;"></i> <%= (listing.reviews && listing.reviews.length > 0) ? (listing.reviews.reduce((s, r) => s + r.rating, 0) / listing.reviews.length).toFixed(1) : "New" %></span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              <% } %>
+            </div>
+          </div>
+        <% } %>
+        
+        <div class="text-center mt-2">
+          <a href="/listings/destinations" class="btn btn-outline-dark rounded-pill px-4">Browse all cities</a>
+        </div>
+      </div>
+      <hr class="my-5 opacity-25">
+    <% } %>
   <div id="skeletonGrid" class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-2 mt-3 g-4">
     <% for(let i = 0; i < 8; i++) { %>
       <div class="col">
