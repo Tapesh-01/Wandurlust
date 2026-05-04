@@ -239,23 +239,57 @@
       sending = true; send.disabled = true;
       input.value = ''; input.style.height = 'auto';
       addMsg('user', text); showTyping();
+      
+      const botMsgDiv = document.createElement('div');
+      botMsgDiv.className = 'wb-bubble bot';
+      let fullReply = "";
+
       try {
-        const res = await fetch('/api/ai-chat', {
+        const response = await fetch('/api/ai-chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: text, history })
         });
-        const data = await res.json();
+
+        if (!response.ok) throw new Error("Network response was not ok");
+
         hideTyping();
-        if (data.error === 'quota_exceeded') {
-          addMsg('bot', "⏳ I'm a bit overwhelmed right now! Free API quota is full. Try again in a minute — I'll be right back! 🙏");
-        } else {
-          const reply = data.reply || data.error || "Hmm, something went wrong. Try again! 🙏";
-          addMsg('bot', reply);
-          history.push({ role: 'user', text });
-          history.push({ role: 'model', text: reply });
-          if (history.length > 20) history = history.slice(-20);
+        msgs.appendChild(botMsgDiv);
+        
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunkText = decoder.decode(value);
+          const lines = chunkText.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const dataStr = line.replace('data: ', '').trim();
+              if (dataStr === '[DONE]') break;
+              try {
+                const data = JSON.parse(dataStr);
+                if (data.chunk) {
+                  fullReply += data.chunk;
+                  botMsgDiv.innerHTML = renderMarkdown(fullReply);
+                  msgs.scrollTop = msgs.scrollHeight;
+                } else if (data.error) {
+                  botMsgDiv.innerHTML = `<span style="color:var(--wb-err)">${data.error}</span>`;
+                }
+              } catch (e) {
+                // Partial JSON or formatting issue, skip for now
+              }
+            }
+          }
         }
+
+        history.push({ role: 'user', text });
+        history.push({ role: 'model', text: fullReply });
+        if (history.length > 20) history = history.slice(-20);
+
       } catch(e) {
         hideTyping();
         addMsg('bot', "Oops! Can't connect right now. Please try again! 🔌");
