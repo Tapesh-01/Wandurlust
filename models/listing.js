@@ -61,6 +61,10 @@ const listingSchema = new Schema({
     default: 0,
     min: 0,
     max: 100
+  },
+  views: {
+    type: Number,
+    default: 0
   }
 });
 

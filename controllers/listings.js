@@ -21,8 +21,13 @@ module.exports.index = async (req, res) => {
   }
 
   // 3. Build Category Condition (Only if NO search is present)
+  let sortQuery = { createdAt: -1 }; // Default sort
   if (category && !search) {
-    query.category = category;
+    if (category === "Trending") {
+      sortQuery = { views: -1 };
+    } else {
+      query.category = category;
+    }
   }
 
   // 4. Build Guests Limit Condition
@@ -52,7 +57,7 @@ module.exports.index = async (req, res) => {
     }
   }
 
-  const allListings = await Listing.find(query).populate("reviews");
+  const allListings = await Listing.find(query).sort(sortQuery).populate("reviews");
 
   res.render("listings/index.ejs", { allListings, search, maxPrice, category });
 };
@@ -70,13 +75,16 @@ module.exports.showListing = async (req, res) => {
         path: "author",
       },
     })
-    .populate("owner"); // This is the fix for showing owner data
+    .populate("owner");
 
   if (!listing) {
     req.flash("error", "Listing you requested for does not exist");
     return res.redirect("/listings");
   }
-  console.log(listing);
+
+  // Auto-Trending: Increment views asynchronously to not block rendering
+  Listing.findByIdAndUpdate(id, { $inc: { views: 1 } }).exec().catch(err => console.error("View increment error:", err));
+
   res.render("listings/show.ejs", { listing });
 };
 
