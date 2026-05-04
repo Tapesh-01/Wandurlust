@@ -723,9 +723,9 @@ html[data-theme="dark"] body {
 }
 
 /* Standardized Card Sizes for Sliders */
-.popular-card, .dest-card-rect {
-  min-width: 320px;
-  max-width: 320px;
+.popular-card, .dest-card-rect, .city-slider-card {
+  min-width: 300px;
+  max-width: 300px;
   flex-shrink: 0;
   scroll-snap-align: start;
   transition: transform 0.3s ease;
@@ -747,7 +747,7 @@ html[data-theme="dark"] body {
 }
 
 @media (max-width: 768px) {
-  .popular-card, .dest-card-rect { 
+  .popular-card, .dest-card-rect, .city-slider-card { 
     min-width: 280px; 
     max-width: 280px; 
   }
