@@ -305,7 +305,7 @@
     <!-- ═══ Dynamic Explore by City Section ═══ -->
     <% 
       if(typeof cityGroups !== 'undefined' && Object.keys(cityGroups).length > 0 && !category && !search) { 
-        const displayCities = Object.keys(cityGroups).sort((a,b) => cityGroups[b].length - cityGroups[a].length).slice(0, 3);
+        const displayCities = Object.keys(cityGroups).sort((a,b) => cityGroups[b].length - cityGroups[a].length).slice(0, 1);
     %>
       <div class="city-wise-section mb-5 px-3">
         <h4 class="fw-bold mb-4">Explore by City</h4>
