@@ -59,7 +59,14 @@ module.exports.index = async (req, res) => {
 
   const allListings = await Listing.find(query).sort(sortQuery).populate("reviews");
 
-  res.render("listings/index.ejs", { allListings, search, maxPrice, category });
+  // Group by City for the "Explore by City" section
+  const cityGroups = {};
+  allListings.forEach(l => {
+    if(!cityGroups[l.location]) cityGroups[l.location] = [];
+    cityGroups[l.location].push(l);
+  });
+
+  res.render("listings/index.ejs", { allListings, cityGroups, search, maxPrice, category });
 };
 
 module.exports.renderNewForm = (req, res) => {

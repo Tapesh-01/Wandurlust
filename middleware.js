@@ -73,3 +73,12 @@ module.exports.validateReview = (req, res, next) => {
 
     next();
   };
+
+module.exports.isAdmin = (req, res, next) => {
+  if (req.user && req.user.isAdmin) {
+    next();
+  } else {
+    req.flash("error", "You do not have permission to perform this action.");
+    res.redirect("/listings");
+  }
+};

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
-const { isLoggedIn, isOwner, validateListing } = require("../middleware.js");
+const { isLoggedIn, isOwner, validateListing, isAdmin } = require("../middleware.js");
 const listingController = require("../controllers/listings.js");
 const multer = require('multer');
 const{storage} = require("../cloudConfig.js");
@@ -22,6 +22,7 @@ route("/")
   .get(wrapAsync(listingController.index))
   .post(
     isLoggedIn,
+    isAdmin, // Only Admin can create
     upload.array("listing[images]", 5),
     validateListing,
     wrapAsync(listingController.createListing)
@@ -31,6 +32,7 @@ route("/")
 router.get(
   "/new",
   isLoggedIn,
+  isAdmin, // Only Admin can see form
   listingController.renderNewForm
 );
 

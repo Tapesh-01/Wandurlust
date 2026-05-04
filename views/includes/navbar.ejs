@@ -142,7 +142,9 @@
       </script>
 
       <div class="navbar-nav ms-auto align-items-center">
-        <a class="nav-link me-3 d-none d-lg-block" href="/listings/new">Add Listing</a>
+        <% if(currUser && currUser.isAdmin) { %>
+          <a class="nav-link me-3 d-none d-lg-block" href="/listings/new">Add Listing</a>
+        <% } %>
 
         <!-- ☀️ Dark Mode Toggle -->
         <button class="theme-toggle-btn me-1" id="themeToggle" title="Toggle dark mode" aria-label="Toggle dark mode">
