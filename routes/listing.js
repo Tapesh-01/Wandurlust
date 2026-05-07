@@ -22,7 +22,6 @@ route("/")
   .get(wrapAsync(listingController.index))
   .post(
     isLoggedIn,
-    isAdmin, // Only Admin can create
     upload.array("listing[images]", 5),
     validateListing,
     wrapAsync(listingController.createListing)
@@ -32,7 +31,6 @@ route("/")
 router.get(
   "/new",
   isLoggedIn,
-  isAdmin, // Only Admin can see form
   listingController.renderNewForm
 );
 
