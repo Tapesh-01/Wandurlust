@@ -100,26 +100,6 @@ const http = require("http");
 // -------------------- DATABASE --------------------
 const MONGO_URL = process.env.ATLASDB_URL || "mongodb://127.0.0.1:27017/wanderlust";
 
-mongoose
-  .connect(MONGO_URL)
-  .then(async () => {
-    console.log("Connected to DB");
-    try {
-      const Listing = require("./models/listing.js");
-      // Aggregate to find most frequent locations
-      const topLocs = await Listing.aggregate([
-        { $group: { _id: "$location", count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-        { $limit: 4 }
-      ]);
-      app.locals.topLocations = topLocs.map(l => l._id).filter(l => l);
-    } catch (e) {
-      console.log("Failed to load top locations:", e);
-      app.locals.topLocations = [];
-    }
-  })
-  .catch((err) => console.log(err));
-
 // -------------------- ROUTES --------------------
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
@@ -338,7 +318,40 @@ io.on("connection", (socket) => {
 });
 
 const PORT = process.env.PORT || 8080;
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server is listening on port ${PORT}`);
-});
-// Restarted!
+
+async function startServer() {
+  try {
+    console.log("Connecting to Database...");
+    await mongoose.connect(MONGO_URL);
+    console.log("Connected to DB successfully!");
+
+    // Aggregate to find most frequent locations
+    try {
+      const Listing = require("./models/listing.js");
+      const topLocs = await Listing.aggregate([
+        { $group: { _id: "$location", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 4 }
+      ]);
+      app.locals.topLocations = topLocs.map(l => l._id).filter(l => l);
+    } catch (e) {
+      console.warn("Warning: Failed to load top locations:", e.message);
+      app.locals.topLocations = [];
+    }
+
+    // Start server
+    server.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server is listening on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("❌ CRITICAL ERROR: Database connection failed!");
+    console.error("Please make sure:");
+    console.error("1. The ATLASDB_URL environment variable is set correctly in your environment (e.g. Render Dashboard).");
+    console.error("2. Your MongoDB Atlas cluster Network Access allows access from anywhere (0.0.0.0/0). Render uses dynamic IP addresses.");
+    console.error("3. The username and password in the database URL are correct.");
+    console.error("\nTechnical Error Details:", err);
+    process.exit(1);
+  }
+}
+
+startServer();
